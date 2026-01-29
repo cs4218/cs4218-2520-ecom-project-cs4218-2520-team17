@@ -1,7 +1,7 @@
 import {
   createCategoryController,
   updateCategoryController,
-  deleteCategoryCOntroller,
+  deleteCategoryController,
 } from "./categoryController.js";
 import categoryModel from "../models/categoryModel.js";
 import slugify from "slugify";
@@ -290,9 +290,9 @@ describe("Category Controller", () => {
   });
 
   // ==========================================
-  // deleteCategoryCOntroller Tests
+  // deleteCategoryController Tests
   // ==========================================
-  describe("deleteCategoryCOntroller", () => {
+  describe("deleteCategoryController", () => {
     describe("Successful Deletion", () => {
       it("should delete category successfully with valid id", async () => {
         // Arrange
@@ -300,7 +300,7 @@ describe("Category Controller", () => {
         categoryModel.findByIdAndDelete.mockResolvedValue({ _id: "123", name: "Electronics" });
 
         // Act
-        await deleteCategoryCOntroller(req, res);
+        await deleteCategoryController(req, res);
 
         // Assert
         expect(categoryModel.findByIdAndDelete).toHaveBeenCalledWith("123");
@@ -321,7 +321,7 @@ describe("Category Controller", () => {
         categoryModel.findByIdAndDelete.mockRejectedValue(dbError);
 
         // Act
-        await deleteCategoryCOntroller(req, res);
+        await deleteCategoryController(req, res);
 
         // Assert
         expect(consoleLogSpy).toHaveBeenCalledWith(dbError);
