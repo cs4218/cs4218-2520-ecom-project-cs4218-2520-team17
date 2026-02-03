@@ -56,7 +56,7 @@ export const registerController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Errro in Registeration",
+      message: "Error in Registration",
       error,
     });
   }
@@ -202,7 +202,7 @@ export const updateProfileController = async (req, res) => {
 //orders
 export const getOrdersController = async (req, res) => {
   try {
-    const orders = await orderModel
+  const orders = await orderModel
       .find({ buyer: req.user._id })
       .populate("products", "-photo")
       .populate("buyer", "name");
