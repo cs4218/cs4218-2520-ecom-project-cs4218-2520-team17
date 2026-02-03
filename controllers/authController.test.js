@@ -1,4 +1,4 @@
-import { registerController, loginController } from "./authController.js";
+import { registerController, loginController, forgotPasswordController } from "./authController.js";
 import userModel from "../models/userModel.js";
 import { hashPassword, comparePassword } from "../helpers/authHelper.js";
 import JWT from "jsonwebtoken";
@@ -162,10 +162,11 @@ describe("Auth Controller", () => {
           _id: "123",
           name: "Test User",
           email: "test@example.com",
-          password: "password123",
+          password: "hashedPassword123",
           phone: "1234567890",
           address: "123 Test St",
           answer: "answer",
+          role: 0,
         };
 
         userModel.findOne.mockResolvedValue(existingUser);
@@ -266,7 +267,7 @@ describe("Auth Controller", () => {
   // loginController Tests
   describe("loginController", () => {
     describe("Request Validation", () => {
-      it("should return 404 when email is not provided", async () => {
+      it("should return 400 when email is not provided", async () => {
         // Arrange
         req.body = {
           password: "password123",
@@ -276,14 +277,14 @@ describe("Auth Controller", () => {
         await loginController(req, res);
 
         // Assert
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({
           success: false,
           message: "Invalid email or password",
         });
       });
 
-      it("should return 404 when password is not provided", async () => {
+      it("should return 400 when password is not provided", async () => {
         // Arrange
         req.body = {
           email: "test@example.com",
@@ -293,7 +294,7 @@ describe("Auth Controller", () => {
         await loginController(req, res);
 
         // Assert
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({
           success: false,
           message: "Invalid email or password",
@@ -302,7 +303,7 @@ describe("Auth Controller", () => {
     });
 
     describe("User Not Found", () => {
-      it("should return 404 when user is not registered", async () => {
+      it("should return 401 when user is not registered", async () => {
         // Arrange
         req.body = {
           email: "nonexistent@example.com",
@@ -316,7 +317,7 @@ describe("Auth Controller", () => {
 
         // Assert
         expect(userModel.findOne).toHaveBeenCalledWith({ email: "nonexistent@example.com" });
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(401);
         expect(res.send).toHaveBeenCalledWith({
           success: false,
           message: "Email is not registered",
@@ -339,6 +340,7 @@ describe("Auth Controller", () => {
           password: "hashedPassword123",
           phone: "1234567890",
           address: "123 Test St",
+          answer: "answer",
           role: 0,
         };
 
@@ -374,6 +376,7 @@ describe("Auth Controller", () => {
           password: "hashedPassword123",
           phone: "1234567890",
           address: "123 Test St",
+          answer: "answer",
           role: 0,
         };
 
@@ -431,6 +434,154 @@ describe("Auth Controller", () => {
         expect(res.send).toHaveBeenCalledWith({
           success: false,
           message: "Error in login",
+          error: dbError,
+        });
+      });
+    });
+  });
+
+  // forgotPasswordController Tests
+  describe("forgotPasswordController", () => {
+    describe("Request Validation", () => {
+      it("should return 400 when email is not provided", async () => {
+        // Arrange
+        req.body = {
+          answer: "myAnswer",
+          newPassword: "newPassword123",
+        };
+
+        // Act
+        await forgotPasswordController(req, res);
+
+        // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith({ message: "Email is required" });
+      });
+
+      it("should return 400 when answer is not provided", async () => {
+        // Arrange
+        req.body = {
+          email: "test@example.com",
+          newPassword: "newPassword123",
+        };
+
+        // Act
+        await forgotPasswordController(req, res);
+
+        // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith({ message: "Answer is required" });
+      });
+
+      it("should return 400 when newPassword is not provided", async () => {
+        // Arrange
+        req.body = {
+          email: "test@example.com",
+          answer: "myAnswer",
+        };
+
+        // Act
+        await forgotPasswordController(req, res);
+
+        // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith({ message: "New Password is required" });
+      });
+    });
+
+    describe("User Not Found", () => {
+      it("should return 404 when email and answer combination is wrong", async () => {
+        // Arrange
+        req.body = {
+          email: "test@example.com",
+          answer: "wrongAnswer",
+          newPassword: "newPassword123",
+        };
+
+        userModel.findOne.mockResolvedValue(null);
+
+        // Act
+        await forgotPasswordController(req, res);
+
+        // Assert
+        expect(userModel.findOne).toHaveBeenCalledWith({
+          email: "test@example.com",
+          answer: "wrongAnswer",
+        });
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Wrong Email Or Answer",
+        });
+      });
+    });
+
+    describe("Successful Password Reset", () => {
+      it("should reset password successfully with valid email and answer", async () => {
+        // Arrange
+        req.body = {
+          email: "test@example.com",
+          answer: "correctAnswer",
+          newPassword: "newSecurePassword",
+        };
+
+        const mockUser = {
+          _id: "userId123",
+          name: "Test User",
+          email: "test@example.com",
+          password: "hashedPassword123",
+          phone: "1234567890",
+          address: "123 Test St",
+          answer: "correctAnswer",
+          role: 0,
+        };
+
+        const hashedNewPassword = "hashedNewPassword123";
+
+        userModel.findOne.mockResolvedValue(mockUser);
+        hashPassword.mockResolvedValue(hashedNewPassword);
+
+        // Act
+        await forgotPasswordController(req, res);
+
+        // Assert
+        expect(userModel.findOne).toHaveBeenCalledWith({
+          email: "test@example.com",
+          answer: "correctAnswer",
+        });
+        expect(hashPassword).toHaveBeenCalledWith("newSecurePassword");
+        expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith("userId123", {
+          password: hashedNewPassword,
+        });
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.send).toHaveBeenCalledWith({
+          success: true,
+          message: "Password Reset Successfully",
+        });
+      });
+    });
+
+    describe("Error Handling", () => {
+      it("should handle error and log it", async () => {
+        // Arrange
+        req.body = {
+          email: "test@example.com",
+          answer: "answer",
+          newPassword: "newPass123",
+        };
+
+        const dbError = new Error("Database error");
+        userModel.findOne.mockRejectedValue(dbError);
+
+        // Act
+        await forgotPasswordController(req, res);
+
+        // Assert
+        expect(consoleLogSpy).toHaveBeenCalledWith(dbError);
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Something went wrong",
           error: dbError,
         });
       });
