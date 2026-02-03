@@ -19,6 +19,9 @@ describe("Auth Middleware", () => {
     // Mock console.log to suppress output
     consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
 
+    // Mock environment variable
+    process.env.JWT_SECRET = "test-jwt-secret";
+
     // Setup default request object
     req = {
       headers: {},
@@ -52,7 +55,7 @@ describe("Auth Middleware", () => {
       await requireSignIn(req, res, next);
 
       // Assert
-      expect(JWT.verify).toHaveBeenCalledWith(token, process.env.JWT_SECRET);
+      expect(JWT.verify).toHaveBeenCalledWith(token, "test-jwt-secret");
       expect(req.user).toEqual(decodedUser);
       expect(next).toHaveBeenCalledTimes(1);
     });
@@ -71,7 +74,7 @@ describe("Auth Middleware", () => {
       // Assert
       expect(JWT.verify).toHaveBeenCalledWith(
         "invalid-token",
-        process.env.JWT_SECRET
+        "test-jwt-secret"
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(error);
       expect(next).not.toHaveBeenCalled();
