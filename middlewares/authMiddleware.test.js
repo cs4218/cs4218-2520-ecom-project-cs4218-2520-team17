@@ -77,6 +77,12 @@ describe("Auth Middleware", () => {
         "test-jwt-secret"
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(error);
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        error: error,
+        message: "Error in requireSignIn middleware",
+      });
       expect(next).not.toHaveBeenCalled();
     });
   });
@@ -130,7 +136,7 @@ describe("Auth Middleware", () => {
       // Assert
       expect(userModel.findById).toHaveBeenCalledWith("user789");
       expect(consoleLogSpy).toHaveBeenCalledWith(dbError);
-      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         error: dbError,

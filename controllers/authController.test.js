@@ -57,6 +57,7 @@ describe("Auth Controller", () => {
         await registerController(req, res);
 
         // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
       });
 
@@ -74,6 +75,7 @@ describe("Auth Controller", () => {
         await registerController(req, res);
 
         // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({ message: "Email is Required" });
       });
 
@@ -91,6 +93,7 @@ describe("Auth Controller", () => {
         await registerController(req, res);
 
         // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({ message: "Password is Required" });
       });
 
@@ -108,6 +111,7 @@ describe("Auth Controller", () => {
         await registerController(req, res);
 
         // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({ message: "Phone no is Required" });
       });
 
@@ -125,6 +129,7 @@ describe("Auth Controller", () => {
         await registerController(req, res);
 
         // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({ message: "Address is Required" });
       });
 
@@ -142,6 +147,7 @@ describe("Auth Controller", () => {
         await registerController(req, res);
 
         // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({ message: "Answer is Required" });
       });
     });
