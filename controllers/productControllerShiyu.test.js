@@ -510,6 +510,67 @@ describe('Test Product Controller', () => {
   });
 
 
+  describe("Test realtedProductController", () => {
+    test("returns 200 with related products", async () => {
+      // Arrange
+      req.params = { pid: "p1", cid: "c1" };
+
+      const fakeProducts = [
+        { _id: "p2", name: "Related A" },
+        { _id: "p3", name: "Related B" },
+      ];
+
+      const query = {
+        select: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        populate: jest.fn().mockResolvedValue(fakeProducts), // last awaited call
+      };
+
+      productModel.find.mockReturnValue(query);
+
+      // Act
+      await realtedProductController(req, res);
+
+      // Assert
+      expect(productModel.find).toHaveBeenCalledWith({
+        category: "c1",
+        _id: { $ne: "p1" },
+      });
+
+      expect(query.select).toHaveBeenCalledWith("-photo");
+      expect(query.limit).toHaveBeenCalledWith(3);
+      expect(query.populate).toHaveBeenCalledWith("category");
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        products: fakeProducts,
+      });
+    });
+
+    test("returns 400 on error", async () => {
+      // Arrange
+      req.params = { pid: "p1", cid: "c1" };
+
+      const err = new Error("DB blew up");
+      productModel.find.mockImplementation(() => {
+        throw err;
+      });
+
+      // Act
+      await realtedProductController(req, res);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "error while geting related product",
+        error: err,
+      });
+    });
+  });
+
+
 
 
 
