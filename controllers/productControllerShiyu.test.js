@@ -370,6 +370,91 @@ describe('Test Product Controller', () => {
     });
   });
 
+  describe("Test productListController", () => {
+    test("returns 200 with products for page 1 (default)", async () => {
+      // Arrange
+      req.params = {}; // no page -> default 1
+
+      const fakeProducts = [{ _id: "1" }, { _id: "2" }];
+
+      const query = {
+        select: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockResolvedValue(fakeProducts), // awaited final result
+      };
+
+      productModel.find.mockReturnValue(query);
+
+      // Act
+      await productListController(req, res);
+
+      // Assert
+      expect(productModel.find).toHaveBeenCalledWith({});
+      expect(query.select).toHaveBeenCalledWith("-photo");
+      expect(query.skip).toHaveBeenCalledWith(0); // (1 - 1) * 6
+      expect(query.limit).toHaveBeenCalledWith(6);
+      expect(query.sort).toHaveBeenCalledWith({ createdAt: -1 });
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        products: fakeProducts,
+      });
+    });
+
+    test("returns 200 with products for page 3", async () => {
+      // Arrange
+      req.params = { page: "3" }; // note: params are strings in Express
+
+      const fakeProducts = [{ _id: "x" }];
+
+      const query = {
+        select: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockResolvedValue(fakeProducts),
+      };
+
+      productModel.find.mockReturnValue(query);
+
+      // Act
+      await productListController(req, res);
+
+      // Assert
+      expect(query.skip).toHaveBeenCalledWith(12); // (3 - 1) * 6 = 12
+      expect(query.limit).toHaveBeenCalledWith(6);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        products: fakeProducts,
+      });
+    });
+
+    test("returns 400 on error", async () => {
+      // Arrange
+      req.params = { page: "2" };
+
+      const err = new Error("DB blew up");
+      productModel.find.mockImplementation(() => {
+        throw err;
+      });
+
+      // Act
+      await productListController(req, res);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "error in per page ctrl",
+        error: err,
+      });
+    });
+  });
+
+
 
 
 
