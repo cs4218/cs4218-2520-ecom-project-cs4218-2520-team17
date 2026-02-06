@@ -2,6 +2,7 @@
 import { describe } from "node:test";
 import {
   getProductController,
+  getSingleProductController
 } from "./productController.js";
 import productModel from "../models/productModel.js";
 
@@ -27,8 +28,8 @@ describe('Test Product Controller', () => {
 
     jest.clearAllMocks()
 
-    // SILENT YOU PEASANTS
-    jest.spyOn(console, "log").mockImplementation(() => {});
+    // SILENT CONSOLE
+    consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
 
     req = {}
     res = makeRes()
@@ -100,8 +101,60 @@ describe('Test Product Controller', () => {
         error: "DB blew up",
       });
 
-      console.log.mockRestore();
     });
   })
+
+  describe("Test getSingleProductController", () => {
+    test("returns 200 with single product", async () => {
+      // Arrange
+      req.params = { slug: "iphone-15" };
+
+      const fakeProduct = { _id: "p1", name: "iPhone 15", slug: "iphone-15" };
+
+      const query = {
+        select: jest.fn().mockReturnThis(),
+        populate: jest.fn().mockResolvedValue(fakeProduct), // last call awaited
+      };
+
+      productModel.findOne.mockReturnValue(query);
+
+      // Act
+      await getSingleProductController(req, res);
+
+      // Assert
+      expect(productModel.findOne).toHaveBeenCalledWith({ slug: "iphone-15" });
+      expect(query.select).toHaveBeenCalledWith("-photo");
+      expect(query.populate).toHaveBeenCalledWith("category");
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Single Product Fetched",
+        product: fakeProduct,
+      });
+    });
+
+    test("returns 500 on error", async () => {
+      // Arrange
+      req.params = { slug: "iphone-15" };
+
+      const err = new Error("DB blew up");
+      productModel.findOne.mockImplementation(() => {
+        throw err;
+      });
+
+      // Act
+      await getSingleProductController(req, res);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Eror while getitng single product",
+        error: err, // your controller sends the full error object (not error.message)
+      });
+    });
+  });
+
 
 })
