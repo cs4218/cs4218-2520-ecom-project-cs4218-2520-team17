@@ -4,7 +4,12 @@ import {
   getProductController,
   getSingleProductController,
   productPhotoController,
-  productFiltersController
+  productFiltersController,
+  productCountController,
+  productListController,
+  searchProductController,
+  realtedProductController,
+  productCategoryController
 } from "./productController.js";
 import productModel from "../models/productModel.js";
 
@@ -318,6 +323,53 @@ describe('Test Product Controller', () => {
       });
     });
   });
+
+  describe("Test productCountController", () => {
+    test("returns 200 with product count", async () => {
+      // Arrange
+      const fakeCount = 42;
+
+      const query = {
+        estimatedDocumentCount: jest.fn().mockResolvedValue(fakeCount),
+      };
+
+      productModel.find.mockReturnValue(query);
+
+      // Act
+      await productCountController(req, res);
+
+      // Assert
+      expect(productModel.find).toHaveBeenCalledWith({});
+      expect(query.estimatedDocumentCount).toHaveBeenCalled();
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        total: fakeCount,
+      });
+    });
+
+    test("returns 400 on error", async () => {
+      // Arrange
+      const err = new Error("DB blew up");
+
+      productModel.find.mockImplementation(() => {
+        throw err;
+      });
+
+      // Act
+      await productCountController(req, res);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        message: "Error in product count",
+        error: err,
+        success: false,
+      });
+    });
+  });
+
 
 
 
