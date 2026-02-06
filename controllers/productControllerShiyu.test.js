@@ -12,12 +12,13 @@ import {
   productCategoryController
 } from "./productController.js";
 import productModel from "../models/productModel.js";
+import categoryModel from "../models/categoryModel.js";
 
 
 
 // Mock Dependencies
 jest.mock("../models/productModel.js");
-
+jest.mock("../models/categoryModel.js")
 
 // Functions
 const makeRes = () => {
@@ -569,6 +570,83 @@ describe('Test Product Controller', () => {
       });
     });
   });
+
+  describe("Test productCategoryController", () => {
+    test("returns 200 with category + products", async () => {
+      // Arrange
+      req.params = { slug: "phones" };
+
+      const fakeCategory = { _id: "c1", name: "Phones", slug: "phones" };
+      const fakeProducts = [{ _id: "p1" }, { _id: "p2" }];
+
+      categoryModel.findOne.mockResolvedValue(fakeCategory);
+
+      const query = {
+        populate: jest.fn().mockResolvedValue(fakeProducts), // last awaited call
+      };
+      productModel.find.mockReturnValue(query);
+
+      // Act
+      await productCategoryController(req, res);
+
+      // Assert
+      expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "phones" });
+      expect(productModel.find).toHaveBeenCalledWith({ category: fakeCategory });
+      expect(query.populate).toHaveBeenCalledWith("category");
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        category: fakeCategory,
+        products: fakeProducts,
+      });
+    });
+
+    test("returns 400 on error (category lookup fails)", async () => {
+      // Arrange
+      req.params = { slug: "phones" };
+
+      const err = new Error("DB blew up");
+      categoryModel.findOne.mockRejectedValue(err);
+
+      // Act
+      await productCategoryController(req, res);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        error: err,
+        message: "Error While Getting products",
+      });
+    });
+
+    test("returns 400 on error (product lookup fails)", async () => {
+      // Arrange
+      req.params = { slug: "phones" };
+
+      const fakeCategory = { _id: "c1", name: "Phones", slug: "phones" };
+      categoryModel.findOne.mockResolvedValue(fakeCategory);
+
+      const err = new Error("DB blew up");
+      productModel.find.mockImplementation(() => {
+        throw err;
+      });
+
+      // Act
+      await productCategoryController(req, res);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        error: err,
+        message: "Error While Getting products",
+      });
+    });
+  });
+
+
 
 
 
