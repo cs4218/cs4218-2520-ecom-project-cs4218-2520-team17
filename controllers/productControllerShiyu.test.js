@@ -3,7 +3,8 @@ import { describe } from "node:test";
 import {
   getProductController,
   getSingleProductController,
-  productPhotoController
+  productPhotoController,
+  productFiltersController
 } from "./productController.js";
 import productModel from "../models/productModel.js";
 
@@ -215,6 +216,109 @@ describe('Test Product Controller', () => {
       });
     });
   });
+
+  describe("Test productFiltersController", () => {
+    test("filters by category only", async () => {
+      // Arrange
+      req.body = { checked: ["cat1", "cat2"], radio: [] };
+
+      const fakeProducts = [{ _id: "1" }, { _id: "2" }];
+      productModel.find.mockResolvedValue(fakeProducts);
+
+      // Act
+      await productFiltersController(req, res);
+
+      // Assert
+      expect(productModel.find).toHaveBeenCalledWith({ category: ["cat1", "cat2"] });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        products: fakeProducts,
+      });
+    });
+
+    test("filters by price only", async () => {
+      // Arrange
+      req.body = { checked: [], radio: [10, 50] };
+
+      const fakeProducts = [{ _id: "1" }];
+      productModel.find.mockResolvedValue(fakeProducts);
+
+      // Act
+      await productFiltersController(req, res);
+
+      // Assert
+      expect(productModel.find).toHaveBeenCalledWith({
+        price: { $gte: 10, $lte: 50 },
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        products: fakeProducts,
+      });
+    });
+
+    test("filters by category + price", async () => {
+      // Arrange
+      req.body = { checked: ["cat1"], radio: [100, 200] };
+
+      const fakeProducts = [{ _id: "x" }];
+      productModel.find.mockResolvedValue(fakeProducts);
+
+      // Act
+      await productFiltersController(req, res);
+
+      // Assert
+      expect(productModel.find).toHaveBeenCalledWith({
+        category: ["cat1"],
+        price: { $gte: 100, $lte: 200 },
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        products: fakeProducts,
+      });
+    });
+
+    test("no filters -> empty args {}", async () => {
+      // Arrange
+      req.body = { checked: [], radio: [] };
+
+      const fakeProducts = [{ _id: "1" }];
+      productModel.find.mockResolvedValue(fakeProducts);
+
+      // Act
+      await productFiltersController(req, res);
+
+      // Assert
+      expect(productModel.find).toHaveBeenCalledWith({});
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        products: fakeProducts,
+      });
+    });
+
+    test("returns 400 on error", async () => {
+      // Arrange
+      req.body = { checked: ["cat1"], radio: [1, 2] };
+
+      const err = new Error("DB blew up");
+      productModel.find.mockRejectedValue(err);
+
+      // Act
+      await productFiltersController(req, res);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Error WHile Filtering Products",
+        error: err,
+      });
+    });
+  });
+
 
 
 
