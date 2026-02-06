@@ -2,7 +2,8 @@
 import { describe } from "node:test";
 import {
   getProductController,
-  getSingleProductController
+  getSingleProductController,
+  productPhotoController
 } from "./productController.js";
 import productModel from "../models/productModel.js";
 
@@ -17,6 +18,7 @@ const makeRes = () => {
   const res = {};
   res.status = jest.fn().mockReturnValue(res);
   res.send = jest.fn().mockReturnValue(res);
+  res.set = jest.fn().mockReturnValue(res); 
   return res;
 };
 
@@ -155,6 +157,65 @@ describe('Test Product Controller', () => {
       });
     });
   });
+
+  describe("Test productPhotoController", () => {
+    test("returns 200 and photo data", async () => {
+      // Arrange
+      req.params = { pid: "product123" };
+
+      const fakePhotoData = Buffer.from("fake-image-bytes");
+
+      const fakeProduct = {
+        photo: {
+          data: fakePhotoData,
+          contentType: "image/jpeg",
+        },
+      };
+
+      const query = {
+        select: jest.fn().mockResolvedValue(fakeProduct),
+      };
+
+      productModel.findById.mockReturnValue(query);
+
+      // Act
+      await productPhotoController(req, res);
+
+      // Assert
+      expect(productModel.findById).toHaveBeenCalledWith("product123");
+      expect(query.select).toHaveBeenCalledWith("photo");
+
+      expect(res.set).toHaveBeenCalledWith(
+        "Content-type",
+        "image/jpeg"
+      );
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith(fakePhotoData);
+    });
+
+    test("returns 500 on error", async () => {
+      // Arrange
+      req.params = { pid: "product123" };
+
+      const err = new Error("DB blew up");
+      productModel.findById.mockImplementation(() => {
+        throw err;
+      });
+
+      // Act
+      await productPhotoController(req, res);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Erorr while getting photo",
+        error: err,
+      });
+    });
+  });
+
 
 
 })
