@@ -25,6 +25,7 @@ const makeRes = () => {
   res.status = jest.fn().mockReturnValue(res);
   res.send = jest.fn().mockReturnValue(res);
   res.set = jest.fn().mockReturnValue(res); 
+  res.json = jest.fn().mockReturnValue(res); 
   return res;
 };
 
@@ -453,6 +454,61 @@ describe('Test Product Controller', () => {
       });
     });
   });
+
+
+  describe("Test searchProductController", () => {
+    test("returns products matching keyword", async () => {
+      // Arrange
+      req.params = { keyword: "iphone" };
+
+      const fakeProducts = [
+        { _id: "1", name: "iPhone 15" },
+        { _id: "2", name: "iPhone Case" },
+      ];
+
+      const query = {
+        select: jest.fn().mockResolvedValue(fakeProducts),
+      };
+
+      productModel.find.mockReturnValue(query);
+
+      // Act
+      await searchProductController(req, res);
+
+      // Assert
+      expect(productModel.find).toHaveBeenCalledWith({
+        $or: [
+          { name: { $regex: "iphone", $options: "i" } },
+          { description: { $regex: "iphone", $options: "i" } },
+        ],
+      });
+
+      expect(query.select).toHaveBeenCalledWith("-photo");
+      expect(res.json).toHaveBeenCalledWith(fakeProducts);
+    });
+
+    test("returns 400 on error", async () => {
+      // Arrange
+      req.params = { keyword: "iphone" };
+
+      const err = new Error("DB blew up");
+      productModel.find.mockImplementation(() => {
+        throw err;
+      });
+
+      // Act
+      await searchProductController(req, res);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Error In Search Product API",
+        error: err,
+      });
+    });
+  });
+
 
 
 
