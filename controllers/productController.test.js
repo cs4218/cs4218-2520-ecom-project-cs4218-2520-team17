@@ -964,7 +964,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({
         success: true,
         counTotal: 2,
-        message: "ALlProducts ",
+        message: "All Products",
         products: fakeProducts,
       });
     })
@@ -987,7 +987,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         message: "Erorr in getting products",
-        error: "DB blew up",
+        error: err,
       });
 
     });
@@ -1039,7 +1039,7 @@ describe("Product Controller", () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: "Eror while getitng single product",
+        message: "Error while getting single product",
         error: err, // your controller sends the full error object (not error.message)
       });
     });
@@ -1185,7 +1185,7 @@ describe("Product Controller", () => {
       });
     });
 
-    test("returns 400 on error", async () => {
+    test("returns 500 on error", async () => {
       // Arrange
       req.body = { checked: ["cat1"], radio: [1, 2] };
 
@@ -1196,7 +1196,7 @@ describe("Product Controller", () => {
       await productFiltersController(req, res);
 
       // Assert
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         message: "Error WHile Filtering Products",
@@ -1230,7 +1230,7 @@ describe("Product Controller", () => {
       });
     });
 
-    test("returns 400 on error", async () => {
+    test("returns 500 on error", async () => {
       // Arrange
       const err = new Error("DB blew up");
 
@@ -1242,7 +1242,7 @@ describe("Product Controller", () => {
       await productCountController(req, res);
 
       // Assert
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         message: "Error in product count",
         error: err,
@@ -1326,10 +1326,10 @@ describe("Product Controller", () => {
       await productListController(req, res);
 
       // Assert
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: "error in per page ctrl",
+        message: "Error in per page ctrl",
         error: err,
       });
     });
@@ -1366,7 +1366,7 @@ describe("Product Controller", () => {
       expect(res.json).toHaveBeenCalledWith(fakeProducts);
     });
 
-    test("returns 400 on error", async () => {
+    test("returns 500 on error", async () => {
       // Arrange
       req.params = { keyword: "iphone" };
 
@@ -1379,7 +1379,7 @@ describe("Product Controller", () => {
       await searchProductController(req, res);
 
       // Assert
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         message: "Error In Search Product API",
@@ -1426,7 +1426,7 @@ describe("Product Controller", () => {
       });
     });
 
-    test("returns 400 on error", async () => {
+    test("returns 500 on error", async () => {
       // Arrange
       req.params = { pid: "p1", cid: "c1" };
 
@@ -1439,7 +1439,7 @@ describe("Product Controller", () => {
       await realtedProductController(req, res);
 
       // Assert
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         message: "error while geting related product",
@@ -1479,7 +1479,7 @@ describe("Product Controller", () => {
       });
     });
 
-    test("returns 400 on error (category lookup fails)", async () => {
+    test("returns 500 on error (category lookup fails)", async () => {
       // Arrange
       req.params = { slug: "phones" };
 
@@ -1490,7 +1490,7 @@ describe("Product Controller", () => {
       await productCategoryController(req, res);
 
       // Assert
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         error: err,
@@ -1514,7 +1514,7 @@ describe("Product Controller", () => {
       await productCategoryController(req, res);
 
       // Assert
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         error: err,
