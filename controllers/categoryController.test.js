@@ -1,10 +1,13 @@
 import {
   createCategoryController,
   updateCategoryController,
+  categoryControlller,
+  singleCategoryController,
   deleteCategoryController,
 } from "./categoryController.js";
 import categoryModel from "../models/categoryModel.js";
 import slugify from "slugify";
+import { describe } from "node:test";
 
 // Mock dependencies
 jest.mock("../models/categoryModel.js");
@@ -284,6 +287,100 @@ describe("Category Controller", () => {
           success: false,
           error: dbError,
           message: "Error while updating category",
+        });
+      });
+    });
+  });
+
+  // ==========================================
+  // categoryController Tests
+  // ==========================================
+  describe("categoryControlller", () => {
+    describe("Successful Retrieval", () => {
+      it("should retrieve all categories successfully with status 200", async () => {
+        // Arrange
+        const mockCategories = [
+          { name: "Electronics", slug: "electronics" },
+          { name: "Books", slug: "books" },
+        ];
+        categoryModel.find.mockResolvedValue(mockCategories);
+        // Act
+        await categoryControlller(req, res);
+
+        // Assert
+        expect(categoryModel.find).toHaveBeenCalledWith({});
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.send).toHaveBeenCalledWith({
+          success: true,
+          message: "All Categories List",
+          category: mockCategories,
+        });
+      });
+    });
+
+    describe("Error Handling", () => {
+      it("should return status 500 when database retrieval fails", async () => {
+        // Arrange
+        const dbError = new Error("Database retrieval failed");
+        categoryModel.find.mockRejectedValue(dbError);
+
+        // Act
+        await categoryControlller(req, res);
+
+        // Assert
+        expect(consoleLogSpy).toHaveBeenCalledWith(dbError);
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          error: dbError,
+          message: "Error while getting all categories",
+        });
+      })
+    });
+  });
+
+  // ==========================================
+  // singleCategoryController Tests
+  // ==========================================
+  describe("singleCategoryController", () => {
+    describe("Successful Retrieval", () => {
+      it("should retrieve single category successfully with valid slug", async () => {
+        // Arrange
+        req.params = { slug: "electronics" };
+        const mockCategory = { name: "Electronics", slug: "electronics" };
+        categoryModel.findOne.mockResolvedValue(mockCategory);
+
+        // Act
+        await singleCategoryController(req, res);
+
+        // Assert
+        expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "electronics" });
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.send).toHaveBeenCalledWith({
+          success: true,
+          message: "Get single category successfully",
+          category: mockCategory,
+        });
+      });
+    });
+
+    describe("Error Handling", () => {
+      it("should return 500 and log error when database retrieval fails", async () => {
+        // Arrange
+        req.params = { slug: "electronics" };
+        const dbError = new Error("Database retrieval failed");
+        categoryModel.findOne.mockRejectedValue(dbError);
+
+        // Act
+        await singleCategoryController(req, res);
+
+        // Assert
+        expect(consoleLogSpy).toHaveBeenCalledWith(dbError);
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          error: dbError,
+          message: "Error while getting single category",
         });
       });
     });
