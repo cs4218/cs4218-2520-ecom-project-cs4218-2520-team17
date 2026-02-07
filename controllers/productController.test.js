@@ -1313,7 +1313,7 @@ describe("Product Controller", () => {
       });
     });
 
-    test("returns 400 on error", async () => {
+    test("returns 500 on error", async () => {
       // Arrange
       req.params = { page: "2" };
 
@@ -1498,7 +1498,7 @@ describe("Product Controller", () => {
       });
     });
 
-    test("returns 400 on error (product lookup fails)", async () => {
+    test("returns 500 on error (product lookup fails)", async () => {
       // Arrange
       req.params = { slug: "phones" };
 
