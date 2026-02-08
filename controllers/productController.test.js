@@ -1,26 +1,27 @@
 // Mock braintree before importing productController (must be first)
-jest.mock("braintree", () => ({
-  BraintreeGateway: jest.fn().mockImplementation(() => ({
-    clientToken: {
-      generate: jest.fn(),
-    },
-    transaction: {
-      sale: jest.fn(),
-    },
-  })),
-  Environment: {
-    Sandbox: "sandbox",
-  },
-}));
+jest.mock("braintree", () => {
+  const mockGenerate = jest.fn();
+  const mockSale = jest.fn();
+  return {
+    BraintreeGateway: jest.fn().mockReturnValue({
+      clientToken: { generate: mockGenerate },
+      transaction: { sale: mockSale },
+    }),
+    Environment: { Sandbox: "sandbox" },
+  };
+});
 
 import {
   createProductController,
   deleteProductController,
   updateProductController,
+  braintreeTokenController,
+  braintreePaymentController,
 } from "./productController.js";
 import productModel from "../models/productModel.js";
 import fs from "fs";
 import slugify from "slugify";
+import braintree from "braintree";
 
 // Mock dependencies
 jest.mock("../models/productModel.js");
@@ -912,5 +913,58 @@ describe("Product Controller", () => {
         });
       });
     });
+  });
+  
+  // ==========================================
+  // braintreeTokenController Tests
+  // ==========================================
+  describe("braintreeTokenController", () => {
+    let gateway;
+
+    beforeEach(() => {
+      // Get the actual gateway instance the controller is using
+      gateway = new braintree.BraintreeGateway();
+    });
+
+    describe("Successful Token Generation", () => {
+      it("should generate token successfully", async () => {
+        // Arrange
+        gateway.clientToken.generate.mockImplementationOnce((options, callback) => {
+          callback(null, { clientToken: "fake-client-token" });
+        });
+
+        // Act
+        await braintreeTokenController(req, res);
+
+        // Assert
+        expect(gateway.clientToken.generate).toHaveBeenCalledWith({}, expect.any(Function));
+        expect(res.send).toHaveBeenCalledWith({ clientToken: "fake-client-token" });
+      });
+    });
+
+    describe("Error Handling", () => {
+      it("should return 500 when token generation fails", async () => {
+        // Arrange
+        const generationError = new Error("Token generation failed");
+        gateway.clientToken.generate.mockImplementationOnce((options, callback) => {
+          callback(generationError, null);
+        });
+
+        // Act
+        await braintreeTokenController(req, res);
+
+        // Assert
+        expect(gateway.clientToken.generate).toHaveBeenCalledWith({}, expect.any(Function));
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith(generationError);
+      });
+    });
+  });
+
+  // ==========================================
+  // braintreePaymentController Tests
+  // ==========================================
+  describe("braintreePaymentController", () => {
+    
   });
 });
