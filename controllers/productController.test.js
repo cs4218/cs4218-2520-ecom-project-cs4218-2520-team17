@@ -1574,6 +1574,19 @@ describe("Product Controller", () => {
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.send).toHaveBeenCalledWith(generationError);
       });
+      it("should log errors to console", async () => {
+        // Arrange
+        const gatewayError = new Error("Gateway crashed");
+        gateway.clientToken.generate.mockImplementationOnce(() => {
+          throw gatewayError;
+        });
+
+        // Act
+        await braintreeTokenController(req, res);
+
+        // Assert
+        expect(consoleLogSpy).toHaveBeenCalledWith(gatewayError);
+      });
     });
   });
 
@@ -1748,6 +1761,24 @@ describe("Product Controller", () => {
         expect(orderModel).not.toHaveBeenCalled();
         expect(res.status).toHaveBeenCalledWith(500);
       });
+    });
+    it("should log error when payment processing fails", async () => {
+      // Arrange
+      req.body = {
+        nonce: "fake-nonce",
+        cart: [{ _id: "p1", name: "Item 1", price: 10 }],
+      };
+      req.user = { _id: "user123" };
+      const gatewayError = new Error("Gateway crashed");
+      gateway.transaction.sale.mockImplementationOnce(() => {
+          throw gatewayError;
+      });
+      
+      // Act
+      await braintreePaymentController(req, res);
+
+      // Assert
+      expect(consoleLogSpy).toHaveBeenCalledWith(gatewayError);
     });
   });
 });
