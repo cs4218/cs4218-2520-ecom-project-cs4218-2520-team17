@@ -1,4 +1,4 @@
-import { registerController, loginController, forgotPasswordController } from "./authController.js";
+import { registerController, loginController, forgotPasswordController, updateProfileController } from "./authController.js";
 import userModel from "../models/userModel.js";
 import { hashPassword, comparePassword } from "../helpers/authHelper.js";
 import JWT from "jsonwebtoken";
@@ -12,13 +12,15 @@ describe("Auth Controller", () => {
   let req;
   let res;
   let consoleLogSpy;
+  let consoleErrorSpy;
 
   beforeEach(() => {
     // Reset all mocks before each test
     jest.clearAllMocks();
 
-    // Mock console.log to suppress output
+    // Mock console.log and console.error to suppress output
     consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     // Mock environment variable
     process.env.JWT_SECRET = "test-secret";
@@ -33,11 +35,13 @@ describe("Auth Controller", () => {
     res = {
       status: jest.fn().mockReturnThis(), // returns res for chaining
       send: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
     };
   });
 
   afterEach(() => {
     consoleLogSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
   });
 
   // registerController Tests
@@ -590,6 +594,203 @@ describe("Auth Controller", () => {
           message: "Something went wrong",
           error: dbError,
         });
+      });
+    });
+  });
+
+  // updateProfileController Tests
+  describe("updateProfileController", () => {
+    it("should enforce the password requirements of a string with minimum 6 characters", async () => {
+      // Arrange
+      req.user = { _id: "userId123" };
+      req.body = {
+        password: "12345", // Less than 6 characters
+      };
+
+      const mockUser = {
+        _id: "userId123",
+        name: "Test User",
+        email: "test@example.com",
+        password: "hashedPassword123",
+        phone: "1234567890",
+        address: "123 Test St",
+        role: 0,
+      };
+
+      userModel.findById.mockResolvedValue(mockUser);
+
+      // Act
+      await updateProfileController(req, res);
+
+      // Assert
+      expect(res.json).toHaveBeenCalledWith({
+        error: "Password is required to be minimally 6 character long",
+      });
+
+      expect(hashPassword).not.toHaveBeenCalled();
+      expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
+    });
+
+    it("should update the user profile with a full request body data", async () => {
+      // Arrange
+      req.user = { _id: "userId123" };
+      req.body = {
+        name: "Updated Name",
+        phone: "9876543210",
+        email: "new@example.com",
+        address: "456 New St",
+        password: "newPassword123",
+      };
+
+      const mockUser = {
+        _id: "userId123",
+        name: "Test User",
+        email: "test@example.com",
+        password: "hashedPassword123",
+        phone: "1234567890",
+        address: "123 Test St",
+        role: 0,
+      };
+
+      const hashedNewPassword = "hashedNewPassword123";
+
+      userModel.findById.mockResolvedValue(mockUser);
+      hashPassword.mockResolvedValue(hashedNewPassword);
+      userModel.findByIdAndUpdate.mockResolvedValue({
+        ...mockUser,
+        name: "Updated Name",
+        phone: "9876543210",
+        email: "new@example.com",
+        address: "456 New St",
+        password: hashedNewPassword,
+      });
+
+      // Act
+      await updateProfileController(req, res);
+
+      // Assert
+      expect(hashPassword).toHaveBeenCalledWith("newPassword123");
+      expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        "userId123",
+        {
+          name: "Updated Name",
+          password: hashedNewPassword,
+          email: "new@example.com",
+          phone: "9876543210",
+          address: "456 New St",
+        },
+        { new: true }
+      );
+    });
+
+    it("should update the user profile with subset of fields", async () => {
+      // Arrange
+      req.user = {
+        _id: "userId123"
+      };
+
+      req.body = {
+        name: "Updated Name" //Only name
+      }
+
+      const mockUser = {
+        _id: "userId123",
+        name: "Test User",
+        email: "test@example.com",
+        password: "hashedPassword123",
+        phone: "1234567890",
+        address: "123 Test St",
+        role: 0,
+      };
+      
+      userModel.findById.mockResolvedValue(mockUser);
+      userModel.findByIdAndUpdate.mockResolvedValue({
+        ...mockUser,
+        name: "Updated Name",
+      });
+
+      // Act
+      await updateProfileController(req, res);
+
+      // Assert
+      expect(hashPassword).not.toHaveBeenCalled(); // No password update
+      expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        "userId123",
+        {
+          name: "Updated Name",
+          password: "hashedPassword123",
+          email: "test@example.com",
+          phone: "1234567890",        
+          address: "123 Test St",
+        },
+        { new: true }
+      );
+    });
+
+    it("should return 200 status and success message upon successful update", async () => {
+      // Arrange
+      req.user = { _id: "userId123" };
+      req.body = {
+        name: "Updated Name",
+        phone: "9876543210",
+        address: "456 New St",
+      };
+
+      const mockUser = {
+        _id: "userId123",
+        name: "Test User",
+        email: "test@example.com",
+        password: "hashedPassword123",
+        phone: "1234567890",
+        address: "123 Test St",
+        role: 0,
+      };
+
+      const updatedUserData = {
+        _id: "userId123",
+        name: "Updated Name",
+        email: "test@example.com",
+        password: "hashedPassword123",
+        phone: "9876543210",
+        address: "456 New St",
+        role: 0,
+      };
+
+      userModel.findById.mockResolvedValue(mockUser);
+      userModel.findByIdAndUpdate.mockResolvedValue(updatedUserData);
+
+      // Act
+      await updateProfileController(req, res);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Profile Updated Successfully",
+        updatedUser: updatedUserData,
+      });
+    });
+
+    it("should handle errors and return 400 status with error message", async () => {
+      // Arrange
+      req.user = { _id: "userId123" };
+      req.body = {
+        name: "Updated Name",
+      };
+
+      const dbError = new Error("Database error");
+      userModel.findById.mockRejectedValue(dbError);
+
+      // Act
+      await updateProfileController(req, res);
+
+      // Assert
+      expect(consoleErrorSpy).toHaveBeenCalledWith(dbError);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Error while updating profile",
+        error: dbError,
       });
     });
   });

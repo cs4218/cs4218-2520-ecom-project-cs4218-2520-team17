@@ -1,9 +1,8 @@
-import connectDB from "./db";
+import connectDB from "./db.js";
 import mongoose from "mongoose";
-import dns from 'node:dns';
+
 
 jest.mock('mongoose');
-jest.mock('node:dns');
 
 // Mock colors by extending String.prototype
 jest.mock('colors', () => {
@@ -90,7 +89,7 @@ describe('Connect to mongoose db', () => {
         });
 
         it('should not throw an error when connection fails', async () => {
-            await expect(connectDB()).resolves.not.toThrow();
+            await expect(connectDB()).resolves.toBeUndefined();
         });
 
         it('should still attempt to connect even if connection fails', async () => {
