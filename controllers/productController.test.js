@@ -22,6 +22,7 @@ import productModel from "../models/productModel.js";
 import fs from "fs";
 import slugify from "slugify";
 import braintree from "braintree";
+import orderModel from "../models/orderModel.js";
 
 // Mock dependencies
 jest.mock("../models/productModel.js");
@@ -57,6 +58,8 @@ describe("Product Controller", () => {
       status: jest.fn().mockReturnThis(),
       // Send response
       send: jest.fn().mockReturnThis(),
+      // Json response
+      json: jest.fn().mockReturnThis(),
     };
 
     // Default slugify mock behavior
@@ -965,6 +968,173 @@ describe("Product Controller", () => {
   // braintreePaymentController Tests
   // ==========================================
   describe("braintreePaymentController", () => {
-    
+    let gateway;
+
+    beforeEach(() => {
+      // Get the actual gateway instance the controller is using
+      gateway = new braintree.BraintreeGateway();
+    });
+
+    describe("Successful Payment Processing", () => {
+      it("should process payment successfully", async () => {
+        // Arrange
+        req.body = {
+          nonce: "fake-nonce",
+          cart: [
+            { price: 10.00 },
+            { price: 15.50 },
+          ],
+        };
+        req.user = { _id: "user123" };
+        gateway.transaction.sale.mockImplementationOnce((saleRequest, callback) => {
+          callback(null, { success: true, transaction: { id: "fake-transaction-id" } });
+        });
+
+        // Act
+        await braintreePaymentController(req, res);
+
+        // Assert
+        expect(gateway.transaction.sale).toHaveBeenCalledWith(
+          {
+            amount: 25.5,
+            paymentMethodNonce: "fake-nonce",
+            options: { submitForSettlement: true },
+          },
+          expect.any(Function)
+        );
+        expect(orderModel).toHaveBeenCalledWith({
+          products: req.body.cart,
+          payment: { success: true,
+                     transaction: { id: "fake-transaction-id" }
+                   },
+          buyer: "user123",
+        });
+        expect(res.json).toHaveBeenCalledWith({ok: true });
+      });
+      it("should process payment successfully with empty cart as a total of 0", async () => {
+        // Arrange
+        req.body = {
+          nonce: "fake-nonce",
+          cart: [],
+        };
+        req.user = { _id: "user123" };
+        gateway.transaction.sale.mockImplementationOnce((saleRequest, callback) => {
+          callback(null, { success: true, transaction: { id: "fake-transaction-id" } });
+        });
+
+        // Act
+        await braintreePaymentController(req, res);
+
+        // Assert
+        expect(gateway.transaction.sale).toHaveBeenCalledWith(
+          {
+            amount: 0,
+            paymentMethodNonce: "fake-nonce",
+            options: { submitForSettlement: true },
+          },
+          expect.any(Function)
+        );
+        expect(orderModel).toHaveBeenCalledWith({
+          products: req.body.cart,
+          payment: { success: true,
+                     transaction: { id: "fake-transaction-id" }
+                   },
+          buyer: "user123",
+        });
+        expect(res.json).toHaveBeenCalledWith({ok: true });
+      });
+      it("should process payment successfully with cart items having zero price", async () => {
+        // Arrange
+        req.body = {
+          nonce: "fake-nonce",
+          cart: [
+            { price: 0 },
+            { price: 0 },
+          ],
+        };
+        req.user = { _id: "user123" };
+        gateway.transaction.sale.mockImplementationOnce((saleRequest, callback) => {
+          callback(null, { success: true, transaction: { id: "fake-transaction-id" } });
+        });
+
+        // Act
+        await braintreePaymentController(req, res);
+
+        // Assert
+        expect(gateway.transaction.sale).toHaveBeenCalledWith(
+          {
+            amount: 0,
+            paymentMethodNonce: "fake-nonce",
+            options: { submitForSettlement: true },
+          },
+          expect.any(Function)
+        );
+        expect(orderModel).toHaveBeenCalledWith({
+          products: req.body.cart,
+          payment: { success: true,
+                     transaction: { id: "fake-transaction-id" }
+                   },
+          buyer: "user123",
+        });
+        expect(res.json).toHaveBeenCalledWith({ok: true });
+      });
+      it ("should process payment successfully with cart items having negative price", async () => {
+        // Arrange
+        req.body = {
+          nonce: "fake-nonce",
+          cart: [
+            { price: -5.00 },
+            { price: 10.00 },
+          ],
+        };
+        req.user = { _id: "user123" };
+        gateway.transaction.sale.mockImplementationOnce((saleRequest, callback) => {
+          callback(null, { success: true, transaction: { id: "fake-transaction-id" } });
+        });
+
+        // Act
+        await braintreePaymentController(req, res);
+
+        // Assert
+        expect(gateway.transaction.sale).toHaveBeenCalledWith(
+          {
+            amount: 5.0,
+            paymentMethodNonce: "fake-nonce",
+            options: { submitForSettlement: true },
+          },
+          expect.any(Function)
+        );
+        expect(orderModel).toHaveBeenCalledWith({
+          products: req.body.cart,
+          payment: { success: true,
+                     transaction: { id: "fake-transaction-id" }
+                   },
+          buyer: "user123",
+        });
+        expect(res.json).toHaveBeenCalledWith({ok: true });
+      });
+    });
+    describe("Error Handling", () => {
+      it("should return 500 when payment processing fails", async () => {
+        // Arrange
+        req.body = {
+          nonce: "fake-nonce",
+          cart: [
+            { price: 10.00 },
+          ],
+        };
+        req.user = { _id: "user123" };
+        gateway.transaction.sale.mockImplementationOnce((saleRequest, callback) => {
+          callback(new Error("Payment processing failed"), null);
+        });
+
+        // Act
+        await braintreePaymentController(req, res);
+
+        // Assert
+        expect(orderModel).not.toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(500);
+      });
+    });
   });
 });
