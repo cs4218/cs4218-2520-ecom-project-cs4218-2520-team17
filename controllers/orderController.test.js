@@ -8,10 +8,12 @@ describe("Order Controller Tests", () => {
     let res;
     let consoleErrorSpy;
 
+    beforeAll(() => {
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    });
+
     beforeEach(() => {
         jest.clearAllMocks();
-
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
         req = {
             body: {},
