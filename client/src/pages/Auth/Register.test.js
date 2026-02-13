@@ -47,6 +47,7 @@ describe('Register Component', () => {
 
   it('should register the user successfully', async () => {
     axios.post.mockResolvedValueOnce({ data: { success: true } });
+    axios.get.mockResolvedValueOnce({ data: { category: [] } });
 
     const { getByText, getByPlaceholderText } = render(
         <MemoryRouter initialEntries={['/register']}>
@@ -55,7 +56,8 @@ describe('Register Component', () => {
           </Routes>
         </MemoryRouter>
       );
-
+    await waitFor(() => expect(axios.get).toHaveBeenCalled());
+    
     fireEvent.change(getByPlaceholderText('Enter Your Name'), { target: { value: 'John Doe' } });
     fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
     fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
@@ -72,6 +74,7 @@ describe('Register Component', () => {
 
   it('should display error message on failed registration', async () => {
     axios.post.mockRejectedValueOnce({ message: 'User already exists' });
+    axios.get.mockResolvedValueOnce({ data: { category: [] } });
 
     const { getByText, getByPlaceholderText } = render(
         <MemoryRouter initialEntries={['/register']}>
@@ -80,6 +83,7 @@ describe('Register Component', () => {
           </Routes>
         </MemoryRouter>
       );
+    await waitFor(() => expect(axios.get).toHaveBeenCalled());
 
     fireEvent.change(getByPlaceholderText('Enter Your Name'), { target: { value: 'John Doe' } });
     fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
