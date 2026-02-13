@@ -56,8 +56,13 @@ jobs:
       - name: Run Jest tests with coverage
         run: npm test
         continue-on-error: true
+        id: jest-test
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Fail if Jest Coverage check failed
+        if: steps.jest-test.outcome == 'failure'
+        run: exit 1
