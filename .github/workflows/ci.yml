@@ -1,4 +1,4 @@
-name: CI - Run Jest Tests
+name: CI - Run Tests and SonarQube Analysis
 
 on:
   push:
@@ -58,7 +58,7 @@ jobs:
 
   # Base configuration for SonarQube analysis
   sonarqube:
-    name: SonarQube
+    name: SonarQube Analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
