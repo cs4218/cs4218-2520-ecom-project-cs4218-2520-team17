@@ -33,7 +33,7 @@ jobs:
           npm run test:frontend -- --coverage=false
 
   coverage:
-    name: Check Coverage
+    name: Check Coverage and Run SonarQube Analysis
     runs-on: ubuntu-latest
     continue-on-error: true
 
@@ -56,15 +56,7 @@ jobs:
       - name: Run Jest tests with coverage
         run: npm test
 
-  # Base configuration for SonarQube analysis
-  sonarqube:
-    name: SonarQube Analysis
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarqube-scan-action@v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
