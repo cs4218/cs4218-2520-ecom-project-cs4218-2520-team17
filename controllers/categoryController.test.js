@@ -52,6 +52,7 @@ describe("Category Controller", () => {
   // ==========================================
   describe("createCategoryController", () => {
     describe("Request Validation", () => {
+      // Li Jiakai, A0252287Y
       it("should return 400 when name is not provided", async () => {
         // Arrange
         req.body = {};
@@ -64,6 +65,7 @@ describe("Category Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when name is empty string", async () => {
         // Arrange
         req.body = { name: "" };
@@ -76,6 +78,7 @@ describe("Category Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when name is null", async () => {
         // Arrange
         req.body = { name: null };
@@ -90,6 +93,7 @@ describe("Category Controller", () => {
     });
 
     describe("Duplicate Category Check", () => {
+      // Li Jiakai, A0252287Y
       it("should return 400 when category already exists", async () => {
         // Arrange
         req.body = { name: "Electronics" };
@@ -110,6 +114,7 @@ describe("Category Controller", () => {
     });
 
     describe("Successful Creation", () => {
+      // Li Jiakai, A0252287Y
       it("should create category successfully with valid name", async () => {
         // Arrange
         req.body = { name: "Electronics" };
@@ -140,6 +145,7 @@ describe("Category Controller", () => {
         });
       });
 
+      // Li Jiakai, A0252287Y
       it("should create category with name containing spaces", async () => {
         // Arrange
         req.body = { name: "Home Appliances" };
@@ -166,6 +172,7 @@ describe("Category Controller", () => {
     });
 
     describe("Error Handling", () => {
+      // Li Jiakai, A0252287Y
       it("should return 500 and log error when findOne throws", async () => {
         // Arrange
         req.body = { name: "Electronics" };
@@ -185,6 +192,7 @@ describe("Category Controller", () => {
         });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 500 and log error when save throws", async () => {
         // Arrange
         req.body = { name: "Electronics" };
@@ -215,6 +223,7 @@ describe("Category Controller", () => {
   // ==========================================
   describe("updateCategoryController", () => {
     describe("Successful Update", () => {
+      // Li Jiakai, A0252287Y
       it("should update category successfully with valid id and name", async () => {
         // Arrange
         req.body = { name: "Updated Electronics" };
@@ -241,6 +250,7 @@ describe("Category Controller", () => {
         });
       });
 
+      // Li Jiakai, A0252287Y
       it("should update category successfully when database returns null", async () => {
         // Arrange
         req.body = { name: "Updated Electronics" };
@@ -269,6 +279,7 @@ describe("Category Controller", () => {
     });
 
     describe("Error Handling", () => {
+      // Li Jiakai, A0252287Y
       it("should return 500 and log error when database update fails", async () => {
         // Arrange
         req.body = { name: "Electronics" };
@@ -391,6 +402,7 @@ describe("Category Controller", () => {
   // ==========================================
   describe("deleteCategoryController", () => {
     describe("Successful Deletion", () => {
+      // Li Jiakai, A0252287Y
       it("should delete category successfully with valid id", async () => {
         // Arrange
         req.params = { id: "123" };
@@ -410,6 +422,7 @@ describe("Category Controller", () => {
     });
 
     describe("Error Handling", () => {
+      // Li Jiakai, A0252287Y
       it("should return 500 and log error when database deletion fails", async () => {
         // Arrange
         req.params = { id: "123" };

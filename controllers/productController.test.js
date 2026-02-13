@@ -48,8 +48,8 @@ const makeRes = () => {
   const res = {};
   res.status = jest.fn().mockReturnValue(res);
   res.send = jest.fn().mockReturnValue(res);
-  res.set = jest.fn().mockReturnValue(res); 
-  res.json = jest.fn().mockReturnValue(res); 
+  res.set = jest.fn().mockReturnValue(res);
+  res.json = jest.fn().mockReturnValue(res);
   return res;
 };
 
@@ -101,6 +101,7 @@ describe("Product Controller", () => {
     };
 
     describe("Request Validation - Missing Required Fields", () => {
+      // Li Jiakai, A0252287Y
       it("should return 400 when name is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, name: undefined };
@@ -113,6 +114,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when name is empty string", async () => {
         // Arrange
         req.fields = { ...validProductFields, name: "" };
@@ -125,6 +127,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when description is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, description: undefined };
@@ -137,6 +140,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Description is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when description is empty", async () => {
         // Arrange
         req.fields = { ...validProductFields, description: "" };
@@ -149,6 +153,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Description is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when price is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, price: undefined };
@@ -161,6 +166,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Price is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when price is zero", async () => {
         // Arrange
         req.fields = { ...validProductFields, price: 0 };
@@ -173,6 +179,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Price is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when category is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, category: undefined };
@@ -185,6 +192,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Category is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when category is empty", async () => {
         // Arrange
         req.fields = { ...validProductFields, category: "" };
@@ -197,6 +205,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Category is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when quantity is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, quantity: undefined };
@@ -209,6 +218,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Quantity is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when quantity is zero", async () => {
         // Arrange
         req.fields = { ...validProductFields, quantity: 0 };
@@ -221,6 +231,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Quantity is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when shipping is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, shipping: undefined };
@@ -233,6 +244,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Shipping is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when shipping is empty", async () => {
         // Arrange
         req.fields = { ...validProductFields, shipping: "" };
@@ -247,6 +259,7 @@ describe("Product Controller", () => {
     });
 
     describe("Request Validation - Photo Size", () => {
+      // Li Jiakai, A0252287Y
       it("should return 400 when photo size exceeds 1mb", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -262,6 +275,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Photo should be less than 1mb" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should allow photo exactly at 1mb limit", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -288,6 +302,7 @@ describe("Product Controller", () => {
     });
 
     describe("Successful Creation", () => {
+      // Li Jiakai, A0252287Y
       it("should create product successfully without photo", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -319,6 +334,7 @@ describe("Product Controller", () => {
         });
       });
 
+      // Li Jiakai, A0252287Y
       it("should create product successfully with valid photo", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -353,6 +369,7 @@ describe("Product Controller", () => {
         });
       });
 
+      // Li Jiakai, A0252287Y
       it("should create product with name containing special characters", async () => {
         // Arrange
         req.fields = { ...validProductFields, name: "NUS 120 T-Shirt" };
@@ -385,6 +402,7 @@ describe("Product Controller", () => {
     });
 
     describe("Error Handling", () => {
+      // Li Jiakai, A0252287Y
       it("should return 500 and log error when save throws", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -413,6 +431,7 @@ describe("Product Controller", () => {
         });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 500 and log error when fs.readFileSync throws", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -453,6 +472,7 @@ describe("Product Controller", () => {
   // ==========================================
   describe("deleteProductController", () => {
     describe("Successful Deletion", () => {
+      // Li Jiakai, A0252287Y
       it("should delete product successfully with valid pid", async () => {
         // Arrange
         req.params = { pid: "123" };
@@ -475,6 +495,7 @@ describe("Product Controller", () => {
         });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return success even when product does not exist", async () => {
         // Arrange
         req.params = { pid: "invalidId123" };
@@ -498,6 +519,7 @@ describe("Product Controller", () => {
     });
 
     describe("Error Handling", () => {
+      // Li Jiakai, A0252287Y
       it("should return 500 and log error when database deletion fails", async () => {
         // Arrange
         req.params = { pid: "123" };
@@ -537,6 +559,7 @@ describe("Product Controller", () => {
     };
 
     describe("Request Validation - Missing Required Fields", () => {
+      // Li Jiakai, A0252287Y
       it("should return 400 when name is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, name: undefined };
@@ -550,6 +573,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when name is empty string", async () => {
         // Arrange
         req.fields = { ...validProductFields, name: "" };
@@ -563,6 +587,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when description is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, description: undefined };
@@ -576,6 +601,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Description is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when description is empty", async () => {
         // Arrange
         req.fields = { ...validProductFields, description: "" };
@@ -589,6 +615,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Description is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when price is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, price: undefined };
@@ -602,6 +629,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Price is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when price is zero", async () => {
         // Arrange
         req.fields = { ...validProductFields, price: 0 };
@@ -615,6 +643,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Price is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when category is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, category: undefined };
@@ -628,6 +657,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Category is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when category is empty", async () => {
         // Arrange
         req.fields = { ...validProductFields, category: "" };
@@ -641,6 +671,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Category is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when quantity is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, quantity: undefined };
@@ -654,6 +685,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Quantity is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when quantity is zero", async () => {
         // Arrange
         req.fields = { ...validProductFields, quantity: 0 };
@@ -667,6 +699,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Quantity is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when shipping is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, shipping: undefined };
@@ -680,6 +713,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Shipping is required" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 400 when shipping is empty", async () => {
         // Arrange
         req.fields = { ...validProductFields, shipping: "" };
@@ -695,6 +729,7 @@ describe("Product Controller", () => {
     });
 
     describe("Request Validation - Photo Size", () => {
+      // Li Jiakai, A0252287Y
       it("should return 400 when photo size exceeds 1mb", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -711,6 +746,7 @@ describe("Product Controller", () => {
         expect(res.send).toHaveBeenCalledWith({ success: false, message: "Photo should be less than 1mb" });
       });
 
+      // Li Jiakai, A0252287Y
       it("should allow photo exactly at 1mb limit during update", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -738,6 +774,7 @@ describe("Product Controller", () => {
     });
 
     describe("Successful Update", () => {
+      // Li Jiakai, A0252287Y
       it("should update product successfully without photo", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -773,6 +810,7 @@ describe("Product Controller", () => {
         });
       });
 
+      // Li Jiakai, A0252287Y
       it("should update product successfully with new photo", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -810,6 +848,7 @@ describe("Product Controller", () => {
         });
       });
 
+      // Li Jiakai, A0252287Y
       it("should update product with different slug transformation", async () => {
         // Arrange
         req.fields = { ...validProductFields, name: "New & Improved Product v2!" };
@@ -844,6 +883,7 @@ describe("Product Controller", () => {
     });
 
     describe("Error Handling", () => {
+      // Li Jiakai, A0252287Y
       it("should return 500 and log error when findByIdAndUpdate throws", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -866,6 +906,7 @@ describe("Product Controller", () => {
         });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 500 and log error when save throws after update", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -896,6 +937,7 @@ describe("Product Controller", () => {
         });
       });
 
+      // Li Jiakai, A0252287Y
       it("should return 500 and log error when fs.readFileSync throws during update", async () => {
         // Arrange
         req.fields = { ...validProductFields };
@@ -1526,11 +1568,6 @@ describe("Product Controller", () => {
   });
 
 
-
-
-
-
-  
   // ==========================================
   // braintreeTokenController Tests
   // ==========================================
@@ -1773,7 +1810,7 @@ describe("Product Controller", () => {
       gateway.transaction.sale.mockImplementationOnce(() => {
           throw gatewayError;
       });
-      
+
       // Act
       await braintreePaymentController(req, res);
 
