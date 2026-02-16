@@ -641,6 +641,7 @@ describe("Auth Controller", () => {
         password: "hashedPassword123",
         phone: "1234567890",
         address: "123 Test St",
+        answer: "correctAnswer",
         role: 0,
       };
 
@@ -676,21 +677,26 @@ describe("Auth Controller", () => {
         password: "hashedPassword123",
         phone: "1234567890",
         address: "123 Test St",
+        answer: "correctAnswer",
         role: 0,
       };
 
       const hashedNewPassword = "hashedNewPassword123";
 
+      const updatedUserData = {
+        _id: "userId123",
+        name: "Updated Name",
+        email: "new@example.com",
+        password: hashedNewPassword,
+        phone: "9876543210",
+        address: "456 New St",
+        answer: "correctAnswer",
+        role: 0,
+      };
+
       userModel.findById.mockResolvedValue(mockUser);
       hashPassword.mockResolvedValue(hashedNewPassword);
-      userModel.findByIdAndUpdate.mockResolvedValue({
-        ...mockUser,
-        name: "Updated Name",
-        phone: "9876543210",
-        email: "new@example.com",
-        address: "456 New St",
-        password: hashedNewPassword,
-      });
+      userModel.findByIdAndUpdate.mockResolvedValue(updatedUserData);
 
       // Act
       await updateProfileController(req, res);
@@ -708,16 +714,22 @@ describe("Auth Controller", () => {
         },
         { new: true }
       );
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Profile Updated Successfully",
+        updatedUser: updatedUserData,
+      });
     });
 
-    it("should update the user profile with subset of fields", async () => {
+    it("should update the user profile with new name", async () => {
       // Arrange
       req.user = {
         _id: "userId123"
       };
 
       req.body = {
-        name: "Updated Name" //Only name
+        name: "Updated Name" // Only name
       }
 
       const mockUser = {
@@ -727,14 +739,23 @@ describe("Auth Controller", () => {
         password: "hashedPassword123",
         phone: "1234567890",
         address: "123 Test St",
+        answer: "correctAnswer",
+        role: 0,
+      };
+
+      const updatedUserData = {
+        _id: "userId123",
+        name: "Updated Name",
+        email: "test@example.com",
+        password: "hashedPassword123",
+        phone: "1234567890",
+        address: "123 Test St",
+        answer: "correctAnswer",
         role: 0,
       };
       
       userModel.findById.mockResolvedValue(mockUser);
-      userModel.findByIdAndUpdate.mockResolvedValue({
-        ...mockUser,
-        name: "Updated Name",
-      });
+      userModel.findByIdAndUpdate.mockResolvedValue(updatedUserData);
 
       // Act
       await updateProfileController(req, res);
@@ -752,16 +773,23 @@ describe("Auth Controller", () => {
         },
         { new: true }
       );
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Profile Updated Successfully",
+        updatedUser: updatedUserData,
+      });
     });
 
-    it("should return 200 status and success message upon successful update", async () => {
+    it("should update the user profile with new email", async () => {
       // Arrange
-      req.user = { _id: "userId123" };
-      req.body = {
-        name: "Updated Name",
-        phone: "9876543210",
-        address: "456 New St",
+      req.user = {
+        _id: "userId123"
       };
+
+      req.body = {
+        email: "new@example.com" // Only email
+      }
 
       const mockUser = {
         _id: "userId123",
@@ -770,19 +798,21 @@ describe("Auth Controller", () => {
         password: "hashedPassword123",
         phone: "1234567890",
         address: "123 Test St",
+        answer: "correctAnswer",
         role: 0,
       };
 
       const updatedUserData = {
         _id: "userId123",
-        name: "Updated Name",
-        email: "test@example.com",
+        name: "Test User",
+        email: "new@example.com",
         password: "hashedPassword123",
-        phone: "9876543210",
-        address: "456 New St",
+        phone: "1234567890",
+        address: "123 Test St",
+        answer: "correctAnswer",
         role: 0,
       };
-
+      
       userModel.findById.mockResolvedValue(mockUser);
       userModel.findByIdAndUpdate.mockResolvedValue(updatedUserData);
 
@@ -790,6 +820,18 @@ describe("Auth Controller", () => {
       await updateProfileController(req, res);
 
       // Assert
+      expect(hashPassword).not.toHaveBeenCalled(); // No password update
+      expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        "userId123",
+        {
+          name: "Test User",
+          password: "hashedPassword123",
+          email: "new@example.com",
+          phone: "1234567890",        
+          address: "123 Test St",
+        },
+        { new: true }
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.send).toHaveBeenCalledWith({
         success: true,
