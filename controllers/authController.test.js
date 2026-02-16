@@ -1,4 +1,4 @@
-import { registerController, loginController, forgotPasswordController, updateProfileController } from "./authController.js";
+import { registerController, loginController, forgotPasswordController, updateProfileController, testController } from "./authController.js";
 import userModel from "../models/userModel.js";
 import { hashPassword, comparePassword } from "../helpers/authHelper.js";
 import JWT from "jsonwebtoken";
@@ -595,6 +595,33 @@ describe("Auth Controller", () => {
           error: dbError,
         });
       });
+    });
+  });
+
+  // testController Tests
+  describe("testController", () => {
+    it("should send 'Protected Routes' message", () => {
+      // Act
+      testController(req, res);
+
+      // Assert
+      expect(res.send).toHaveBeenCalledWith("Protected Routes");
+    });
+
+    it("should handle errors and send error response", () => {
+      // Arrange
+      const mockError = new Error("Test error");
+      res.send = jest.fn().mockImplementationOnce(() => {
+        throw mockError;
+      }).mockReturnThis();
+
+      // Act
+      testController(req, res);
+
+      // Assert
+      expect(consoleLogSpy).toHaveBeenCalledWith(mockError);
+      expect(res.send).toHaveBeenCalledTimes(2); // First call throws, second call handles error
+      expect(res.send).toHaveBeenLastCalledWith({ error: mockError });
     });
   });
 
