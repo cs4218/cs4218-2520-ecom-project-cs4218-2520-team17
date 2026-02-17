@@ -129,8 +129,8 @@ describe('Login Component', () => {
         });
     });
 
-    it('should display error message on failed login', async () => {
-        axios.post.mockRejectedValueOnce({ message: 'Invalid credentials' });
+    it('should display error message when API call throws error', async () => {
+        axios.post.mockRejectedValueOnce(new Error('Network Error'));
         axios.get.mockResolvedValueOnce({ data: { category: [] } });
 
         const { getByPlaceholderText, getByText } = render(
@@ -148,5 +148,26 @@ describe('Login Component', () => {
 
         await waitFor(() => expect(axios.post).toHaveBeenCalled());
         expect(toast.error).toHaveBeenCalledWith('Something went wrong');
+    });
+
+    it('should display error message when API call returns success: false', async () => {
+        axios.post.mockResolvedValueOnce({ data: { success: false, message: 'Invalid credentials' } });
+        axios.get.mockResolvedValueOnce({ data: { category: [] } });
+
+        const { getByPlaceholderText, getByText } = render(
+            <MemoryRouter initialEntries={['/login']}>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                </Routes>
+            </MemoryRouter>
+        );
+        await waitFor(() => expect(axios.get).toHaveBeenCalled());
+
+        fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
+        fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
+        fireEvent.click(getByText('LOGIN'));
+
+        await waitFor(() => expect(axios.post).toHaveBeenCalled());
+        expect(toast.error).toHaveBeenCalledWith('Invalid credentials');
     });
 });
