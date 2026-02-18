@@ -1,8 +1,6 @@
-import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import '@testing-library/jest-dom/extend-expect';
 import toast from 'react-hot-toast';
 import Register from './Register';
 
@@ -17,10 +15,10 @@ jest.mock('../../context/auth', () => ({
   jest.mock('../../context/cart', () => ({
     useCart: jest.fn(() => [null, jest.fn()]) // Mock useCart hook to return null state and a mock function
   }));
-    
+
 jest.mock('../../context/search', () => ({
     useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
-  }));  
+  }));
 
   Object.defineProperty(window, 'localStorage', {
     value: {
@@ -38,7 +36,7 @@ window.matchMedia = window.matchMedia || function() {
       removeListener: function() {}
     };
   };
-      
+
 
 describe('Register Component', () => {
   beforeEach(() => {
@@ -53,11 +51,12 @@ describe('Register Component', () => {
         <MemoryRouter initialEntries={['/register']}>
           <Routes>
             <Route path="/register" element={<Register />} />
+            <Route path="*" element={<></>} />
           </Routes>
         </MemoryRouter>
       );
     await waitFor(() => expect(axios.get).toHaveBeenCalled());
-    
+
     fireEvent.change(getByPlaceholderText('Enter Your Name'), { target: { value: 'John Doe' } });
     fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
     fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
@@ -80,6 +79,7 @@ describe('Register Component', () => {
         <MemoryRouter initialEntries={['/register']}>
           <Routes>
             <Route path="/register" element={<Register />} />
+            <Route path="*" element={<></>} />
           </Routes>
         </MemoryRouter>
       );

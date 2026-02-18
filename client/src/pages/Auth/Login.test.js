@@ -1,8 +1,6 @@
-import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import '@testing-library/jest-dom/extend-expect';
 import toast from 'react-hot-toast';
 import Login from './Login';
 
@@ -17,10 +15,10 @@ jest.mock('../../context/auth', () => ({
   jest.mock('../../context/cart', () => ({
     useCart: jest.fn(() => [null, jest.fn()]) // Mock useCart hook to return null state and a mock function
   }));
-    
+
 jest.mock('../../context/search', () => ({
     useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
-  }));  
+  }));
 
   Object.defineProperty(window, 'localStorage', {
     value: {
@@ -37,7 +35,7 @@ window.matchMedia = window.matchMedia || function() {
       addListener: function() {},
       removeListener: function() {}
     };
-  };  
+  };
 
 describe('Login Component', () => {
     beforeEach(() => {
@@ -51,6 +49,7 @@ describe('Login Component', () => {
           <MemoryRouter initialEntries={['/login']}>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="*" element={<></>} />
             </Routes>
           </MemoryRouter>
         );
@@ -67,16 +66,17 @@ describe('Login Component', () => {
           <MemoryRouter initialEntries={['/login']}>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="*" element={<></>} />
             </Routes>
           </MemoryRouter>
         );
         await waitFor(() => expect(axios.get).toHaveBeenCalled());
-    
+
         expect(getByText('LOGIN FORM')).toBeInTheDocument();
         expect(getByPlaceholderText('Enter Your Email').value).toBe('');
         expect(getByPlaceholderText('Enter Your Password').value).toBe('');
       });
-    
+
       it('should allow typing email and password', async () => {
         axios.get.mockResolvedValueOnce({ data: { category: [] } });
 
@@ -84,6 +84,7 @@ describe('Login Component', () => {
           <MemoryRouter initialEntries={['/login']}>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="*" element={<></>} />
             </Routes>
           </MemoryRouter>
         );
@@ -94,7 +95,7 @@ describe('Login Component', () => {
         expect(getByPlaceholderText('Enter Your Email').value).toBe('test@example.com');
         expect(getByPlaceholderText('Enter Your Password').value).toBe('password123');
       });
-      
+
     it('should login the user successfully', async () => {
         axios.post.mockResolvedValueOnce({
             data: {
@@ -109,6 +110,7 @@ describe('Login Component', () => {
             <MemoryRouter initialEntries={['/login']}>
                 <Routes>
                     <Route path="/login" element={<Login />} />
+                    <Route path="*" element={<></>} />
                 </Routes>
             </MemoryRouter>
         );
@@ -137,6 +139,7 @@ describe('Login Component', () => {
             <MemoryRouter initialEntries={['/login']}>
                 <Routes>
                     <Route path="/login" element={<Login />} />
+                    <Route path="*" element={<></>} />
                 </Routes>
             </MemoryRouter>
         );
