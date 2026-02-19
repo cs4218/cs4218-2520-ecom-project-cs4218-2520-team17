@@ -44,6 +44,7 @@ describe("Auth Controller", () => {
     consoleErrorSpy.mockRestore();
   });
 
+  // Tan Zhi Heng, A0252037M
   // registerController Tests
   describe("registerController", () => {
     describe("Request Validation", () => {
@@ -274,6 +275,7 @@ describe("Auth Controller", () => {
     });
   });
 
+  // Tan Zhi Heng, A0252037M
   // loginController Tests
   describe("loginController", () => {
     describe("Request Validation", () => {
@@ -450,6 +452,7 @@ describe("Auth Controller", () => {
     });
   });
 
+  // Tan Zhi Heng, A0252037M
   // forgotPasswordController Tests
   describe("forgotPasswordController", () => {
     describe("Request Validation", () => {
@@ -598,6 +601,7 @@ describe("Auth Controller", () => {
     });
   });
 
+  // Tan Zhi Heng, A0252037M
   // testController Tests
   describe("testController", () => {
     it("should send 'Protected Routes' message", () => {

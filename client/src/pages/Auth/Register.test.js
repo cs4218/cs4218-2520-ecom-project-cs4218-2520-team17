@@ -99,6 +99,7 @@ describe('Register Component', () => {
     expect(toast.error).toHaveBeenCalledWith('Something went wrong');
   });
 
+  // Tan Zhi Heng, A0252037M
   it('should display error message when API call returns success: false', async () => {
     axios.post.mockResolvedValueOnce({ data: { success: false, message: 'User already exists' } });
     axios.get.mockResolvedValueOnce({ data: { category: [] } });

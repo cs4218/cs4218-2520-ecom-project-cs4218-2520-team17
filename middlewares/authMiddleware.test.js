@@ -6,6 +6,7 @@ import userModel from "../models/userModel.js";
 jest.mock("jsonwebtoken");
 jest.mock("../models/userModel.js");
 
+// Tan Zhi Heng, A0252037M
 describe("Auth Middleware", () => {
   let req;
   let res;
