@@ -53,16 +53,21 @@ jobs:
       - name: Install client dependencies
         run: npm ci --prefix ./client
 
-      - name: Run Jest tests with coverage
-        run: npm test
+      - name: Run Backend Jest tests with coverage
+        run: npm run test:backend
         continue-on-error: true
-        id: jest-test
+        id: jest-test-backend
+
+      - name: Run Frontend (client) Jest tests with coverage
+        run: npm run test:frontend
+        continue-on-error: true
+        id: jest-test-frontend
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Fail if Jest Coverage check failed
-        if: steps.jest-test.outcome == 'failure'
+      - name: Fail if any Jest Coverage check failed
+        if: steps.jest-test-backend.outcome == 'failure' || steps.jest-test-frontend.outcome == 'failure'
         run: exit 1

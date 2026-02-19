@@ -24,6 +24,7 @@ export default {
 
   // jest code coverage
   collectCoverage: true,
+  coverageDirectory: "<rootDir>/coverage/frontend",
   collectCoverageFrom: [
     "<rootDir>/client/src/components/**",
     "<rootDir>/client/src/context/**",
