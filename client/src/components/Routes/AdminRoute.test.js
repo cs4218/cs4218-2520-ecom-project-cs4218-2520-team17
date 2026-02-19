@@ -41,6 +41,8 @@ const renderAdminRoute = (useAuthReturnValue = { token: 'test-token' }) => {
 describe('AdminRoute Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Restore original implementations of spies
+    jest.restoreAllMocks();
   });
 
   describe('Initial Loading State', () => {
@@ -163,6 +165,8 @@ describe('AdminRoute Component', () => {
     test('should display Unauthorized when API call fails', async () => {
       // Arrange
       axios.get.mockRejectedValue(new Error('Network error'));
+      // Suppress console.error output
+      jest.spyOn(console, 'error').mockImplementation(() => {});
 
       // Act
       renderAdminRoute();
