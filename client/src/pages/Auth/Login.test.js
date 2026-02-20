@@ -50,8 +50,15 @@ const renderLoginComponent = () => {
 };
 
 describe('Login Component', () => {
+    let consoleLogSpy;
+
     beforeEach(() => {
         jest.clearAllMocks();
+        consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        consoleLogSpy.mockRestore();
     });
 
     it('renders login form', async () => {
@@ -120,7 +127,8 @@ describe('Login Component', () => {
 
     it('should display error message when API call throws error', async () => {
         // Arrange
-        axios.post.mockRejectedValueOnce(new Error('Network Error'));
+        const error = new Error('Network Error');
+        axios.post.mockRejectedValueOnce(error);
         renderLoginComponent();
         await waitFor(() => expect(axios.get).toHaveBeenCalled());
 
@@ -132,6 +140,7 @@ describe('Login Component', () => {
         // Assert
         await waitFor(() => expect(axios.post).toHaveBeenCalled());
         expect(toast.error).toHaveBeenCalledWith('Something went wrong');
+        expect(consoleLogSpy).toHaveBeenCalledWith(error);
     });
 
     // Tan Zhi Heng, A0252037M
@@ -142,9 +151,9 @@ describe('Login Component', () => {
         await waitFor(() => expect(axios.get).toHaveBeenCalled());
         
         // Act
-        fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
-        fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
-        fireEvent.click(getByText('LOGIN'));
+        fireEvent.change(screen.getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
+        fireEvent.change(screen.getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
+        fireEvent.click(screen.getByText('LOGIN'));
         
         // Assert
         await waitFor(() => expect(axios.post).toHaveBeenCalled());
