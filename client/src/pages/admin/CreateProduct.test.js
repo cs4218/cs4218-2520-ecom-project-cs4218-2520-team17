@@ -410,7 +410,7 @@ describe("CreateProduct Component", () => {
       // Act
       const fileInput = screen.getByLabelText(/upload photo/i);
       const nonImageFile = new File(["dummy text file"], "file.txt", { type: "text/plain" });
-      userEvent.upload(fileInput, nonImageFile);
+      await userEvent.upload(fileInput, nonImageFile);
 
       // Assert
       expect(screen.queryByText("file.txt")).not.toBeInTheDocument();
