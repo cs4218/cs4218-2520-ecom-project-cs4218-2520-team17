@@ -118,9 +118,9 @@ describe('Login Component', () => {
         });
     });
 
-    it('should display error message on failed login', async () => {
+    it('should display error message when API call throws error', async () => {
         // Arrange
-        axios.post.mockRejectedValueOnce({ message: 'Invalid credentials' });
+        axios.post.mockRejectedValueOnce(new Error('Network Error'));
         renderLoginComponent();
         await waitFor(() => expect(axios.get).toHaveBeenCalled());
 
@@ -132,5 +132,22 @@ describe('Login Component', () => {
         // Assert
         await waitFor(() => expect(axios.post).toHaveBeenCalled());
         expect(toast.error).toHaveBeenCalledWith('Something went wrong');
+    });
+
+    // Tan Zhi Heng, A0252037M
+    it('should display error message when API call returns success: false', async () => {
+        // Arrange
+        axios.post.mockResolvedValueOnce({ data: { success: false, message: 'Invalid credentials' } });
+        renderLoginComponent();
+        await waitFor(() => expect(axios.get).toHaveBeenCalled());
+        
+        // Act
+        fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
+        fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
+        fireEvent.click(getByText('LOGIN'));
+        
+        // Assert
+        await waitFor(() => expect(axios.post).toHaveBeenCalled());
+        expect(toast.error).toHaveBeenCalledWith('Invalid credentials');
     });
 });

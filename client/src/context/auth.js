@@ -1,6 +1,7 @@
 import { useState, useContext, createContext, useEffect } from "react";
 import axios from "axios";
 
+// Establishes a global auth state accessible throughout the app
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
@@ -12,6 +13,7 @@ const AuthProvider = ({ children }) => {
     //default axios
     axios.defaults.headers.common["Authorization"] = auth?.token;
 
+    // On mount, loads saved auth data from localStorage to maintain sessions across page refreshes
     useEffect(() => {
        const data = localStorage.getItem("auth");
        if (data) {
@@ -24,6 +26,7 @@ const AuthProvider = ({ children }) => {
        }
        //eslint-disable-next-line
     }, []);
+    // Any component inside {children} can access auth and setAuth via useAuth() hook
     return (
         <AuthContext.Provider value={[auth, setAuth]}>
             {children}
