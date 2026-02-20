@@ -73,7 +73,7 @@ describe("SearchInput", () => {
 
     render(<SearchInput />);
 
-    await fireEvent.click(screen.getByRole("button", { name: /search/i }));
+    fireEvent.click(screen.getByRole("button", { name: /search/i }));
 
     await waitFor(() => {
       expect(axios.get).toHaveBeenCalledWith("/api/v1/product/search/iphone");
@@ -100,7 +100,7 @@ describe("SearchInput", () => {
 
     render(<SearchInput />);
 
-    await fireEvent.click(screen.getByRole("button", { name: /search/i }));
+    fireEvent.click(screen.getByRole("button", { name: /search/i }));
 
     await waitFor(() => {
       expect(logSpy).toHaveBeenCalled();
