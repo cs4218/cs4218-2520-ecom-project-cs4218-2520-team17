@@ -631,6 +631,7 @@ describe("Auth Controller", () => {
 
   // updateProfileController Tests
   describe("updateProfileController", () => {
+    //  Sebastian Tay Yong Xun, A0252864X
     it("should enforce the password requirements of a string with minimum 6 characters", async () => {
       // Arrange
       req.user = { _id: "userId123" };
@@ -663,6 +664,7 @@ describe("Auth Controller", () => {
       expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
     });
 
+    //  Sebastian Tay Yong Xun, A0252864X
     it("should update the user profile with a full request body data", async () => {
       // Arrange
       req.user = { _id: "userId123" };
@@ -726,7 +728,8 @@ describe("Auth Controller", () => {
       });
     });
 
-    it("should update the user profile with new name", async () => {
+    //  Sebastian Tay Yong Xun, A0252864X
+    it("should update the user profile with subset of fields", async () => {
       // Arrange
       req.user = {
         _id: "userId123"
@@ -785,7 +788,8 @@ describe("Auth Controller", () => {
       });
     });
 
-    it("should update the user profile with new email", async () => {
+    //  Sebastian Tay Yong Xun, A0252864X
+    it("should return 200 status and success message upon successful update", async () => {
       // Arrange
       req.user = {
         _id: "userId123"
@@ -844,6 +848,7 @@ describe("Auth Controller", () => {
       });
     });
 
+    //  Sebastian Tay Yong Xun, A0252864X
     it("should handle errors and return 400 status with error message", async () => {
       // Arrange
       req.user = { _id: "userId123" };
