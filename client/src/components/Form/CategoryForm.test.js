@@ -8,6 +8,7 @@ describe('CategoryForm Component', () => {
   });
 
   describe('Rendering', () => {
+    // Li Jiakai, A0252287Y
     test('should render input and button', () => {
       // Arrange
       const handleSubmit = jest.fn();
@@ -24,6 +25,7 @@ describe('CategoryForm Component', () => {
       expect(button).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test('should render input container with mb-3 class', () => {
       // Arrange
       const handleSubmit = jest.fn();
@@ -39,6 +41,7 @@ describe('CategoryForm Component', () => {
       expect(inputContainer).toHaveClass('mb-3');
     });
 
+    // Li Jiakai, A0252287Y
     test('should render submit button with btn-primary class', () => {
       // Arrange
       const handleSubmit = jest.fn();
@@ -54,6 +57,7 @@ describe('CategoryForm Component', () => {
       expect(submitButton).toHaveClass('btn btn-primary');
     });
 
+    // Li Jiakai, A0252287Y
     test('should render value in input field', () => {
       // Arrange
       const handleSubmit = jest.fn();
@@ -70,6 +74,7 @@ describe('CategoryForm Component', () => {
   });
 
   describe('Interaction Test', () => {
+    // Li Jiakai, A0252287Y
     test('should call setValue on input change', () => {
       // Arrange
       const handleSubmit = jest.fn();
@@ -86,6 +91,7 @@ describe('CategoryForm Component', () => {
       expect(setValue).toHaveBeenCalledWith('Books');
     });
 
+    // Li Jiakai, A0252287Y
     test('should call handleSubmit when submit button is clicked', () => {
       // Arrange
       const handleSubmit = jest.fn((e) => e.preventDefault());

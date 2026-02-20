@@ -12,6 +12,7 @@ const renderAdminMenu = () => {
 
 describe('AdminMenu Component', () => {
   describe('Rendering', () => {
+    // Li Jiakai, A0252287Y
     test('should render component without crashing', () => {
       // Arrange & Act
       const { container } = renderAdminMenu();
@@ -20,6 +21,7 @@ describe('AdminMenu Component', () => {
       expect(container).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test('should render Admin Panel heading with correct level', () => {
       // Arrange & Act
       renderAdminMenu();
@@ -30,6 +32,7 @@ describe('AdminMenu Component', () => {
       expect(heading.tagName).toBe('H4');
     });
 
+    // Li Jiakai, A0252287Y
     test('should render all navigation links', () => {
       // Arrange
       const expectedLinks = [
@@ -51,6 +54,7 @@ describe('AdminMenu Component', () => {
   });
 
   describe('Navigation Links', () => {
+    // Li Jiakai, A0252287Y
     test('should have correct href for Create Category link', () => {
       // Arrange & Act
       renderAdminMenu();
@@ -60,6 +64,7 @@ describe('AdminMenu Component', () => {
       expect(link).toHaveAttribute('href', '/dashboard/admin/create-category');
     });
 
+    // Li Jiakai, A0252287Y
     test('should have correct href for Create Product link', () => {
       // Arrange & Act
       renderAdminMenu();
@@ -69,6 +74,7 @@ describe('AdminMenu Component', () => {
       expect(link).toHaveAttribute('href', '/dashboard/admin/create-product');
     });
 
+    // Li Jiakai, A0252287Y
     test('should have correct href for Products link', () => {
       // Arrange & Act
       renderAdminMenu();
@@ -78,6 +84,7 @@ describe('AdminMenu Component', () => {
       expect(link).toHaveAttribute('href', '/dashboard/admin/products');
     });
 
+    // Li Jiakai, A0252287Y
     test('should have correct href for Orders link', () => {
       // Arrange & Act
       renderAdminMenu();
@@ -87,6 +94,7 @@ describe('AdminMenu Component', () => {
       expect(link).toHaveAttribute('href', '/dashboard/admin/orders');
     });
 
+    // Li Jiakai, A0252287Y
     test('should have correct href for Users link', () => {
       // Arrange & Act
       renderAdminMenu();
@@ -98,6 +106,7 @@ describe('AdminMenu Component', () => {
   });
 
   describe('CSS Classes', () => {
+    // Li Jiakai, A0252287Y
     test('should apply correct CSS classes to navigation links', () => {
       // Arrange & Act
       renderAdminMenu();
@@ -109,6 +118,7 @@ describe('AdminMenu Component', () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test('should have text-center class on main container', () => {
       // Arrange & Act
       renderAdminMenu();
@@ -118,6 +128,7 @@ describe('AdminMenu Component', () => {
       expect(mainContainer).toHaveClass('text-center');
     });
 
+    // Li Jiakai, A0252287Y
     test('should have dashboard-menu class on menu list container', () => {
       // Arrange & Act
       renderAdminMenu();

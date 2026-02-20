@@ -8,6 +8,7 @@ jest.mock('../../components/Layout', () => ({ children, title }) => (
 ));
 
 describe('Admin Users Page', () => {
+  // Li Jiakai, A0252287Y
   test('should render layout with correct title', () => {
     // Arrange & Act
     render(<Users />);
@@ -18,6 +19,7 @@ describe('Admin Users Page', () => {
     expect(layout.getAttribute('data-title')).toBe('Dashboard - All Users');
   });
 
+  // Li Jiakai, A0252287Y
   test('should render AdminMenu mock', () => {
     // Arrange & Act
     render(<Users />);
@@ -27,6 +29,7 @@ describe('Admin Users Page', () => {
     expect(adminMenu).toBeInTheDocument();
   });
 
+  // Li Jiakai, A0252287Y
   test('should render container with correct classes', () => {
     // Arrange & Act
     render(<Users />);
@@ -36,6 +39,7 @@ describe('Admin Users Page', () => {
     expect(container).toHaveClass('container-fluid', 'm-3', 'p-3');
   });
 
+  // Li Jiakai, A0252287Y
   test('should render row with correct class', () => {
     // Arrange & Act
     render(<Users />);
@@ -45,6 +49,7 @@ describe('Admin Users Page', () => {
     expect(row).toHaveClass('row');
   });
 
+  // Li Jiakai, A0252287Y
   test('should render sidebar with correct class', () => {
     // Arrange & Act
     render(<Users />);
@@ -54,6 +59,7 @@ describe('Admin Users Page', () => {
     expect(sidebar).toHaveClass('col-md-3');
   });
 
+  // Li Jiakai, A0252287Y
   test('should render main with correct class', () => {
     // Arrange & Act
     render(<Users />);
@@ -63,6 +69,7 @@ describe('Admin Users Page', () => {
     expect(main).toHaveClass('col-md-9');
   });
 
+  // Li Jiakai, A0252287Y
   test('should render All Users heading with correct level', () => {
     // Arrange & Act
     render(<Users />);

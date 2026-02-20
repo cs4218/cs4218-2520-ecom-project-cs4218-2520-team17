@@ -102,6 +102,7 @@ describe("UpdateProduct Component", () => {
   });
 
   describe("Initial Rendering", () => {
+    // Li Jiakai, A0252287Y
     test("should render without crashing", async () => {
       // Arrange
       setupAxiosMocks();
@@ -114,6 +115,7 @@ describe("UpdateProduct Component", () => {
       expect(screen.getByTestId("update-product-container")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render Layout with correct title", async () => {
       // Arrange
       setupAxiosMocks();
@@ -129,6 +131,7 @@ describe("UpdateProduct Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should render AdminMenu component", async () => {
       // Arrange
       setupAxiosMocks();
@@ -141,6 +144,7 @@ describe("UpdateProduct Component", () => {
       expect(screen.getByTestId("admin-menu")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render Update Product heading", async () => {
       // Arrange
       setupAxiosMocks();
@@ -155,6 +159,7 @@ describe("UpdateProduct Component", () => {
       ).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render Update Product and Delete Product buttons", async () => {
       // Arrange
       setupAxiosMocks();
@@ -174,6 +179,7 @@ describe("UpdateProduct Component", () => {
   });
 
   describe("Fetching Product and Categories on Mount", () => {
+    // Li Jiakai, A0252287Y
     test("should call GET /api/v1/product/get-product/:slug on mount", async () => {
       // Arrange
       setupAxiosMocks();
@@ -189,6 +195,7 @@ describe("UpdateProduct Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should call GET /api/v1/category/get-category on mount", async () => {
       // Arrange
       setupAxiosMocks();
@@ -202,6 +209,7 @@ describe("UpdateProduct Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should populate form fields with the fetched product data", async () => {
       // Arrange/Act
       await renderAndWaitForLoad();
@@ -213,6 +221,7 @@ describe("UpdateProduct Component", () => {
       expect(screen.getByDisplayValue("10")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should populate the category select with the product's category", async () => {
       // Arrange/Act
       await renderAndWaitForLoad();
@@ -222,6 +231,7 @@ describe("UpdateProduct Component", () => {
       expect(categorySelect).toHaveValue("cat1");
     });
 
+    // Li Jiakai, A0252287Y
     test("should populate the shipping select with the product's shipping value", async () => {
       // Arrange/Act
       await renderAndWaitForLoad();
@@ -231,6 +241,7 @@ describe("UpdateProduct Component", () => {
       expect(shippingSelect).toHaveValue("true");
     });
 
+    // Li Jiakai, A0252287Y
     test("should display fetched categories as options in the category select", async () => {
       // Arrange/Act
       await renderAndWaitForLoad();
@@ -243,6 +254,7 @@ describe("UpdateProduct Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should show the existing product photo from API before a new photo is selected", async () => {
       // Arrange/Act
       await renderAndWaitForLoad();
@@ -255,6 +267,7 @@ describe("UpdateProduct Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when product fetch returns success: false", async () => {
       // Arrange
       axios.get.mockImplementation((url) => {
@@ -272,6 +285,7 @@ describe("UpdateProduct Component", () => {
       expect(toast.error).toHaveBeenCalledWith("Mock Error Message");
     });
 
+    // Li Jiakai, A0252287Y
     test("should log error and show error toast when product fetch throws an error", async () => {
       // Arrange
       const consoleErrorSpy = jest
@@ -295,6 +309,7 @@ describe("UpdateProduct Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when category fetch returns success: false", async () => {
       // Arrange
       axios.get.mockImplementation((url) => {
@@ -312,6 +327,7 @@ describe("UpdateProduct Component", () => {
       expect(toast.error).toHaveBeenCalledWith("Mock Error Message");
     });
 
+    // Li Jiakai, A0252287Y
     test("should log error and show error toast when category fetch throws an error", async () => {
       // Arrange
       const consoleErrorSpy = jest
@@ -337,6 +353,7 @@ describe("UpdateProduct Component", () => {
   });
 
   describe("Photo Upload", () => {
+    // Li Jiakai, A0252287Y
     test("should display selected photo file name in the label", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -349,6 +366,7 @@ describe("UpdateProduct Component", () => {
       expect(screen.getByText("new-photo.jpg")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should show a blob preview when a new photo is selected", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -365,6 +383,7 @@ describe("UpdateProduct Component", () => {
   });
 
   describe("Updating a Product", () => {
+    // Li Jiakai, A0252287Y
     test("should call PUT /api/v1/product/update-product/:id with FormData on submit", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -382,6 +401,7 @@ describe("UpdateProduct Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should include updated field values in the submitted FormData", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -423,6 +443,7 @@ describe("UpdateProduct Component", () => {
       expect(submittedFormData.get("photo")).toBe(mockPhoto);
     });
 
+    // Li Jiakai, A0252287Y
     test("should show success toast and navigate to products page on successful update", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -437,6 +458,7 @@ describe("UpdateProduct Component", () => {
       expect(mockNavigate).toHaveBeenCalledWith("/dashboard/admin/products");
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast and not navigate when API returns success: false", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -453,6 +475,7 @@ describe("UpdateProduct Component", () => {
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when PUT throws a network error", async () => {
       // Arrange
       const consoleErrorSpy = jest
@@ -473,6 +496,7 @@ describe("UpdateProduct Component", () => {
   });
 
   describe("Deleting a Product", () => {
+    // Li Jiakai, A0252287Y
     test("should show a confirmation prompt when delete button is clicked", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -487,6 +511,7 @@ describe("UpdateProduct Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should call DELETE /api/v1/product/delete-product/:id when prompt is confirmed", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -504,6 +529,7 @@ describe("UpdateProduct Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should show success toast and navigate after successful delete", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -519,6 +545,7 @@ describe("UpdateProduct Component", () => {
       expect(mockNavigate).toHaveBeenCalledWith("/dashboard/admin/products");
     });
 
+    // Li Jiakai, A0252287Y
     test("should not call DELETE when window.confirm returns false", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -532,6 +559,7 @@ describe("UpdateProduct Component", () => {
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
+    // Li Jiakai, A0252287Y
     test("should not call DELETE when window.confirm returns undefined", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -544,6 +572,7 @@ describe("UpdateProduct Component", () => {
       expect(axios.delete).not.toHaveBeenCalled();
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when API returns success: false on delete", async () => {
       // Arrange
       await renderAndWaitForLoad();
@@ -560,6 +589,7 @@ describe("UpdateProduct Component", () => {
       expect(toast.error).toHaveBeenCalledWith("Delete failed");
     });
 
+    // Li Jiakai, A0252287Y
     test("should log error and show error toast when DELETE throws a network error", async () => {
       // Arrange
       const consoleErrorSpy = jest

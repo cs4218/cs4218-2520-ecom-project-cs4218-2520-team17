@@ -75,6 +75,7 @@ describe("CreateProduct Component", () => {
   });
 
   describe("Initial Rendering", () => {
+    // Li Jiakai, A0252287Y
     test("should render without crashing", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -87,6 +88,7 @@ describe("CreateProduct Component", () => {
       expect(screen.getByTestId("create-product-container")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render Layout with correct title", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -102,6 +104,7 @@ describe("CreateProduct Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should render AdminMenu component", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -114,6 +117,7 @@ describe("CreateProduct Component", () => {
       expect(screen.getByTestId("admin-menu")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render Create Product h1 heading", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -128,6 +132,7 @@ describe("CreateProduct Component", () => {
       expect(heading.tagName).toBe("H1");
     });
 
+    // Li Jiakai, A0252287Y
     test("should render all product form fields", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -143,6 +148,7 @@ describe("CreateProduct Component", () => {
       expect(screen.getByPlaceholderText(/write a quantity/i)).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render Upload Photo label with default text", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -155,6 +161,7 @@ describe("CreateProduct Component", () => {
       expect(screen.getByText(/upload photo/i)).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render Create Product button", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -171,6 +178,7 @@ describe("CreateProduct Component", () => {
   });
 
   describe("Fetching Categories on Mount", () => {
+    // Li Jiakai, A0252287Y
     test("should call GET /api/v1/category/get-category on mount", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -184,6 +192,7 @@ describe("CreateProduct Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should display fetched categories in the select dropdown", async () => {
       // Arrange/Act
       await renderWithMockCategories();
@@ -194,6 +203,7 @@ describe("CreateProduct Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when category fetch returns success: false", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: false, message: "Failed to fetch categories" } });
@@ -206,6 +216,7 @@ describe("CreateProduct Component", () => {
       expect(toast.error).toHaveBeenCalledWith("Failed to fetch categories");
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when category fetch throws an error", async () => {
       // Arrange
       const consoleErrorSpy = jest
@@ -254,6 +265,7 @@ describe("CreateProduct Component", () => {
       fireEvent.click(screen.getByRole("button", { name: /create product/i }));
     };
 
+    // Li Jiakai, A0252287Y
     test("should call POST /api/v1/product/create-product with FormData on submit", async () => {
       // Arrange
       axios.post.mockResolvedValueOnce({ data: { success: true } });
@@ -270,6 +282,7 @@ describe("CreateProduct Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should include all form field values in the submitted FormData", async () => {
       // Arrange
       axios.post.mockResolvedValueOnce({ data: { success: true } });
@@ -301,6 +314,7 @@ describe("CreateProduct Component", () => {
       expect(photoContent).toBe("dummy photo content");
     });
 
+    // Li Jiakai, A0252287Y
     test("should show success toast and navigate to products page on successful create", async () => {
       // Arrange
       axios.post.mockResolvedValueOnce({ data: { success: true } });
@@ -314,6 +328,7 @@ describe("CreateProduct Component", () => {
       expect(mockNavigate).toHaveBeenCalledWith("/dashboard/admin/products");
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast and not navigate when API returns success: false", async () => {
       // Arrange
       axios.post.mockResolvedValueOnce({
@@ -329,6 +344,7 @@ describe("CreateProduct Component", () => {
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when POST throws a network error", async () => {
       // Arrange
       const consoleErrorSpy = jest
@@ -348,6 +364,7 @@ describe("CreateProduct Component", () => {
   });
 
   describe("Photo Upload", () => {
+    // Li Jiakai, A0252287Y
     test("should display the selected file name in the label", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -360,6 +377,7 @@ describe("CreateProduct Component", () => {
       expect(screen.getByText("photo.jpg")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should display a photo preview image after selecting a file", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -375,6 +393,7 @@ describe("CreateProduct Component", () => {
       expect(global.URL.createObjectURL).toHaveBeenCalledWith(mockFile);
     });
 
+    // Li Jiakai, A0252287Y
     test("should not display a photo preview before any file is selected", async () => {
       // Arrange/Act
       await renderWithMockCategories();
@@ -383,6 +402,7 @@ describe("CreateProduct Component", () => {
       expect(screen.queryByAltText("product_photo")).not.toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should reject non-image files", async () => {
       // Arrange
       await renderWithMockCategories();

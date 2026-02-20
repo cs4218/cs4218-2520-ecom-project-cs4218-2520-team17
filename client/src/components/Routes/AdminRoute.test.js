@@ -46,6 +46,7 @@ describe('AdminRoute Component', () => {
   });
 
   describe('Initial Loading State', () => {
+    // Li Jiakai, A0252287Y
     test('should display Spinner component when result is undefined and token exists', async () => {
       // Arrange
       axios.get.mockImplementation(
@@ -61,6 +62,7 @@ describe('AdminRoute Component', () => {
       expect(screen.queryByTestId('outlet-content')).not.toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test('should display Spinner and not call API when token is not present', () => {
       // Arrange & Act
       renderAdminRoute({});
@@ -70,6 +72,7 @@ describe('AdminRoute Component', () => {
       expect(axios.get).not.toHaveBeenCalled();
     });
 
+    // Li Jiakai, A0252287Y
     test('should display Spinner and not call API when token is null', () => {
       // Arrange & Act
       renderAdminRoute({ token: null });
@@ -81,6 +84,7 @@ describe('AdminRoute Component', () => {
   });
 
   describe('Authorized User', () => {
+    // Li Jiakai, A0252287Y
     test('should call API with correct endpoint when token exists', async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: { ok: true } });
@@ -93,6 +97,7 @@ describe('AdminRoute Component', () => {
       expect(axios.get).toHaveBeenCalledWith('/api/v1/auth/admin-auth');
     });
 
+    // Li Jiakai, A0252287Y
     test('should render Outlet when API returns ok: true', async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: { ok: true } });
@@ -107,6 +112,7 @@ describe('AdminRoute Component', () => {
     });
 
 
+    // Li Jiakai, A0252287Y
     test('should call API only once on initial render', async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: { ok: true } });
@@ -121,6 +127,7 @@ describe('AdminRoute Component', () => {
   });
 
   describe('Unauthorized User', () => {
+    // Li Jiakai, A0252287Y
     test('should display Unauthorized message when API returns ok: false', async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: { ok: false } });
@@ -134,6 +141,7 @@ describe('AdminRoute Component', () => {
       expect(screen.queryByTestId('outlet-content')).not.toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test('should render h1 heading for Unauthorized message', async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: { ok: false } });
@@ -147,6 +155,7 @@ describe('AdminRoute Component', () => {
       expect(heading.tagName).toBe('H1');
     });
 
+    // Li Jiakai, A0252287Y
     test('should have text-center class on Unauthorized message', async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: { ok: false } });
@@ -162,6 +171,7 @@ describe('AdminRoute Component', () => {
   });
 
   describe('Error Handling', () => {
+    // Li Jiakai, A0252287Y
     test('should display Unauthorized when API call fails', async () => {
       // Arrange
       axios.get.mockRejectedValue(new Error('Network error'));
@@ -178,6 +188,7 @@ describe('AdminRoute Component', () => {
   });
 
   describe('Token Change and Dependencies', () => {
+    // Li Jiakai, A0252287Y
     test('should call API again when token changes', async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: { ok: true } });
@@ -218,6 +229,7 @@ describe('AdminRoute Component', () => {
       expect(screen.queryByTestId('outlet-content')).not.toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test('should not call API again when token is unchanged', async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: { ok: true } });
@@ -257,6 +269,7 @@ describe('AdminRoute Component', () => {
   });
 
   describe('API Edge Cases', () => {
+    // Li Jiakai, A0252287Y
     test('should handle API response without ok property', async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: {} });
@@ -269,6 +282,7 @@ describe('AdminRoute Component', () => {
       expect(screen.getByText('Unauthorized')).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test('should handle null API response data', async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: null });

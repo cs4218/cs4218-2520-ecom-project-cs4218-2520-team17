@@ -67,6 +67,7 @@ describe("Products (Admin View) Component", () => {
   });
 
   describe("Rendering", () => {
+    // Li Jiakai, A0252287Y
     test("should render without crashing", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: [] } });
@@ -79,6 +80,7 @@ describe("Products (Admin View) Component", () => {
       expect(container).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render the Layout wrapper component", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: [] } });
@@ -91,6 +93,7 @@ describe("Products (Admin View) Component", () => {
       expect(screen.getByTestId("layout")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render the AdminMenu component", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: [] } });
@@ -103,6 +106,7 @@ describe("Products (Admin View) Component", () => {
       expect(screen.getByTestId("admin-menu")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test('should render the "All Products List" h1 heading', async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: [] } });
@@ -119,6 +123,7 @@ describe("Products (Admin View) Component", () => {
   });
 
   describe("API Integration", () => {
+    // Li Jiakai, A0252287Y
     test("should call axios.get with the correct endpoint on mount", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: [] } });
@@ -132,6 +137,7 @@ describe("Products (Admin View) Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should call the products API exactly once on mount", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -143,6 +149,7 @@ describe("Products (Admin View) Component", () => {
       await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(1));
     });
 
+    // Li Jiakai, A0252287Y
     test("should display products after a successful API response", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -157,6 +164,7 @@ describe("Products (Admin View) Component", () => {
       expect(screen.getByText("Mechanical Keyboard")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should call toast.error when the API request fails", async () => {
       // Arrange
       axios.get.mockRejectedValueOnce(new Error("Network Error"));
@@ -171,6 +179,7 @@ describe("Products (Admin View) Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should not render any product cards when the API returns an empty list", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: [] } });
@@ -185,6 +194,7 @@ describe("Products (Admin View) Component", () => {
   });
 
   describe("Product Card Rendering", () => {
+    // Li Jiakai, A0252287Y
     test("should render the correct number of product cards", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -197,6 +207,7 @@ describe("Products (Admin View) Component", () => {
       expect(screen.getAllByRole("link")).toHaveLength(mockProducts.length)
     });
 
+    // Li Jiakai, A0252287Y
     test("should render each product's name as a card title", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -211,6 +222,7 @@ describe("Products (Admin View) Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should render each product's description as card text", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -225,6 +237,7 @@ describe("Products (Admin View) Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should render each product image with a src pointing to the correct photo API endpoint", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -244,6 +257,7 @@ describe("Products (Admin View) Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should render each product image with an alt attribute equal to the product name", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -258,6 +272,7 @@ describe("Products (Admin View) Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should apply the 'card-img-top' class to each product image", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -272,6 +287,7 @@ describe("Products (Admin View) Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should apply 'card-title' class (h5) to each product name", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -290,6 +306,7 @@ describe("Products (Admin View) Component", () => {
   });
 
   describe("Navigation Links", () => {
+    // Li Jiakai, A0252287Y
     test("should wrap each product card in a Link pointing to the correct admin edit route", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -308,6 +325,7 @@ describe("Products (Admin View) Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should apply the 'product-link' class to every product link", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -325,6 +343,7 @@ describe("Products (Admin View) Component", () => {
   });
 
   describe("Layout Structure", () => {
+    // Li Jiakai, A0252287Y
     test("should render outer container with the 'row' class", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: [] } });
@@ -337,6 +356,7 @@ describe("Products (Admin View) Component", () => {
       expect(screen.getByTestId("admin-products-container")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render a 'col-md-3' sidebar column containing AdminMenu", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: [] } });
@@ -352,6 +372,7 @@ describe("Products (Admin View) Component", () => {
       expect(within(sidebar).getByTestId("admin-menu")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render a 'col-md-9' main column containing the product list", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: [] } });
@@ -369,6 +390,7 @@ describe("Products (Admin View) Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should apply 'text-center' class to the heading", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: [] } });
@@ -382,6 +404,7 @@ describe("Products (Admin View) Component", () => {
       expect(heading).toHaveClass("text-center");
     });
 
+    // Li Jiakai, A0252287Y
     test("should wrap product cards in a flex container with class 'd-flex'", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -396,6 +419,7 @@ describe("Products (Admin View) Component", () => {
       expect(listContainer).toHaveClass("d-flex");
     });
 
+    // Li Jiakai, A0252287Y
     test("should apply 'card' and 'm-2' classes to each product card", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -413,6 +437,7 @@ describe("Products (Admin View) Component", () => {
   });
 
   describe("Edge Cases", () => {
+    // Li Jiakai, A0252287Y
     test("should render correctly with a single product", async () => {
       // Arrange
       const singleProduct = [mockProducts[0]];
@@ -430,6 +455,7 @@ describe("Products (Admin View) Component", () => {
       ).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render correctly with no products", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: [] } });
@@ -443,6 +469,7 @@ describe("Products (Admin View) Component", () => {
       expect(screen.queryAllByTestId("admin-product-card")).toHaveLength(0);
     });
 
+    // Li Jiakai, A0252287Y
     test("should log the error to the console when the API call fails", async () => {
       // Arrange
       const consoleSpy = jest
@@ -459,6 +486,7 @@ describe("Products (Admin View) Component", () => {
       expect(consoleSpy).toHaveBeenCalledWith(networkError)
     });
 
+    // Li Jiakai, A0252287Y
     test("should not call toast.error on a successful API response", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { products: mockProducts } });
@@ -471,6 +499,7 @@ describe("Products (Admin View) Component", () => {
       expect(toast.error).not.toHaveBeenCalled();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render a product whose name and description contain special characters", async () => {
       // Arrange
       const specialProduct = [

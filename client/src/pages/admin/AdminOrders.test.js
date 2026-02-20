@@ -108,6 +108,7 @@ describe("AdminOrders Component", () => {
   });
 
   describe("Layout and structure", () => {
+    // Li Jiakai, A0252287Y
     test("should render Layout wrapper with correct title", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [] });
@@ -124,6 +125,7 @@ describe("AdminOrders Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should render AdminMenu component", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [] });
@@ -136,6 +138,7 @@ describe("AdminOrders Component", () => {
       expect(screen.getByTestId("admin-menu")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render 'All Orders' heading", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [] });
@@ -150,6 +153,7 @@ describe("AdminOrders Component", () => {
       expect(heading.tagName).toBe("H1");
     });
 
+    // Li Jiakai, A0252287Y
     test("should render menu column with correct class", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [] });
@@ -164,6 +168,7 @@ describe("AdminOrders Component", () => {
       expect(menuCol).toHaveClass("col-md-3");
     });
 
+    // Li Jiakai, A0252287Y
     test("should render content column with correct class", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [] });
@@ -180,6 +185,7 @@ describe("AdminOrders Component", () => {
   });
 
   describe("API integration", () => {
+    // Li Jiakai, A0252287Y
     test("should call the all-orders endpoint on mount when token is present", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [] });
@@ -193,6 +199,7 @@ describe("AdminOrders Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should call the all-orders endpoint exactly once on mount", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [] });
@@ -204,6 +211,7 @@ describe("AdminOrders Component", () => {
       await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(1));
     });
 
+    // Li Jiakai, A0252287Y
     test("should not call the all-orders endpoint when there is no auth token", async () => {
       // Arrange
       useAuth.mockReturnValue([{ token: "" }, jest.fn()]);
@@ -215,6 +223,7 @@ describe("AdminOrders Component", () => {
       await waitFor(() => expect(axios.get).not.toHaveBeenCalled());
     });
 
+    // Li Jiakai, A0252287Y
     test("should log error to console and show error toast when the API request fails", async () => {
       // Arrange
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
@@ -231,6 +240,7 @@ describe("AdminOrders Component", () => {
   });
 
   describe("Order list rendering", () => {
+    // Li Jiakai, A0252287Y
     test("should render no order tables when API returns an empty array", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [] });
@@ -243,6 +253,7 @@ describe("AdminOrders Component", () => {
       expect(screen.queryAllByRole("table")).toHaveLength(0);
     });
 
+    // Li Jiakai, A0252287Y
     test("should render one table per order", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: mockOrders });
@@ -255,6 +266,7 @@ describe("AdminOrders Component", () => {
       expect(screen.getAllByRole("table")).toHaveLength(mockOrders.length);
     });
 
+    // Li Jiakai, A0252287Y
     test("should render order id for each order", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: mockOrders });
@@ -269,6 +281,7 @@ describe("AdminOrders Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should render the buyer name for each order", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: mockOrders });
@@ -283,6 +296,7 @@ describe("AdminOrders Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should render 'Success' for a successful payment", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [mockOrders[0]] });
@@ -297,6 +311,7 @@ describe("AdminOrders Component", () => {
       expect(within(paymentStatus).getByText("Success")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render 'Failed' for an unsuccessful payment", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [mockOrders[1]] });
@@ -311,6 +326,7 @@ describe("AdminOrders Component", () => {
       expect(within(paymentStatus).getByText("Failed")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render the product quantity for each order", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: mockOrders });
@@ -328,6 +344,7 @@ describe("AdminOrders Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should render a relative date for each order", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: mockOrders });
@@ -344,6 +361,7 @@ describe("AdminOrders Component", () => {
   });
 
   describe("Status dropdown", () => {
+    // Li Jiakai, A0252287Y
     test("should render a status select for each order", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: mockOrders });
@@ -358,6 +376,7 @@ describe("AdminOrders Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should display all valid status options in the dropdown", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [mockOrders[0]] });
@@ -379,6 +398,7 @@ describe("AdminOrders Component", () => {
       ]);
     });
 
+    // Li Jiakai, A0252287Y
     test("should set the default value of the select to the order's current status", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [mockOrders[1]] }); // status: "Shipped"
@@ -391,6 +411,7 @@ describe("AdminOrders Component", () => {
       expect(screen.getByTestId("order-status-select")).toHaveValue("Shipped");
     });
 
+    // Li Jiakai, A0252287Y
     test("should call PUT endpoint with correct orderId and new status on change", async () => {
       // Arrange
       // Fetching initial data
@@ -417,6 +438,7 @@ describe("AdminOrders Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should refresh the orders list after a successful status update", async () => {
       // Arrange
       // Fetching initial data
@@ -439,6 +461,7 @@ describe("AdminOrders Component", () => {
       expect(screen.getByTestId("order-status-select")).toHaveValue("Processing");
     });
 
+    // Li Jiakai, A0252287Y
     test("should log error to console and show error toast when the status update fails", async () => {
       // Arrange
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
@@ -461,6 +484,7 @@ describe("AdminOrders Component", () => {
   });
 
   describe("Product cards rendering within orders", () => {
+    // Li Jiakai, A0252287Y
     test("should render a product card for every product in every order", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: mockOrders });
@@ -477,6 +501,7 @@ describe("AdminOrders Component", () => {
       expect(screen.getAllByRole("img")).toHaveLength(totalProducts);
     });
 
+    // Li Jiakai, A0252287Y
     test("should render the product name inside each product card", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [mockOrders[0]] });
@@ -489,6 +514,7 @@ describe("AdminOrders Component", () => {
       expect(screen.getByText("Laptop")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render a truncated description (first 30 chars) in each product card", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [mockOrders[0]] });
@@ -503,6 +529,7 @@ describe("AdminOrders Component", () => {
       ).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render the product price in each product card", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [mockOrders[0]] });
@@ -515,6 +542,7 @@ describe("AdminOrders Component", () => {
       expect(screen.getByText(`Price : ${mockProducts[0].price}`)).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render a product image with the correct photo API src", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [mockOrders[0]] });
@@ -531,6 +559,7 @@ describe("AdminOrders Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should render the product image with correct alt text", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: [mockOrders[1]] });

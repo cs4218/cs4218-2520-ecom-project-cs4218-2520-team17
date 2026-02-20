@@ -51,6 +51,7 @@ describe("CreateCategory Component", () => {
   });
 
   describe("Initial Rendering", () => {
+    // Li Jiakai, A0252287Y
     test("should render without crashing", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -63,6 +64,7 @@ describe("CreateCategory Component", () => {
       expect(screen.getByTestId("create-category-container")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render Layout with correct title", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -76,6 +78,7 @@ describe("CreateCategory Component", () => {
       expect(layout).toHaveAttribute("data-title", "Dashboard - Create Category");
     });
 
+    // Li Jiakai, A0252287Y
     test("should render AdminMenu component", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -88,6 +91,7 @@ describe("CreateCategory Component", () => {
       expect(screen.getByTestId("admin-menu")).toBeInTheDocument()
     });
 
+    // Li Jiakai, A0252287Y
     test("should render Manage Category heading", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -102,6 +106,7 @@ describe("CreateCategory Component", () => {
       ).toBeInTheDocument()
     });
 
+    // Li Jiakai, A0252287Y
     test("should render category table headers", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -115,6 +120,7 @@ describe("CreateCategory Component", () => {
       expect(screen.getByRole("columnheader", { name: /actions/i })).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should render the create category form", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -129,6 +135,7 @@ describe("CreateCategory Component", () => {
   });
 
   describe("Fetching Categories on Mount", () => {
+    // Li Jiakai, A0252287Y
     test("should call GET to correct API endpoint on mount", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } });
@@ -142,6 +149,7 @@ describe("CreateCategory Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should display fetched categories in the table", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({
@@ -158,6 +166,7 @@ describe("CreateCategory Component", () => {
       });
     });
 
+    // Li Jiakai, A0252287Y
     test("should render one table row per category", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({
@@ -173,6 +182,7 @@ describe("CreateCategory Component", () => {
       expect(rows).toHaveLength(mockCategories.length);
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when fetching categories returns success: false", async () => {
       // Arrange
       axios.get.mockResolvedValueOnce({ data: { success: false, message: "Failed to fetch categories" } });
@@ -185,6 +195,7 @@ describe("CreateCategory Component", () => {
       expect(toast.error).toHaveBeenCalledWith("Failed to fetch categories");
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when fetching categories throws an error", async () => {
       // Arrange
       const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
@@ -202,6 +213,7 @@ describe("CreateCategory Component", () => {
 
 
   describe("Creating a Category", () => {
+    // Li Jiakai, A0252287Y
     test("should call POST endpoint with the entered name on submit", async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: { success: true, category: [] } });
@@ -224,6 +236,7 @@ describe("CreateCategory Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should show success toast and refresh categories on successful create", async () => {
       // Arrange
       axios.get.mockResolvedValue({
@@ -250,6 +263,7 @@ describe("CreateCategory Component", () => {
       expect(axios.get).toHaveBeenCalledTimes(2);
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when API returns success: false on create", async () => {
       // Arrange
       axios.get.mockResolvedValue({ data: { success: true, category: [] } });
@@ -275,6 +289,7 @@ describe("CreateCategory Component", () => {
       expect(toast.error).toHaveBeenCalledWith("Category already exists")
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when POST throws a network error", async () => {
       // Arrange
       const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
@@ -297,6 +312,7 @@ describe("CreateCategory Component", () => {
   });
 
   describe("Editing a Category", () => {
+    // Li Jiakai, A0252287Y
     test("should open the edit modal when Edit button is clicked", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -309,6 +325,7 @@ describe("CreateCategory Component", () => {
       expect(screen.getByTestId("edit-modal")).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should pre-fill the modal form with the selected category name", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -323,6 +340,7 @@ describe("CreateCategory Component", () => {
       expect(modalInput).toHaveValue("Electronics");
     });
 
+    // Li Jiakai, A0252287Y
     test("should close the modal when cancel button is clicked", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -337,6 +355,7 @@ describe("CreateCategory Component", () => {
       expect(screen.queryByTestId("edit-modal")).not.toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should call PUT endpoint with updated name on update submit", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -360,6 +379,7 @@ describe("CreateCategory Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should show success toast and close modal on successful update", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -386,6 +406,7 @@ describe("CreateCategory Component", () => {
       expect(screen.queryByTestId("edit-modal")).not.toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test("should refresh category list after successful update", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -404,6 +425,7 @@ describe("CreateCategory Component", () => {
       expect(axios.get.mock.calls.length).toBeGreaterThan(callsBefore)
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when API returns success: false on update", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -423,6 +445,7 @@ describe("CreateCategory Component", () => {
       expect(toast.error).toHaveBeenCalledWith("Update failed")
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when PUT throws a network error", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -444,6 +467,7 @@ describe("CreateCategory Component", () => {
   });
 
   describe("Deleting a Category", () => {
+    // Li Jiakai, A0252287Y
     test("should call DELETE endpoint with correct id on delete", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -461,6 +485,7 @@ describe("CreateCategory Component", () => {
       );
     });
 
+    // Li Jiakai, A0252287Y
     test("should show success toast and refresh categories on successful delete", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -477,6 +502,7 @@ describe("CreateCategory Component", () => {
       expect(axios.get.mock.calls.length).toBeGreaterThan(callsBefore);
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when API returns success: false on delete", async () => {
       // Arrange
       await renderWithMockCategories();
@@ -493,6 +519,7 @@ describe("CreateCategory Component", () => {
       expect(toast.error).toHaveBeenCalledWith("Delete failed")
     });
 
+    // Li Jiakai, A0252287Y
     test("should show error toast when DELETE throws a network error", async () => {
       // Arrange
       await renderWithMockCategories();

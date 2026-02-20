@@ -34,6 +34,7 @@ describe('AdminDashboard Component', () => {
   });
 
   describe('Component Rendering', () => {
+    // Li Jiakai, A0252287Y
     test('should render component without crashing', () => {
       // Arrange
       const authValue = { user: null };
@@ -45,6 +46,7 @@ describe('AdminDashboard Component', () => {
       expect(container).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test('should render Layout wrapper component', () => {
       // Arrange
       const authValue = { user: null };
@@ -57,6 +59,7 @@ describe('AdminDashboard Component', () => {
       expect(layout).toBeInTheDocument();
     });
 
+    // Li Jiakai, A0252287Y
     test('should render AdminMenu component', () => {
       // Arrange
       const authValue = { user: null };
@@ -71,6 +74,7 @@ describe('AdminDashboard Component', () => {
   });
 
   describe('Layout Structure', () => {
+    // Li Jiakai, A0252287Y
     test('should render container with correct CSS classes', () => {
       // Arrange
       const authValue = { user: null };
@@ -83,6 +87,7 @@ describe('AdminDashboard Component', () => {
       expect(containerDiv).toHaveClass('container-fluid', 'm-3', 'p-3');
     });
 
+    // Li Jiakai, A0252287Y
     test('should render row layout with two columns', () => {
       // Arrange
       const authValue = { user: null };
@@ -97,6 +102,7 @@ describe('AdminDashboard Component', () => {
       expect(columns.length).toBe(2);
     });
 
+    // Li Jiakai, A0252287Y
     test('should render AdminMenu in col-md-3 sidebar', () => {
       // Arrange
       const authValue = { user: null };
@@ -112,6 +118,7 @@ describe('AdminDashboard Component', () => {
       expect(sidebarCol).toHaveClass('col-md-3');
     });
 
+    // Li Jiakai, A0252287Y
     test('should render card content in col-md-9 main area', () => {
       // Arrange
       const authValue = { user: null };
@@ -127,6 +134,7 @@ describe('AdminDashboard Component', () => {
       expect(mainCol).toHaveClass('col-md-9');
     });
 
+    // Li Jiakai, A0252287Y
     test('should render info card with correct classes', () => {
       // Arrange
       const authValue = { user: null };
@@ -149,6 +157,7 @@ describe('AdminDashboard Component', () => {
       }
     };
 
+    // Li Jiakai, A0252287Y
     test('should display admin name when user is available', () => {
       // Arrange + Act
       renderAdminDashboard(defaultAuthValue);
@@ -159,6 +168,7 @@ describe('AdminDashboard Component', () => {
       expect(nameHeading).toHaveTextContent('Admin Name : Admin User');
     });
 
+    // Li Jiakai, A0252287Y
     test('should display admin email when user is available', () => {
       // Arrange + Act
       renderAdminDashboard(defaultAuthValue);
@@ -168,6 +178,7 @@ describe('AdminDashboard Component', () => {
       expect(emailHeading).toHaveTextContent('Admin Email : admin@example.com');
     });
 
+    // Li Jiakai, A0252287Y
     test('should display admin contact phone when user is available', () => {
       // Arrange + Act
       renderAdminDashboard(defaultAuthValue);
@@ -177,6 +188,7 @@ describe('AdminDashboard Component', () => {
       expect(phoneHeading).toHaveTextContent('Admin Contact : 1234567890');
     });
 
+    // Li Jiakai, A0252287Y
     test('should render all three heading elements with h3 tag', () => {
       // Arrange + Act
       renderAdminDashboard(defaultAuthValue);
@@ -192,6 +204,7 @@ describe('AdminDashboard Component', () => {
 
   describe('User Data Edge Cases', () => {
     describe('Null, Undefined, and Empty User', () => {
+      // Li Jiakai, A0252287Y
       test('should handle null user', () => {
         // Arrange
         const authValue = { user: null };
@@ -206,6 +219,7 @@ describe('AdminDashboard Component', () => {
         expect(screen.getByTestId('admin-dashboard-phone')).toHaveTextContent('Admin Contact :');
       });
 
+      // Li Jiakai, A0252287Y
       test('should handle undefined user', () => {
         // Arrange
         const authValue = { user: undefined };
@@ -220,6 +234,7 @@ describe('AdminDashboard Component', () => {
         expect(screen.getByTestId('admin-dashboard-phone')).toHaveTextContent('Admin Contact :');
       });
 
+      // Li Jiakai, A0252287Y
       test('should handle empty user', () => {
         // Arrange
         const authValue = { user: {} };
@@ -234,6 +249,7 @@ describe('AdminDashboard Component', () => {
         expect(screen.getByTestId('admin-dashboard-phone')).toHaveTextContent('Admin Contact :');
       });
 
+      // Li Jiakai, A0252287Y
       test('should handle null auth value', () => {
         // Arrange
         const authValue = null;
@@ -248,6 +264,7 @@ describe('AdminDashboard Component', () => {
         expect(screen.getByTestId('admin-dashboard-phone')).toHaveTextContent('Admin Contact :');
       });
 
+      // Li Jiakai, A0252287Y
       test('should handle undefined auth value', () => {
         // Arrange
         const authValue = undefined;
@@ -262,6 +279,7 @@ describe('AdminDashboard Component', () => {
         expect(screen.getByTestId('admin-dashboard-phone')).toHaveTextContent('Admin Contact :');
       });
 
+      // Li Jiakai, A0252287Y
       test('should handle empty auth value', () => {
         // Arrange
         const authValue = {};
@@ -278,6 +296,7 @@ describe('AdminDashboard Component', () => {
     });
 
     describe('Missing User Fields', () => {
+      // Li Jiakai, A0252287Y
       test('should display empty string when user name is missing', () => {
         // Arrange
         const authValue = {
@@ -297,6 +316,7 @@ describe('AdminDashboard Component', () => {
       });
 
 
+      // Li Jiakai, A0252287Y
       test('should display empty string when user email is missing', () => {
         // Arrange
         const authValue = {
@@ -315,6 +335,7 @@ describe('AdminDashboard Component', () => {
         expect(screen.getByTestId('admin-dashboard-phone')).toHaveTextContent('Admin Contact : 1234567890');
       });
 
+      // Li Jiakai, A0252287Y
       test('should display empty string when user phone is missing', () => {
         // Arrange
         const authValue = {
@@ -336,6 +357,7 @@ describe('AdminDashboard Component', () => {
   });
 
   describe('Auth Context Integration', () => {
+    // Li Jiakai, A0252287Y
     test('should call useAuth hook to retrieve auth state', () => {
       // Arrange
       const authValue = { user: null };
@@ -348,6 +370,7 @@ describe('AdminDashboard Component', () => {
       expect(useAuth).toHaveBeenCalled();
     });
 
+    // Li Jiakai, A0252287Y
     test('should retrieve user data from auth context array', () => {
       // Arrange
       const authValue = {
@@ -367,6 +390,7 @@ describe('AdminDashboard Component', () => {
       expect(screen.getByTestId('admin-dashboard-phone')).toHaveTextContent('Admin Contact : 9999999999');
     });
 
+    // Li Jiakai, A0252287Y
     test('should handle multiple renders with different auth states', () => {
       // Arrange
       const authValue1 = {
@@ -416,6 +440,7 @@ describe('AdminDashboard Component', () => {
   });
 
   describe('Special Characters and Long Text', () => {
+    // Li Jiakai, A0252287Y
     test('should handle user name with special characters', () => {
       // Arrange
       const authValue = {
@@ -434,6 +459,7 @@ describe('AdminDashboard Component', () => {
 
     });
 
+    // Li Jiakai, A0252287Y
     test('should handle email with plus and dot addressing', () => {
       // Arrange
       const authValue = {
@@ -451,6 +477,7 @@ describe('AdminDashboard Component', () => {
       expect(screen.getByTestId('admin-dashboard-email')).toHaveTextContent('Admin Email : john.admin+123@example.com');
     });
 
+    // Li Jiakai, A0252287Y
     test('should handle phone numbers with plus and dashes', () => {
       // Arrange
       const authValue = {
