@@ -7,7 +7,6 @@ import {
 } from "./categoryController.js";
 import categoryModel from "../models/categoryModel.js";
 import slugify from "slugify";
-import { describe } from "node:test";
 
 // Mock dependencies
 jest.mock("../models/categoryModel.js");
