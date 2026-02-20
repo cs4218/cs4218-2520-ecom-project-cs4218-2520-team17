@@ -1,8 +1,6 @@
-import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import '@testing-library/jest-dom/extend-expect';
 import toast from 'react-hot-toast';
 import Register from './Register';
 
@@ -17,10 +15,10 @@ jest.mock('../../context/auth', () => ({
   jest.mock('../../context/cart', () => ({
     useCart: jest.fn(() => [null, jest.fn()]) // Mock useCart hook to return null state and a mock function
   }));
-    
+
 jest.mock('../../context/search', () => ({
     useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
-  }));  
+  }));
 
   Object.defineProperty(window, 'localStorage', {
     value: {
@@ -38,7 +36,19 @@ window.matchMedia = window.matchMedia || function() {
       removeListener: function() {}
     };
   };
-      
+
+
+const renderRegisterComponent = () => {
+  axios.get.mockResolvedValueOnce({ data: { category: [] } });
+  render(
+    <MemoryRouter initialEntries={['/register']}>
+      <Routes>
+        <Route path="/register" element={<Register />} />
+        <Route path="*" element={<></>} />
+      </Routes>
+    </MemoryRouter>
+  );
+};
 
 describe('Register Component', () => {
   beforeEach(() => {
@@ -46,55 +56,43 @@ describe('Register Component', () => {
   });
 
   it('should register the user successfully', async () => {
+    // Arrange
     axios.post.mockResolvedValueOnce({ data: { success: true } });
-    axios.get.mockResolvedValueOnce({ data: { category: [] } });
-
-    const { getByText, getByPlaceholderText } = render(
-        <MemoryRouter initialEntries={['/register']}>
-          <Routes>
-            <Route path="/register" element={<Register />} />
-          </Routes>
-        </MemoryRouter>
-      );
+    renderRegisterComponent();
     await waitFor(() => expect(axios.get).toHaveBeenCalled());
-    
-    fireEvent.change(getByPlaceholderText('Enter Your Name'), { target: { value: 'John Doe' } });
-    fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
-    fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
-    fireEvent.change(getByPlaceholderText('Enter Your Phone'), { target: { value: '1234567890' } });
-    fireEvent.change(getByPlaceholderText('Enter Your Address'), { target: { value: '123 Street' } });
-    fireEvent.change(getByPlaceholderText('Enter Your DOB'), { target: { value: '2000-01-01' } });
-    fireEvent.change(getByPlaceholderText('What is Your Favorite sports'), { target: { value: 'Football' } });
 
-    fireEvent.click(getByText('REGISTER'));
+    // Act
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Name'), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Phone'), { target: { value: '1234567890' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Address'), { target: { value: '123 Street' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your DOB'), { target: { value: '2000-01-01' } });
+    fireEvent.change(screen.getByPlaceholderText('What is Your Favorite sports'), { target: { value: 'Football' } });
+    fireEvent.click(screen.getByText('REGISTER'));
 
+    // Assert
     await waitFor(() => expect(axios.post).toHaveBeenCalled());
     expect(toast.success).toHaveBeenCalledWith('Register Successfully, please login');
   });
 
   it('should display error message on failed registration', async () => {
+    // Arrange
     axios.post.mockRejectedValueOnce({ message: 'User already exists' });
-    axios.get.mockResolvedValueOnce({ data: { category: [] } });
-
-    const { getByText, getByPlaceholderText } = render(
-        <MemoryRouter initialEntries={['/register']}>
-          <Routes>
-            <Route path="/register" element={<Register />} />
-          </Routes>
-        </MemoryRouter>
-      );
+    renderRegisterComponent();
     await waitFor(() => expect(axios.get).toHaveBeenCalled());
 
-    fireEvent.change(getByPlaceholderText('Enter Your Name'), { target: { value: 'John Doe' } });
-    fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
-    fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
-    fireEvent.change(getByPlaceholderText('Enter Your Phone'), { target: { value: '1234567890' } });
-    fireEvent.change(getByPlaceholderText('Enter Your Address'), { target: { value: '123 Street' } });
-    fireEvent.change(getByPlaceholderText('Enter Your DOB'), { target: { value: '2000-01-01' } });
-    fireEvent.change(getByPlaceholderText('What is Your Favorite sports'), { target: { value: 'Football' } });
+    // Act
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Name'), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Phone'), { target: { value: '1234567890' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Address'), { target: { value: '123 Street' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your DOB'), { target: { value: '2000-01-01' } });
+    fireEvent.change(screen.getByPlaceholderText('What is Your Favorite sports'), { target: { value: 'Football' } });
+    fireEvent.click(screen.getByText('REGISTER'));
 
-    fireEvent.click(getByText('REGISTER'));
-
+    // Assert
     await waitFor(() => expect(axios.post).toHaveBeenCalled());
     expect(toast.error).toHaveBeenCalledWith('Something went wrong');
   });

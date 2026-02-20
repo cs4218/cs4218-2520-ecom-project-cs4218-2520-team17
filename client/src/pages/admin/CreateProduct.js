@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Layout from "./../../components/Layout";
 import AdminMenu from "./../../components/AdminMenu";
 import toast from "react-hot-toast";
@@ -10,61 +10,67 @@ const { Option } = Select;
 const CreateProduct = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [shipping, setShipping] = useState("");
   const [photo, setPhoto] = useState("");
+  const [category, setCategory] = useState("");
+  const [shipping, setShipping] = useState("");
 
-  //get all category
-  const getAllCategory = async () => {
+  // get all category
+  const getAllCategory = useCallback(async () => {
     try {
       const { data } = await axios.get("/api/v1/category/get-category");
       if (data?.success) {
         setCategories(data?.category);
+      } else {
+        toast.error(data?.message);
       }
     } catch (error) {
-      console.log(error);
-      toast.error("Something wwent wrong in getting catgeory");
+      console.error(error);
+      toast.error("Something went wrong in getting category");
     }
-  };
+  }, []);
 
   useEffect(() => {
     getAllCategory();
-  }, []);
+  }, [getAllCategory]);
 
   //create product function
-  const handleCreate = async (e) => {
+  const handleCreate = useCallback(async (e) => {
     e.preventDefault();
     try {
       const productData = new FormData();
+
       productData.append("name", name);
       productData.append("description", description);
       productData.append("price", price);
       productData.append("quantity", quantity);
       productData.append("photo", photo);
       productData.append("category", category);
-      const { data } = axios.post(
+      productData.append("shipping", shipping);
+
+      const { data } = await axios.post(
         "/api/v1/product/create-product",
         productData
       );
       if (data?.success) {
-        toast.error(data?.message);
-      } else {
         toast.success("Product Created Successfully");
         navigate("/dashboard/admin/products");
+      } else {
+        toast.error(data?.message);
       }
     } catch (error) {
-      console.log(error);
-      toast.error("something went wrong");
+      console.error(error);
+      toast.error("Something went wrong");
     }
-  };
+  }, [name, description, price, quantity, photo, category, shipping, navigate]);
 
   return (
     <Layout title={"Dashboard - Create Product"}>
-      <div className="container-fluid m-3 p-3">
+      <div className="container-fluid m-3 p-3" data-testid="create-product-container">
         <div className="row">
           <div className="col-md-3">
             <AdminMenu />
@@ -73,11 +79,12 @@ const CreateProduct = () => {
             <h1>Create Product</h1>
             <div className="m-1 w-75">
               <Select
-                bordered={false}
+                variant="borderless"
                 placeholder="Select a category"
                 size="large"
                 showSearch
                 className="form-select mb-3"
+                data-testid="category-select"
                 onChange={(value) => {
                   setCategory(value);
                 }}
@@ -116,7 +123,7 @@ const CreateProduct = () => {
                 <input
                   type="text"
                   value={name}
-                  placeholder="write a name"
+                  placeholder="Write a name"
                   className="form-control"
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -125,7 +132,7 @@ const CreateProduct = () => {
                 <textarea
                   type="text"
                   value={description}
-                  placeholder="write a description"
+                  placeholder="Write a description"
                   className="form-control"
                   onChange={(e) => setDescription(e.target.value)}
                 />
@@ -135,7 +142,7 @@ const CreateProduct = () => {
                 <input
                   type="number"
                   value={price}
-                  placeholder="write a Price"
+                  placeholder="Write a Price"
                   className="form-control"
                   onChange={(e) => setPrice(e.target.value)}
                 />
@@ -144,29 +151,30 @@ const CreateProduct = () => {
                 <input
                   type="number"
                   value={quantity}
-                  placeholder="write a quantity"
+                  placeholder="Write a quantity"
                   className="form-control"
                   onChange={(e) => setQuantity(e.target.value)}
                 />
               </div>
               <div className="mb-3">
                 <Select
-                  bordered={false}
-                  placeholder="Select Shipping "
+                  variant="borderless"
+                  placeholder="Select Shipping"
                   size="large"
                   showSearch
                   className="form-select mb-3"
+                  data-testid="shipping-select"
                   onChange={(value) => {
                     setShipping(value);
                   }}
                 >
-                  <Option value="0">No</Option>
-                  <Option value="1">Yes</Option>
+                  <Option value={false}>No</Option>
+                  <Option value={true}>Yes</Option>
                 </Select>
               </div>
               <div className="mb-3">
                 <button className="btn btn-primary" onClick={handleCreate}>
-                  CREATE PRODUCT
+                  Create Product
                 </button>
               </div>
             </div>

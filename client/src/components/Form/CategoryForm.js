@@ -1,10 +1,8 @@
-import React from "react";
-
 const CategoryForm = ({ handleSubmit, value, setValue }) => {
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
+      <form onSubmit={handleSubmit} data-testid="category-form">
+        <div className="mb-3" data-testid="category-form-input-container">
           <input
             type="text"
             className="form-control"

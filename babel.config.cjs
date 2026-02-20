@@ -1,6 +1,7 @@
 module.exports = {
   presets: [
     ['@babel/preset-env', { targets: { node: 'current' } }],
-    '@babel/preset-react'
+    // https://jestjs.io/docs/tutorial-react#setup
+    ['@babel/preset-react', {runtime: 'automatic'}]
   ]
 };
