@@ -27,7 +27,9 @@ describe('Spinner Component', () => {
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
     jest.useRealTimers();
   });
 
@@ -39,6 +41,11 @@ describe('Spinner Component', () => {
 
         // Assert
         expect(container).toBeInTheDocument();
+        
+        // Cleanup pending timers
+        act(() => {
+            jest.advanceTimersByTime(0);
+        });
     });
 
     // Sebastian Tay Yong Xun, A0252864X
@@ -48,6 +55,11 @@ describe('Spinner Component', () => {
 
         // Assert
         expect(screen.getByText(/redirecting to you in 3 second/i)).toBeInTheDocument();
+        
+        // Cleanup pending timers
+        act(() => {
+            jest.advanceTimersByTime(0);
+        });
     });
 
     // Sebastian Tay Yong Xun, A0252864X
@@ -59,6 +71,11 @@ describe('Spinner Component', () => {
         const spinner = screen.getByRole('status');
         expect(spinner).toBeInTheDocument();
         expect(spinner).toHaveClass('spinner-border');
+        
+        // Cleanup pending timers
+        act(() => {
+            jest.advanceTimersByTime(0);
+        });
     });
 
     // Sebastian Tay Yong Xun, A0252864X
@@ -70,6 +87,11 @@ describe('Spinner Component', () => {
         const loadingText = screen.getByText(/loading.../i);
         expect(loadingText).toBeInTheDocument();
         expect(loadingText).toHaveClass('visually-hidden');
+        
+        // Cleanup pending timers
+        act(() => {
+            jest.advanceTimersByTime(0);
+        });
     });
   });
 
