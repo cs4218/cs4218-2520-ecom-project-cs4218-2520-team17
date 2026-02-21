@@ -632,7 +632,6 @@ describe("Auth Controller", () => {
   // updateProfileController Tests
   describe("updateProfileController", () => {
     //  Sebastian Tay Yong Xun, A0252864X
-    //  Sebastian Tay Yong Xun, A0252864X
     it("should enforce the password requirements of a string with minimum 6 characters", async () => {
       // Arrange
       req.user = { _id: "userId123" };
@@ -665,7 +664,6 @@ describe("Auth Controller", () => {
       expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
     });
 
-    //  Sebastian Tay Yong Xun, A0252864X
     //  Sebastian Tay Yong Xun, A0252864X
     it("should update the user profile with a full request body data", async () => {
       // Arrange
@@ -850,7 +848,6 @@ describe("Auth Controller", () => {
       });
     });
 
-    //  Sebastian Tay Yong Xun, A0252864X
     //  Sebastian Tay Yong Xun, A0252864X
     it("should handle errors and return 400 status with error message", async () => {
       // Arrange
