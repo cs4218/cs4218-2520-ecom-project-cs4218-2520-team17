@@ -34,6 +34,7 @@ describe('About Component', () => {
     });
 
     describe('Layout Integration', () => {
+        // Sebastian Tay Yong Xun, A0252864X
         test('should render Layout with correct title', () => {
             // Arrange & Act
             renderAbout();

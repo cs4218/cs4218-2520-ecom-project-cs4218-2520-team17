@@ -12,6 +12,10 @@ describe("Order Controller Tests", () => {
         consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     });
 
+    afterAll(() => {
+        consoleErrorSpy.mockRestore();
+    });
+
     beforeEach(() => {
         jest.clearAllMocks();
 

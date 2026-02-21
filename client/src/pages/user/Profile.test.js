@@ -4,7 +4,6 @@ import axios from 'axios';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Profile from './Profile';
-import { describe } from 'node:test';
 
 jest.mock('axios');
 jest.mock('react-hot-toast');
