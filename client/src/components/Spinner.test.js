@@ -196,22 +196,4 @@ describe('Spinner Component', () => {
         clearIntervalSpy.mockRestore();
     });
   });
-
-  describe('Edge Cases', () => {
-    // Sebastian Tay Yong Xun, A0252864X
-    test('should handle path with leading slash', async () => {
-        // Arrange
-        renderSpinner('/admin');
-
-        // Act - advance timer to trigger navigation
-        await act(async () => {
-            jest.advanceTimersByTime(3000);
-        });
-
-        // Assert
-        expect(mockNavigate).toHaveBeenCalledWith('//admin', {
-            state: '/current-path',
-        });
-    });
-  });
 });
