@@ -1,6 +1,6 @@
 # CS4218 Project - Virtual Vault
 
-## MS1 CI
+## MS1 CI URL
 https://github.com/cs4218/cs4218-2520-ecom-project-cs4218-2520-team17/actions/runs/21795485541/job/62882258560
 
 ## 1. Project Introduction

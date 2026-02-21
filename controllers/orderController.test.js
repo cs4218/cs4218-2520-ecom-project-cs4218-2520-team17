@@ -8,10 +8,16 @@ describe("Order Controller Tests", () => {
     let res;
     let consoleErrorSpy;
 
+    beforeAll(() => {
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    });
+
+    afterAll(() => {
+        consoleErrorSpy.mockRestore();
+    });
+
     beforeEach(() => {
         jest.clearAllMocks();
-
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
         req = {
             body: {},
@@ -27,6 +33,7 @@ describe("Order Controller Tests", () => {
     // getOrdersController Tests
     describe("getOrdersController", () => {
         describe("Error Handling", () => {
+            //  Sebastian Tay Yong Xun, A0252864X
             it("should log the errors", async () => {
                 // Arrange
                 req.user = { _id: "userId123" };
@@ -45,6 +52,7 @@ describe("Order Controller Tests", () => {
                 expect(consoleErrorSpy).toHaveBeenCalledWith(dbError);
             });
 
+            //  Sebastian Tay Yong Xun, A0252864X
             it("should return 500 status", async () => {
                 // Arrange
                 req.user = { _id: "userId123" };
@@ -73,6 +81,7 @@ describe("Order Controller Tests", () => {
 
     describe("getAllOrdersController", () => {
         describe("Error Handling", () => {
+            //  Sebastian Tay Yong Xun, A0252864X
             it("should log the errors", async () => {
                 // Arrange
                 const error = new Error("Database error");
@@ -91,6 +100,7 @@ describe("Order Controller Tests", () => {
                 expect(consoleErrorSpy).toHaveBeenCalledWith(error);
             });
 
+            //  Sebastian Tay Yong Xun, A0252864X
             it("should return 500 status", async () => {
                 // Arrange
                 const error = new Error("Database error");
@@ -119,6 +129,7 @@ describe("Order Controller Tests", () => {
 
     describe("orderStatusController", () => {
         describe("Error Handling", () => {
+            //  Sebastian Tay Yong Xun, A0252864X
             it("should log the errors", async () => {
                 // Arrange
                 req.params = { orderId: "orderId123" };
@@ -135,6 +146,7 @@ describe("Order Controller Tests", () => {
                 expect(consoleErrorSpy).toHaveBeenCalledWith(statusUpdateError);
             });
 
+            //  Sebastian Tay Yong Xun, A0252864X
             it("should return 500 status", async () => {
                 // Arrange
                 req.params = { orderId: "orderId123" };
