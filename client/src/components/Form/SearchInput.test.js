@@ -20,7 +20,6 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
 }));
 
-
 describe("SearchInput", () => {
   beforeEach(() => {
     jest.clearAllMocks();
