@@ -63,7 +63,7 @@ describe("Auth Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
+        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is Required" });
       });
 
       it("should return error when email is not provided", async () => {
@@ -81,7 +81,7 @@ describe("Auth Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ message: "Email is Required" });
+        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Email is Required" });
       });
 
       it("should return error when password is not provided", async () => {
@@ -99,7 +99,7 @@ describe("Auth Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ message: "Password is Required" });
+        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Password is Required" });
       });
 
       it("should return error when phone is not provided", async () => {
@@ -117,7 +117,7 @@ describe("Auth Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ message: "Phone no is Required" });
+        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Phone no is Required" });
       });
 
       it("should return error when address is not provided", async () => {
@@ -135,7 +135,7 @@ describe("Auth Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ message: "Address is Required" });
+        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Address is Required" });
       });
 
       it("should return error when answer is not provided", async () => {
@@ -153,7 +153,7 @@ describe("Auth Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ message: "Answer is Required" });
+        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Answer is Required" });
       });
     });
 
@@ -187,7 +187,7 @@ describe("Auth Controller", () => {
 
         // Assert
         expect(userModel.findOne).toHaveBeenCalledWith({ email: "test@example.com" });
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({
           success: false,
           message: "Already Register please login",
@@ -468,7 +468,7 @@ describe("Auth Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ message: "Email is required" });
+        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Email is required" });
       });
 
       it("should return 400 when answer is not provided", async () => {
@@ -483,7 +483,7 @@ describe("Auth Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ message: "Answer is required" });
+        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Answer is required" });
       });
 
       it("should return 400 when newPassword is not provided", async () => {
@@ -498,12 +498,12 @@ describe("Auth Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ message: "New Password is required" });
+        expect(res.send).toHaveBeenCalledWith({ success: false, message: "New Password is required" });
       });
     });
 
     describe("User Not Found", () => {
-      it("should return 404 when email and answer combination is wrong", async () => {
+      it("should return 401 when email and answer combination is wrong", async () => {
         // Arrange
         req.body = {
           email: "test@example.com",
@@ -521,7 +521,7 @@ describe("Auth Controller", () => {
           email: "test@example.com",
           answer: "wrongAnswer",
         });
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(401);
         expect(res.send).toHaveBeenCalledWith({
           success: false,
           message: "Wrong Email Or Answer",
@@ -609,7 +609,10 @@ describe("Auth Controller", () => {
       testController(req, res);
 
       // Assert
-      expect(res.send).toHaveBeenCalledWith("Protected Routes");
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Protected Routes",
+      });
     });
 
     it("should handle errors and send error response", () => {
@@ -624,8 +627,13 @@ describe("Auth Controller", () => {
 
       // Assert
       expect(consoleLogSpy).toHaveBeenCalledWith(mockError);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledTimes(2); // First call throws, second call handles error
-      expect(res.send).toHaveBeenLastCalledWith({ error: mockError });
+      expect(res.send).toHaveBeenLastCalledWith({
+        success: false,
+        message: "Error in test controller",
+        error: mockError,
+      });
     });
   });
 
@@ -655,8 +663,10 @@ describe("Auth Controller", () => {
       await updateProfileController(req, res);
 
       // Assert
-      expect(res.json).toHaveBeenCalledWith({
-        error: "Password is required to be minimally 6 character long",
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Password is required to be minimally 6 character long",
       });
 
       expect(hashPassword).not.toHaveBeenCalled();
@@ -844,7 +854,7 @@ describe("Auth Controller", () => {
       });
     });
 
-    it("should handle errors and return 400 status with error message", async () => {
+    it("should handle errors and return 500 status with error message", async () => {
       // Arrange
       req.user = { _id: "userId123" };
       req.body = {
@@ -859,7 +869,7 @@ describe("Auth Controller", () => {
 
       // Assert
       expect(consoleErrorSpy).toHaveBeenCalledWith(dbError);
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         message: "Error while updating profile",
