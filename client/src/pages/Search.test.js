@@ -33,7 +33,7 @@ describe('Search Page', () => {
       render(<Search />);
 
       // Assert
-      expect(screen.getByText('Search Resuts')).toBeInTheDocument();
+      expect(screen.getByText('Search Results')).toBeInTheDocument();
       expect(screen.getByTestId('layout-title')).toHaveTextContent('Search results');
     });
 
@@ -118,7 +118,7 @@ describe('Search Page', () => {
       render(<Search />);
 
       // Assert
-      expect(screen.getByText('Search Resuts')).toBeInTheDocument();
+      expect(screen.getByText('Search Results')).toBeInTheDocument();
       expect(screen.getByText(/Found|No Products Found/)).toBeInTheDocument();
     });
   });

@@ -99,12 +99,11 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
    - productCountController
    - productListController
    - searchProductController
-   - realtedProductController
+   - relatedProductController
    - productCategoryController
 
-
 **Client Related Files**
-1. `components/Form/Searchinput.js`
+1. `components/Form/SearchInput.js`
 2. `context/search.js`
 3. `pages/Search.js`
 4. `pages/ProductDetails.js`
