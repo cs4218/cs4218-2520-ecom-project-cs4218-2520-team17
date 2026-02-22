@@ -40,35 +40,45 @@ function TestConsumer() {
 
 describe("SearchContext / SearchProvider", () => {
   test("provides default values", () => {
+    // Arrange
     render(
       <SearchProvider>
         <TestConsumer />
       </SearchProvider>
     );
 
+    // Assert
     expect(screen.getByTestId("keyword")).toHaveTextContent("");
     expect(screen.getByTestId("results-count")).toHaveTextContent("0");
   });
 
   test("allows updating keyword", () => {
+    // Arrange
     render(
       <SearchProvider>
         <TestConsumer />
       </SearchProvider>
     );
 
+    // Act
     fireEvent.click(screen.getByRole("button", { name: /set keyword/i }));
+
+    // Assert
     expect(screen.getByTestId("keyword")).toHaveTextContent("iphone");
   });
 
   test("allows updating results", () => {
+    // Arrange
     render(
       <SearchProvider>
         <TestConsumer />
       </SearchProvider>
     );
 
+    // Act
     fireEvent.click(screen.getByRole("button", { name: /set results/i }));
+
+    // Assert
     expect(screen.getByTestId("results-count")).toHaveTextContent("2");
   });
 });
