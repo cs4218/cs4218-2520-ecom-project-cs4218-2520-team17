@@ -50,6 +50,21 @@ https://github.com/cs4218/cs4218-2520-ecom-project-cs4218-2520-team17/actions/ru
    - `components/Routes/AdminRoute.js`
 
 #### Rayyan Ismail
+**Server Related Files**
+1. `controllers/categoryController.js`
+   - categoryController
+   - singleCategoryController
+
+2. `controllers/productController.js`
+   - braintreeTokenController
+   - braintreePaymentController (renamed from brainTreePaymentController)
+
+**Client Related Files**
+1. `pages/Homepage.js`
+2. `context/cart.js`
+3. `pages/CartPage.js`
+4. `hooks/useCategory.js`
+5. `pages/Categories.js`
 
 #### Sebastian Tay Yong Xun
 **Server Related Files**
