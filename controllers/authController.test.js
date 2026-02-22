@@ -859,7 +859,7 @@ describe("Auth Controller", () => {
     });
 
     //  Sebastian Tay Yong Xun, A0252864X
-    it("should handle errors and return 400 status with error message", async () => {
+    it("should handle errors and return 500 status with error message", async () => {
       // Arrange
       req.user = { _id: "userId123" };
       req.body = {
