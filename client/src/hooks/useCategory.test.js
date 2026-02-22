@@ -17,15 +17,20 @@ describe("useCategory hook", () => {
     consoleLogSpy.mockRestore();
   });
 
-  it("should initialise with an empty categories array", () => {
+  it("should initialise with an empty categories array", async () => {
     // Arrange
     axios.get.mockResolvedValueOnce({ data: { category: [] } });
 
     // Act
     const { result } = renderHook(() => useCategory());
 
-    // Assert
+    // Assert - initial value before the effect resolves
     expect(result.current).toEqual([]);
+
+    // Wait for the async useEffect to settle so no state update leaks
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalled();
+    });
   });
 
   it("should fetch and return categories on mount", async () => {
