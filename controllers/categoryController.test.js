@@ -307,6 +307,7 @@ describe("Category Controller", () => {
   // ==========================================
   describe("categoryControlller", () => {
     describe("Successful Retrieval", () => {
+      // Rayyan Ismail, A0259275R
       it("should retrieve all categories successfully with status 200", async () => {
         // Arrange
         const mockCategories = [
@@ -329,6 +330,7 @@ describe("Category Controller", () => {
     });
 
     describe("Error Handling", () => {
+      // Rayyan Ismail, A0259275R
       it("should return status 500 when database retrieval fails", async () => {
         // Arrange
         const dbError = new Error("Database retrieval failed");
@@ -354,6 +356,7 @@ describe("Category Controller", () => {
   // ==========================================
   describe("singleCategoryController", () => {
     describe("Successful Retrieval", () => {
+      // Rayyan Ismail, A0259275R
       it("should retrieve single category successfully with valid slug", async () => {
         // Arrange
         req.params = { slug: "electronics" };
@@ -375,6 +378,7 @@ describe("Category Controller", () => {
     });
 
     describe("Error Handling", () => {
+      // Rayyan Ismail, A0259275R
       it("should return 500 and log error when database retrieval fails", async () => {
         // Arrange
         req.params = { slug: "electronics" };

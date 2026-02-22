@@ -1580,6 +1580,7 @@ describe("Product Controller", () => {
     });
 
     describe("Successful Token Generation", () => {
+      // Rayyan Ismail, A0259275R
       it("should generate token successfully", async () => {
         // Arrange
         gateway.clientToken.generate.mockImplementationOnce((options, callback) => {
@@ -1596,6 +1597,7 @@ describe("Product Controller", () => {
     });
 
     describe("Error Handling", () => {
+      // Rayyan Ismail, A0259275R
       it("should return 500 when token generation fails", async () => {
         // Arrange
         const generationError = new Error("Token generation failed");
@@ -1639,6 +1641,7 @@ describe("Product Controller", () => {
     });
 
     describe("Successful Payment Processing", () => {
+      // Rayyan Ismail, A0259275R
       it("should process payment successfully", async () => {
         // Arrange
         req.body = {
@@ -1674,6 +1677,7 @@ describe("Product Controller", () => {
         });
         expect(res.json).toHaveBeenCalledWith({ok: true });
       });
+      // Rayyan Ismail, A0259275R
       it("should process payment successfully with empty cart as a total of 0", async () => {
         // Arrange
         req.body = {
@@ -1706,6 +1710,7 @@ describe("Product Controller", () => {
         });
         expect(res.json).toHaveBeenCalledWith({ok: true });
       });
+      // Rayyan Ismail, A0259275R
       it("should process payment successfully with cart items having zero price", async () => {
         // Arrange
         req.body = {
@@ -1741,6 +1746,7 @@ describe("Product Controller", () => {
         });
         expect(res.json).toHaveBeenCalledWith({ok: true });
       });
+      // Rayyan Ismail, A0259275R
       it ("should process payment successfully with cart items having negative price", async () => {
         // Arrange
         req.body = {
@@ -1778,6 +1784,7 @@ describe("Product Controller", () => {
       });
     });
     describe("Error Handling", () => {
+      // Rayyan Ismail, A0259275R
       it("should return 500 when payment processing fails", async () => {
         // Arrange
         req.body = {
@@ -1799,6 +1806,7 @@ describe("Product Controller", () => {
         expect(res.status).toHaveBeenCalledWith(500);
       });
     });
+    // Rayyan Ismail, A0259275R
     it("should log error when payment processing fails", async () => {
       // Arrange
       req.body = {
