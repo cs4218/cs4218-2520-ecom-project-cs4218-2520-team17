@@ -159,13 +159,12 @@ To begin unit testing with Jest in your project, follow these steps:
 #### Sebastian Tay Yong Xun
 **Server Related Files**
 1. `controllers/authController.js`
-* updateProfileController
-* getOrdersController
-* getAllOrdersController
-* orderStatusController (Renamed to updateOrderStatusController)
+   - updateProfileController
+   - getOrdersController
+   - getAllOrdersController
+   - orderStatusController (Renamed to updateOrderStatusController)
 
-Note: 
-getOrdersController, getAllOrdersController, orderStatusController have been refactored to `controllers/orderController.js`
+Note: getOrdersController, getAllOrdersController, orderStatusController have been refactored to `controllers/orderController.js`
 
 **Client Related Files**
 1. `pages/user/Orders.js`
@@ -183,3 +182,16 @@ getOrdersController, getAllOrdersController, orderStatusController have been ref
 #### Tan Shi Yu
 
 #### Tan Zhi Heng
+**Server Related Files**
+1. `helpers/authHelper.js`
+2. `middlewares/authMiddleware.js`
+3. `controllers/authController.js`
+   - registerController
+   - loginController
+   - forgotPasswordController
+   - testController
+
+**Client Related Files**
+1. `context/auth.js`
+2. `pages/Auth/Register.js`
+3. `pages/Auth/Login.js`
