@@ -10,10 +10,12 @@ const Orders = () => {
   const [auth, setAuth] = useAuth();
   const getOrders = async () => {
     try {
-      const { data } = await axios.get("/api/v1/order/orders");
-      setOrders(data);
+      const response = await axios.get("/api/v1/order/orders");
+      if (response?.data) {
+        setOrders(response.data);
+      }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -22,7 +24,7 @@ const Orders = () => {
   }, [auth?.token]);
   return (
     <Layout title={"Your Orders"}>
-      <div className="container-flui p-3 m-3 dashboard">
+      <div className="container-fluid p-3 m-3 dashboard">
         <div className="row">
           <div className="col-md-3">
             <UserMenu />
@@ -31,14 +33,14 @@ const Orders = () => {
             <h1 className="text-center">All Orders</h1>
             {orders?.map((o, i) => {
               return (
-                <div className="border shadow">
+                <div className="border shadow" key={o._id}>
                   <table className="table">
                     <thead>
                       <tr>
                         <th scope="col">#</th>
                         <th scope="col">Status</th>
                         <th scope="col">Buyer</th>
-                        <th scope="col"> date</th>
+                        <th scope="col">Date</th>
                         <th scope="col">Payment</th>
                         <th scope="col">Quantity</th>
                       </tr>

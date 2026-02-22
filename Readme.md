@@ -1,6 +1,6 @@
 # CS4218 Project - Virtual Vault
 
-## MS1 CI
+## MS1 CI URL
 https://github.com/cs4218/cs4218-2520-ecom-project-cs4218-2520-team17/actions/runs/21795485541/job/62882258560
 
 ## 1. Project Introduction
@@ -147,3 +147,39 @@ To begin unit testing with Jest in your project, follow these steps:
      ```bash
      npm run test
      ```
+
+## Workload Split
+
+### Milestone 1
+
+#### Li Jiakai
+
+#### Rayyan Ismail
+
+#### Sebastian Tay Yong Xun
+**Server Related Files**
+1. `controllers/authController.js`
+* updateProfileController
+* getOrdersController
+* getAllOrdersController
+* orderStatusController (Renamed to updateOrderStatusController)
+
+Note: 
+getOrdersController, getAllOrdersController, orderStatusController have been refactored to `controllers/orderController.js`
+
+**Client Related Files**
+1. `pages/user/Orders.js`
+2. `pages/user/Profile.js`
+3. `pages/Contact.js`
+4. `pages/Policy.js`
+5. `pages/About.js`
+6. `pages/Pagenotfound.js`
+7. `components/Footer.js`
+8. `components/Header.js`
+9. `components/Layout.js`
+10. `components/Spinner.js`
+
+
+#### Tan Shi Yu
+
+#### Tan Zhi Heng

@@ -36,7 +36,7 @@ export const getAllOrdersController = async (req, res) => {
 };
 
 //order status
-export const orderStatusController = async (req, res) => {
+export const updateOrderStatusController = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { status } = req.body;
