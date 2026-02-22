@@ -32,6 +32,7 @@ describe("CategoryProduct page", () => {
   });
 
   test("fetches products by category slug and renders category name + results + cards", async () => {
+    // Arrange
     useParams.mockReturnValue({ slug: "phones" });
 
     axios.get.mockResolvedValueOnce({
@@ -58,8 +59,10 @@ describe("CategoryProduct page", () => {
       },
     });
 
+    // Act
     render(<CategoryProduct />);
 
+    // Assert
     // wait for async render (category heading appears after axios resolves)
     expect(await screen.findByText(/Category - Phones/i)).toBeInTheDocument();
 
@@ -89,6 +92,7 @@ describe("CategoryProduct page", () => {
   });
 
   test("clicking 'More Details' navigates to the product page", async () => {
+    // Arrange
     useParams.mockReturnValue({ slug: "phones" });
 
     axios.get.mockResolvedValueOnce({
@@ -107,6 +111,7 @@ describe("CategoryProduct page", () => {
       },
     });
 
+    // Act
     render(<CategoryProduct />);
 
     // wait for card to appear
@@ -115,14 +120,18 @@ describe("CategoryProduct page", () => {
     const btn = screen.getByRole("button", { name: /more details/i });
     fireEvent.click(btn);
 
+    // Assert
     expect(mockNavigate).toHaveBeenCalledWith("/product/iphone-15");
   });
 
   test("does not call axios when slug is missing", () => {
+    // Arrange
     useParams.mockReturnValue({}); // no slug
 
+    // Act
     render(<CategoryProduct />);
 
+    // Assert
     expect(axios.get).not.toHaveBeenCalled();
   });
 });

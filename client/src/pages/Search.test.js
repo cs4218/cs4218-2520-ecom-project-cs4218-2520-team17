@@ -21,10 +21,13 @@ jest.mock("../context/search", () => ({
 
 describe("Search page", () => {
   test("renders heading and 'No Products Found' when results empty", () => {
+    // Arrange
     useSearch.mockReturnValue([{ results: [] }, jest.fn()]);
 
+    // Act
     render(<Search />);
 
+    // Assert
     expect(screen.getByText("Search Resuts")).toBeInTheDocument();
     expect(screen.getByText("No Products Found")).toBeInTheDocument();
 
@@ -33,6 +36,7 @@ describe("Search page", () => {
   });
 
   test("renders 'Found N' when results exist", () => {
+    // Arrange
     const mockResults = [
       {
         _id: "abc123",
@@ -50,14 +54,17 @@ describe("Search page", () => {
 
     useSearch.mockReturnValue([{ results: mockResults }, jest.fn()]);
 
+    // Act
     render(<Search />);
 
+    // Assert
     expect(screen.getByText("Found 2")).toBeInTheDocument();
     expect(screen.getByText("iPhone")).toBeInTheDocument();
     expect(screen.getByText("MacBook")).toBeInTheDocument();
   });
 
   test("renders product card details correctly (image, truncated description, price, buttons)", () => {
+    // Arrange
     const product = {
       _id: "p1",
       name: "Camera",
@@ -67,6 +74,7 @@ describe("Search page", () => {
 
     useSearch.mockReturnValue([{ results: [product] }, jest.fn()]);
 
+    // Act
     render(<Search />);
 
     // image src + alt
@@ -76,6 +84,8 @@ describe("Search page", () => {
 
     // description substring(0, 30) + "..."
     const expectedDesc = product.description.substring(0, 30) + "...";
+
+    // Assert
     expect(screen.getByText(expectedDesc)).toBeInTheDocument();
 
     // price text (note: your component renders: " $ {p.price}")
@@ -87,10 +97,13 @@ describe("Search page", () => {
   });
 
   test("does not crash if values is undefined (optional chaining)", () => {
+    // Arrange
     useSearch.mockReturnValue([undefined, jest.fn()]);
 
+    // Act
     render(<Search />);
 
+    // Assert
     // still shows the heading
     expect(screen.getByText("Search Resuts")).toBeInTheDocument();
 

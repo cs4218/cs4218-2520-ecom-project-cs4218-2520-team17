@@ -31,6 +31,7 @@ describe("ProductDetails page", () => {
   });
 
   test("renders product details + similar products after fetching", async () => {
+    // Arrange
     useParams.mockReturnValue({ slug: "iphone-15" });
 
     // 1st call: get-product/:slug
@@ -63,8 +64,10 @@ describe("ProductDetails page", () => {
         },
       });
 
+    // Act
     render(<ProductDetails />);
 
+    // Assert
     // waits for product name to appear (after state update)
     expect(await screen.findByText(/Name : iPhone 15/i)).toBeInTheDocument();
     expect(screen.getByText(/Description : A very cool phone/i)).toBeInTheDocument();
@@ -92,6 +95,7 @@ describe("ProductDetails page", () => {
   });
 
   test("shows 'No Similar Products found' when related list is empty", async () => {
+    // Arrange
     useParams.mockReturnValue({ slug: "iphone-15" });
 
     axios.get
@@ -111,8 +115,10 @@ describe("ProductDetails page", () => {
         data: { products: [] },
       });
 
+    // Act
     render(<ProductDetails />);
 
+    // Assert
     // wait for fetch to finish
     expect(await screen.findByText(/Name : iPhone 15/i)).toBeInTheDocument();
 
@@ -120,6 +126,7 @@ describe("ProductDetails page", () => {
   });
 
   test("clicking 'More Details' navigates to the related product page", async () => {
+    // Arrange
     useParams.mockReturnValue({ slug: "iphone-15" });
 
     axios.get
@@ -149,12 +156,14 @@ describe("ProductDetails page", () => {
         },
       });
 
+    // Act
     render(<ProductDetails />);
 
     // wait until related product button shows up
     const btn = await screen.findByRole("button", { name: /more details/i });
     fireEvent.click(btn);
 
+    // Assert
     expect(mockNavigate).toHaveBeenCalledWith("/product/pixel-9");
   });
 });
