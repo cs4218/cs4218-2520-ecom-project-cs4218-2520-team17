@@ -22,7 +22,7 @@ import {
   productCountController,
   productListController,
   searchProductController,
-  realtedProductController,
+  relatedProductController,
   productCategoryController,
   braintreeTokenController,
   braintreePaymentController,
@@ -1007,7 +1007,7 @@ describe("Product Controller", () => {
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.send).toHaveBeenCalledWith({
         success: true,
-        counTotal: 2,
+        countTotal: 2,
         message: "All Products",
         products: fakeProducts,
       });
@@ -1030,7 +1030,7 @@ describe("Product Controller", () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: "Erorr in getting products",
+        message: "Error in getting products",
         error: err,
       });
 
@@ -1163,7 +1163,7 @@ describe("Product Controller", () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: "Erorr while getting photo",
+        message: "Error while getting photo",
         error: err,
       });
     });
@@ -1265,7 +1265,7 @@ describe("Product Controller", () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: "Error WHile Filtering Products",
+        message: "Error While Filtering Products",
         error: err,
       });
     });
@@ -1454,7 +1454,7 @@ describe("Product Controller", () => {
     });
   });
 
-  describe("Test realtedProductController", () => {
+  describe("Test relatedProductController", () => {
     test("returns 200 with related products", async () => {
       // Arrange
       req.params = { pid: "p1", cid: "c1" };
@@ -1473,7 +1473,7 @@ describe("Product Controller", () => {
       productModel.find.mockReturnValue(query);
 
       // Act
-      await realtedProductController(req, res);
+      await relatedProductController(req, res);
 
       // Assert
       expect(productModel.find).toHaveBeenCalledWith({
@@ -1502,13 +1502,13 @@ describe("Product Controller", () => {
       });
 
       // Act
-      await realtedProductController(req, res);
+      await relatedProductController(req, res);
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: "error while geting related product",
+        message: "Error while getting related product",
         error: err,
       });
     });
