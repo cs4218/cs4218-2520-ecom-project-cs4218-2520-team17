@@ -339,6 +339,31 @@ describe("CartPage", () => {
         JSON.stringify([])
       );
     });
+
+    // Rayyan, A0259275R
+    it("should handle error in removeCartItem gracefully", () => {
+      // Arrange - use a cart that will cause the spread operator to fail
+      // when trying to remove. We mock setCart to throw.
+      const throwingSetCart = jest.fn(() => { throw new Error("removeCartItem error"); });
+      useAuth.mockReturnValue([mockAuthLoggedIn, mockSetAuth]);
+      useCart.mockReturnValue([mockCartItems, throwingSetCart]);
+      axios.get.mockResolvedValue({ data: { clientToken: "mock-client-token" } });
+
+      render(
+        <MemoryRouter initialEntries={["/cart"]}>
+          <Routes>
+            <Route path="/cart" element={<CartPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      // Act
+      const removeButtons = screen.getAllByText("Remove");
+      fireEvent.click(removeButtons[0]);
+
+      // Assert
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.any(Error));
+    });
   });
 
   describe("Total Price", () => {
@@ -360,6 +385,23 @@ describe("CartPage", () => {
 
       // Assert
       expect(screen.getByText(/\$0\.00/)).toBeInTheDocument();
+    });
+
+    // Rayyan, A0259275R
+    it("should handle error in totalPrice gracefully", () => {
+      // Arrange - mock toLocaleString to throw so the catch block in totalPrice is hit
+      const toLocaleSpy = jest.spyOn(Number.prototype, "toLocaleString").mockImplementation(() => {
+        throw new Error("toLocaleString error");
+      });
+
+      // Act
+      renderCartPage(mockAuthLoggedIn, mockCartItems);
+
+      // Assert
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.any(Error));
+
+      // Cleanup
+      toLocaleSpy.mockRestore();
     });
   });
 
@@ -404,6 +446,20 @@ describe("CartPage", () => {
 
       // Assert
       expect(screen.getByText("Update Address")).toBeInTheDocument();
+    });
+
+    // Rayyan, A0259275R
+    it("should navigate to profile when Update Address is clicked for user with no address", () => {
+      // Arrange
+      renderCartPage(mockAuthNoAddress, mockCartItems);
+
+      // Act
+      fireEvent.click(screen.getByText("Update Address"));
+
+      // Assert
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/dashboard/user/profile"
+      );
     });
   });
 
