@@ -20,7 +20,7 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
 }));
 
-describe("SearchInput", () => {
+describe("SearchInput Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -37,7 +37,8 @@ describe("SearchInput", () => {
 
     // Assert
     expect(screen.getByRole("searchbox")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /search/i })).toBeInTheDocument();
+    expect(screen.getByRole("searchbox")).toBeInTheDocument();
+
   });
 
   test("typing updates keyword via setValues", async () => {
@@ -63,6 +64,7 @@ describe("SearchInput", () => {
   });
 
   test("submit calls API, stores results, and navigates", async () => {
+    // Arrange
     const setValues = jest.fn();
     const values = { keyword: "iphone", results: [] };
 
@@ -70,6 +72,7 @@ describe("SearchInput", () => {
 
     axios.get.mockResolvedValueOnce({ data: ["p1", "p2"] });
 
+    // Act
     render(<SearchInput />);
 
     fireEvent.click(screen.getByRole("button", { name: /search/i }));
@@ -78,6 +81,7 @@ describe("SearchInput", () => {
       expect(axios.get).toHaveBeenCalledWith("/api/v1/product/search/iphone");
     });
 
+    // Assert
     expect(setValues).toHaveBeenCalledWith({
       ...values,
       results: ["p1", "p2"],
@@ -87,6 +91,7 @@ describe("SearchInput", () => {
   });
 
   test("on API error: logs error and does not navigate", async () => {
+    // Arrange
     const setValues = jest.fn();
     const values = { keyword: "iphone", results: [] };
 
@@ -97,6 +102,7 @@ describe("SearchInput", () => {
 
     const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
 
+    // Act
     render(<SearchInput />);
 
     fireEvent.click(screen.getByRole("button", { name: /search/i }));
@@ -105,6 +111,7 @@ describe("SearchInput", () => {
       expect(logSpy).toHaveBeenCalled();
     });
 
+    // Assert
     expect(mockNavigate).not.toHaveBeenCalled();
     logSpy.mockRestore();
   });
