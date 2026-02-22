@@ -1,22 +1,20 @@
-// client/src/pages/CategoryProduct.test.js
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import CategoryProduct from "./CategoryProduct";
-import axios from "axios";
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import CategoryProduct from './CategoryProduct';
+import axios from 'axios';
 
-jest.mock("axios");
+jest.mock('axios');
 
-// Mock Layout to avoid header/footer deps
-jest.mock("../components/Layout", () => {
+jest.mock('../components/Layout', () => {
   return function LayoutMock({ children }) {
-    return <div data-testid="layout">{children}</div>;
+    return <div data-testid='layout'>{children}</div>;
   };
 });
 
 const mockNavigate = jest.fn();
 
-jest.mock("react-router-dom", () => {
-  const actual = jest.requireActual("react-router-dom");
+jest.mock('react-router-dom', () => {
+  const actual = jest.requireActual('react-router-dom');
   return {
     ...actual,
     useParams: jest.fn(),
@@ -24,117 +22,155 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-const { useParams } = require("react-router-dom");
+const { useParams } = require('react-router-dom');
 
-describe("CategoryProduct page", () => {
+describe('CategoryProduct Page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  // Tan Shi Yu, A0251681E
-  test("fetches products by category slug and renders category name + results + cards", async () => {
-    // Arrange
-    useParams.mockReturnValue({ slug: "phones" });
+  describe('Rendering', () => {
+    // Tan Shi Yu, A0251681E
+    test('should render category name, results count, and product cards after fetching', async () => {
+      // Arrange
+      useParams.mockReturnValue({ slug: 'phones' });
 
-    axios.get.mockResolvedValueOnce({
-      data: {
-        category: { name: "Phones" },
-        products: [
-          {
-            _id: "p1",
-            name: "iPhone 15",
-            price: 1999,
-            slug: "iphone-15",
-            description:
-              "This is a long description for iPhone 15 that should be truncated for display purposes.",
-          },
-          {
-            _id: "p2",
-            name: "Pixel 9",
-            price: 999,
-            slug: "pixel-9",
-            description:
-              "This is a long description for Pixel 9 that should be truncated for display purposes.",
-          },
-        ],
-      },
+      axios.get.mockResolvedValueOnce({
+        data: {
+          category: { name: 'Phones' },
+          products: [
+            {
+              _id: 'p1',
+              name: 'iPhone 15',
+              price: 1999,
+              slug: 'iphone-15',
+              description:
+                'This is a long description for iPhone 15 that should be truncated for display purposes.',
+            },
+            {
+              _id: 'p2',
+              name: 'Pixel 9',
+              price: 999,
+              slug: 'pixel-9',
+              description:
+                'This is a long description for Pixel 9 that should be truncated for display purposes.',
+            },
+          ],
+        },
+      });
+
+      // Act
+      render(<CategoryProduct />);
+
+      // Assert
+      expect(await screen.findByText(/Category - Phones/i)).toBeInTheDocument();
+      expect(screen.getByText(/2 result found/i)).toBeInTheDocument();
+
+      expect(screen.getByText('iPhone 15')).toBeInTheDocument();
+      expect(screen.getByText('Pixel 9')).toBeInTheDocument();
+
+      expect(screen.getByRole('img', { name: 'iPhone 15' })).toHaveAttribute(
+        'src',
+        '/api/v1/product/product-photo/p1'
+      );
+      expect(screen.getByRole('img', { name: 'Pixel 9' })).toHaveAttribute(
+        'src',
+        '/api/v1/product/product-photo/p2'
+      );
+
+      expect(screen.getByText('$1,999.00')).toBeInTheDocument();
+      expect(screen.getByText('$999.00')).toBeInTheDocument();
+
+      expect(axios.get).toHaveBeenCalledWith('/api/v1/product/product-category/phones');
     });
 
-    // Act
-    render(<CategoryProduct />);
+    // Tan Shi Yu, A0251681E
+    test('should not call axios when slug is missing', () => {
+      // Arrange
+      useParams.mockReturnValue({});
 
-    // Assert
-    // wait for async render (category heading appears after axios resolves)
-    expect(await screen.findByText(/Category - Phones/i)).toBeInTheDocument();
+      // Act
+      render(<CategoryProduct />);
 
-    // count
-    expect(screen.getByText(/2 result found/i)).toBeInTheDocument();
-
-    // product names
-    expect(screen.getByText("iPhone 15")).toBeInTheDocument();
-    expect(screen.getByText("Pixel 9")).toBeInTheDocument();
-
-    // images
-    expect(screen.getByRole("img", { name: "iPhone 15" })).toHaveAttribute(
-      "src",
-      "/api/v1/product/product-photo/p1"
-    );
-    expect(screen.getByRole("img", { name: "Pixel 9" })).toHaveAttribute(
-      "src",
-      "/api/v1/product/product-photo/p2"
-    );
-
-    // price formatted
-    expect(screen.getByText("$1,999.00")).toBeInTheDocument();
-    expect(screen.getByText("$999.00")).toBeInTheDocument();
-
-    // axios called correctly
-    expect(axios.get).toHaveBeenCalledWith("/api/v1/product/product-category/phones");
-  });
-
-  // Tan Shi Yu, A0251681E
-  test("clicking 'More Details' navigates to the product page", async () => {
-    // Arrange
-    useParams.mockReturnValue({ slug: "phones" });
-
-    axios.get.mockResolvedValueOnce({
-      data: {
-        category: { name: "Phones" },
-        products: [
-          {
-            _id: "p1",
-            name: "iPhone 15",
-            price: 1999,
-            slug: "iphone-15",
-            description:
-              "This is a long description for iPhone 15 that should be truncated for display purposes.",
-          },
-        ],
-      },
+      // Assert
+      expect(axios.get).not.toHaveBeenCalled();
     });
 
-    // Act
-    render(<CategoryProduct />);
+    // Tan Shi Yu, A0251681E
+    test('should render "0 result found" when API returns an empty products list', async () => {
+      // Arrange
+      useParams.mockReturnValue({ slug: 'empty-cat' });
 
-    // wait for card to appear
-    await screen.findByText(/Category - Phones/i);
+      axios.get.mockResolvedValueOnce({
+        data: {
+          category: { name: 'Empty Category' },
+          products: [],
+        },
+      });
 
-    const btn = screen.getByRole("button", { name: /more details/i });
-    fireEvent.click(btn);
+      // Act
+      render(<CategoryProduct />);
 
-    // Assert
-    expect(mockNavigate).toHaveBeenCalledWith("/product/iphone-15");
+      // Assert
+      expect(await screen.findByText(/Category - Empty Category/i)).toBeInTheDocument();
+      expect(screen.getByText(/0 result found/i)).toBeInTheDocument();
+    });
   });
 
-  // Tan Shi Yu, A0251681E
-  test("does not call axios when slug is missing", () => {
-    // Arrange
-    useParams.mockReturnValue({}); // no slug
+  describe('Behaviour', () => {
+    // Tan Shi Yu, A0251681E
+    test('should log error and not crash when the API call fails', async () => {
+      // Arrange
+      useParams.mockReturnValue({ slug: 'phones' });
+      axios.get.mockRejectedValueOnce(new Error('network error'));
 
-    // Act
-    render(<CategoryProduct />);
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
-    // Assert
-    expect(axios.get).not.toHaveBeenCalled();
+      // Act
+      render(<CategoryProduct />);
+
+      await waitFor(() => {
+        expect(logSpy).toHaveBeenCalled();
+      });
+
+      // Assert
+      expect(axios.get).toHaveBeenCalledWith('/api/v1/product/product-category/phones');
+      logSpy.mockRestore();
+    });
+  });
+
+  describe('Interaction Test', () => {
+    // Tan Shi Yu, A0251681E
+    test('should navigate to the product page on clicking "More Details"', async () => {
+      // Arrange
+      useParams.mockReturnValue({ slug: 'phones' });
+
+      axios.get.mockResolvedValueOnce({
+        data: {
+          category: { name: 'Phones' },
+          products: [
+            {
+              _id: 'p1',
+              name: 'iPhone 15',
+              price: 1999,
+              slug: 'iphone-15',
+              description:
+                'This is a long description for iPhone 15 that should be truncated for display purposes.',
+            },
+          ],
+        },
+      });
+
+      render(<CategoryProduct />);
+
+      await screen.findByText(/Category - Phones/i);
+
+      // Act
+      const btn = screen.getByRole('button', { name: /more details/i });
+      fireEvent.click(btn);
+
+      // Assert
+      expect(mockNavigate).toHaveBeenCalledWith('/product/iphone-15');
+    });
   });
 });
