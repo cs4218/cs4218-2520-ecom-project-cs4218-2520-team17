@@ -1125,6 +1125,28 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith(fakePhotoData);
     });
 
+    test("does not send a response when photo data is absent", async () => {
+      // Arrange
+      req.params = { pid: "product123" };
+
+      const fakeProduct = {
+        photo: { data: null, contentType: "image/jpeg" },
+      };
+
+      const query = {
+        select: jest.fn().mockResolvedValue(fakeProduct),
+      };
+
+      productModel.findById.mockReturnValue(query);
+
+      // Act
+      await productPhotoController(req, res);
+
+      // Assert
+      expect(res.set).not.toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalled();
+    });
+
     test("returns 500 on error", async () => {
       // Arrange
       req.params = { pid: "product123" };
