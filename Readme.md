@@ -1,7 +1,98 @@
-# CS4218 Project - Virtual Vault
+# CS4218 Project - Virtual Vault - Team 17
+
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=cs4218-2520-g17_ecom&metric=bugs)](https://sonarcloud.io/summary/new_code?id=cs4218-2520-g17_ecom)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=cs4218-2520-g17_ecom&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=cs4218-2520-g17_ecom)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=cs4218-2520-g17_ecom&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=cs4218-2520-g17_ecom)
+
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=cs4218-2520-g17_ecom&metric=coverage)](https://sonarcloud.io/summary/new_code?id=cs4218-2520-g17_ecom)
+[![CI - Run Tests and SonarQube Analysis](https://github.com/cs4218/cs4218-2520-ecom-project-cs4218-2520-team17/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/cs4218/cs4218-2520-ecom-project-cs4218-2520-team17/actions/workflows/ci.yml)
+
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=cs4218-2520-g17_ecom)](https://sonarcloud.io/summary/new_code?id=cs4218-2520-g17_ecom)
 
 ## MS1 CI URL
 https://github.com/cs4218/cs4218-2520-ecom-project-cs4218-2520-team17/actions/runs/21795485541/job/62882258560
+
+## Workload Distribution
+
+### Milestone 1
+
+#### Li Jiakai
+
+**Server Related Files**
+1. Admin Actions
+   - `controllers/categoryController.js`
+      - createCategoryController
+      - updateCategoryController
+      - deleteCategoryController
+  
+2. Admin View Products
+   - `controllers/productController.js`
+      - createProductController
+      - deleteProductController
+      - updateProductController 
+
+**Client Related Files**
+1. Admin Dashboard
+   - `components/AdminMenu.js`
+   - `pages/admin/AdminDashboard.js`
+2. Admin Actions
+   - `components/Form/CategoryForm.js` 
+   - `pages/admin/CreateCategory.js`
+   - `pages/admin/CreateProduct.js` 
+   - `pages/admin/UpdateProduct.js`
+3. Admin View Orders
+   - `pages/admin/AdminOrders.js`
+5. Admin View Products
+   - `pages/admin/Products.js`
+6. Admin View Users
+   - `pages/admin/Users.js`
+7. Admin Route
+   - `components/Routes/AdminRoute.js`
+
+#### Rayyan Ismail
+
+#### Sebastian Tay Yong Xun
+**Server Related Files**
+1. `controllers/authController.js`
+   - updateProfileController
+   - getOrdersController
+   - getAllOrdersController
+   - orderStatusController (Renamed to updateOrderStatusController)
+
+Note: getOrdersController, getAllOrdersController, orderStatusController have been refactored to `controllers/orderController.js`
+
+**Client Related Files**
+1. `pages/user/Orders.js`
+2. `pages/user/Profile.js`
+3. `pages/Contact.js`
+4. `pages/Policy.js`
+5. `pages/About.js`
+6. `pages/Pagenotfound.js`
+7. `components/Footer.js`
+8. `components/Header.js`
+9. `components/Layout.js`
+10. `components/Spinner.js`
+
+
+#### Tan Shi Yu
+
+#### Tan Zhi Heng
+**Server Related Files**
+1. `helpers/authHelper.js`
+2. `middlewares/authMiddleware.js`
+3. `controllers/authController.js`
+   - registerController
+   - loginController
+   - forgotPasswordController
+   - testController
+
+**Client Related Files**
+1. `context/auth.js`
+2. `pages/Auth/Register.js`
+3. `pages/Auth/Login.js`
+
+
+---
 
 ## 1. Project Introduction
 
@@ -147,51 +238,3 @@ To begin unit testing with Jest in your project, follow these steps:
      ```bash
      npm run test
      ```
-
-## Workload Split
-
-### Milestone 1
-
-#### Li Jiakai
-
-#### Rayyan Ismail
-
-#### Sebastian Tay Yong Xun
-**Server Related Files**
-1. `controllers/authController.js`
-   - updateProfileController
-   - getOrdersController
-   - getAllOrdersController
-   - orderStatusController (Renamed to updateOrderStatusController)
-
-Note: getOrdersController, getAllOrdersController, orderStatusController have been refactored to `controllers/orderController.js`
-
-**Client Related Files**
-1. `pages/user/Orders.js`
-2. `pages/user/Profile.js`
-3. `pages/Contact.js`
-4. `pages/Policy.js`
-5. `pages/About.js`
-6. `pages/Pagenotfound.js`
-7. `components/Footer.js`
-8. `components/Header.js`
-9. `components/Layout.js`
-10. `components/Spinner.js`
-
-
-#### Tan Shi Yu
-
-#### Tan Zhi Heng
-**Server Related Files**
-1. `helpers/authHelper.js`
-2. `middlewares/authMiddleware.js`
-3. `controllers/authController.js`
-   - registerController
-   - loginController
-   - forgotPasswordController
-   - testController
-
-**Client Related Files**
-1. `context/auth.js`
-2. `pages/Auth/Register.js`
-3. `pages/Auth/Login.js`
