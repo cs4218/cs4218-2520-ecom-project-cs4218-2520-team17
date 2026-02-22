@@ -41,7 +41,7 @@ function TestConsumer() {
 describe("SearchContext / SearchProvider", () => {
   // Tan Shi Yu, A0251681E
   test("provides default values", () => {
-    // Arrange
+    // Arrange & Act
     render(
       <SearchProvider>
         <TestConsumer />
@@ -54,7 +54,7 @@ describe("SearchContext / SearchProvider", () => {
   });
 
   test("allows updating keyword", () => {
-    // Arrange
+    // Arrange & Act
     render(
       <SearchProvider>
         <TestConsumer />
@@ -70,14 +70,13 @@ describe("SearchContext / SearchProvider", () => {
 
   // Tan Shi Yu, A0251681E
   test("allows updating results", () => {
-    // Arrange
+    // Arrange & Act
     render(
       <SearchProvider>
         <TestConsumer />
       </SearchProvider>
     );
 
-    // Act
     fireEvent.click(screen.getByRole("button", { name: /set results/i }));
 
     // Assert
