@@ -39,6 +39,7 @@ function TestConsumer() {
 }
 
 describe("SearchContext / SearchProvider", () => {
+  // Tan Shi Yu, A0251681E
   test("provides default values", () => {
     // Arrange
     render(
@@ -67,6 +68,7 @@ describe("SearchContext / SearchProvider", () => {
     expect(screen.getByTestId("keyword")).toHaveTextContent("iphone");
   });
 
+  // Tan Shi Yu, A0251681E
   test("allows updating results", () => {
     // Arrange
     render(

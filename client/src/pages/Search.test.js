@@ -20,6 +20,7 @@ jest.mock("../context/search", () => ({
 }));
 
 describe("Search page", () => {
+  // Tan Shi Yu, A0251681E
   test("renders heading and 'No Products Found' when results empty", () => {
     // Arrange
     useSearch.mockReturnValue([{ results: [] }, jest.fn()]);
@@ -63,6 +64,7 @@ describe("Search page", () => {
     expect(screen.getByText("MacBook")).toBeInTheDocument();
   });
 
+  // Tan Shi Yu, A0251681E
   test("renders product card details correctly (image, truncated description, price, buttons)", () => {
     // Arrange
     const product = {
@@ -96,6 +98,7 @@ describe("Search page", () => {
     expect(screen.getByRole("button", { name: /add to cart/i })).toBeInTheDocument();
   });
 
+  // Tan Shi Yu, A0251681E
   test("does not crash if values is undefined (optional chaining)", () => {
     // Arrange
     useSearch.mockReturnValue([undefined, jest.fn()]);

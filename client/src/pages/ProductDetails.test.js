@@ -30,6 +30,7 @@ describe("ProductDetails page", () => {
     jest.clearAllMocks();
   });
 
+  // Tan Shi Yu, A0251681E
   test("renders product details + similar products after fetching", async () => {
     // Arrange
     useParams.mockReturnValue({ slug: "iphone-15" });
@@ -94,6 +95,7 @@ describe("ProductDetails page", () => {
     );
   });
 
+  // Tan Shi Yu, A0251681E
   test("shows 'No Similar Products found' when related list is empty", async () => {
     // Arrange
     useParams.mockReturnValue({ slug: "iphone-15" });
@@ -125,6 +127,7 @@ describe("ProductDetails page", () => {
     expect(screen.getByText(/No Similar Products found/i)).toBeInTheDocument();
   });
 
+  // Tan Shi Yu, A0251681E
   test("clicking 'More Details' navigates to the related product page", async () => {
     // Arrange
     useParams.mockReturnValue({ slug: "iphone-15" });

@@ -25,6 +25,7 @@ describe("SearchInput Component", () => {
     jest.clearAllMocks();
   });
 
+  // Tan Shi Yu, A0251681E
   test("renders input and button", () => {
     // Arrange
     const setValues = jest.fn();
@@ -41,6 +42,7 @@ describe("SearchInput Component", () => {
 
   });
 
+  // Tan Shi Yu, A0251681E
   test("typing updates keyword via setValues", async () => {
     // Arrange
     const setValues = jest.fn();
@@ -63,6 +65,7 @@ describe("SearchInput Component", () => {
     });
   });
 
+  // Tan Shi Yu, A0251681E
   test("submit calls API, stores results, and navigates", async () => {
     // Arrange
     const setValues = jest.fn();
@@ -90,6 +93,7 @@ describe("SearchInput Component", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/search");
   });
 
+  // Tan Shi Yu, A0251681E
   test("on API error: logs error and does not navigate", async () => {
     // Arrange
     const setValues = jest.fn();

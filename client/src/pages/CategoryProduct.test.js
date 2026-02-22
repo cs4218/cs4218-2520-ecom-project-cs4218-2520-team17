@@ -31,6 +31,7 @@ describe("CategoryProduct page", () => {
     jest.clearAllMocks();
   });
 
+  // Tan Shi Yu, A0251681E
   test("fetches products by category slug and renders category name + results + cards", async () => {
     // Arrange
     useParams.mockReturnValue({ slug: "phones" });
@@ -91,6 +92,7 @@ describe("CategoryProduct page", () => {
     expect(axios.get).toHaveBeenCalledWith("/api/v1/product/product-category/phones");
   });
 
+  // Tan Shi Yu, A0251681E
   test("clicking 'More Details' navigates to the product page", async () => {
     // Arrange
     useParams.mockReturnValue({ slug: "phones" });
@@ -124,6 +126,7 @@ describe("CategoryProduct page", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/product/iphone-15");
   });
 
+  // Tan Shi Yu, A0251681E
   test("does not call axios when slug is missing", () => {
     // Arrange
     useParams.mockReturnValue({}); // no slug
