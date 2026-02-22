@@ -23,6 +23,13 @@ jest.mock("../context/search", () => ({
   useSearch: jest.fn(() => [{ keyword: "" }, jest.fn()]),
 }));
 
+// Mock Layout to just render children, avoiding Header's async state updates
+jest.mock("./../components/Layout", () => {
+  return function MockLayout({ children }) {
+    return <div data-testid="layout">{children}</div>;
+  };
+});
+
 // Mock DropIn component
 jest.mock("braintree-web-drop-in-react", () => {
   return function MockDropIn({ onInstance }) {
@@ -137,25 +144,27 @@ describe("CartPage", () => {
 
   describe("Guest User Display", () => {
     // Rayyan, A0259275R
-    it("should display 'Hello Guest' when user is not logged in", () => {
+    it("should display 'Hello Guest' when user is not logged in", async () => {
       // Arrange & Act
       renderCartPage(mockAuthGuest, []);
 
       // Assert
       expect(screen.getByText("Hello Guest")).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should display empty cart message when guest has no items", () => {
+    it("should display empty cart message when guest has no items", async () => {
       // Arrange & Act
       renderCartPage(mockAuthGuest, []);
 
       // Assert
       expect(screen.getByText("Your Cart Is Empty")).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should display 'please login to checkout' when guest has cart items", () => {
+    it("should display 'please login to checkout' when guest has cart items", async () => {
       // Arrange & Act
       renderCartPage(mockAuthGuest, mockCartItems);
 
@@ -163,10 +172,11 @@ describe("CartPage", () => {
       expect(
         screen.getByText(/please login to checkout/)
       ).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should show 'Plase Login to checkout' button when guest user", () => {
+    it("should show 'Plase Login to checkout' button when guest user", async () => {
       // Arrange & Act
       renderCartPage(mockAuthGuest, mockCartItems);
 
@@ -174,10 +184,11 @@ describe("CartPage", () => {
       expect(
         screen.getByText("Plase Login to checkout")
       ).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should navigate to login with state when login button is clicked", () => {
+    it("should navigate to login with state when login button is clicked", async () => {
       // Arrange
       renderCartPage(mockAuthGuest, mockCartItems);
 
@@ -188,12 +199,13 @@ describe("CartPage", () => {
       expect(mockNavigate).toHaveBeenCalledWith("/login", {
         state: "/cart",
       });
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
   });
 
   describe("Logged In User Display", () => {
     // Rayyan, A0259275R
-    it("should display user name when logged in", () => {
+    it("should display user name when logged in", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, []);
 
@@ -201,10 +213,11 @@ describe("CartPage", () => {
       const heading = screen.getByRole("heading", { level: 1 });
       expect(heading).toHaveTextContent("Hello");
       expect(heading).toHaveTextContent("John Doe");
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should display item count when cart has items", () => {
+    it("should display item count when cart has items", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, mockCartItems);
 
@@ -212,31 +225,34 @@ describe("CartPage", () => {
       expect(
         screen.getByText(/You Have 2 items in your cart/)
       ).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should display empty cart message when logged in with no items", () => {
+    it("should display empty cart message when logged in with no items", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, []);
 
       // Assert
       expect(screen.getByText("Your Cart Is Empty")).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
   });
 
   describe("Cart Items Rendering", () => {
     // Rayyan, A0259275R
-    it("should render all cart items", () => {
+    it("should render all cart items", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, mockCartItems);
 
       // Assert
       expect(screen.getByText("Test Product 1")).toBeInTheDocument();
       expect(screen.getByText("Test Product 2")).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should display truncated descriptions (first 30 chars)", () => {
+    it("should display truncated descriptions (first 30 chars)", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, mockCartItems);
 
@@ -246,20 +262,22 @@ describe("CartPage", () => {
           mockCartItems[0].description.substring(0, 30)
         )
       ).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should display item prices", () => {
+    it("should display item prices", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, mockCartItems);
 
       // Assert
       expect(screen.getByText("Price : 29.99")).toBeInTheDocument();
       expect(screen.getByText("Price : 49.99")).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should render product images with correct src and alt", () => {
+    it("should render product images with correct src and alt", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, mockCartItems);
 
@@ -275,24 +293,27 @@ describe("CartPage", () => {
         "/api/v1/product/product-photo/p2"
       );
       expect(images[1]).toHaveAttribute("alt", "Test Product 2");
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should render a Remove button for each cart item", () => {
+    it("should render a Remove button for each cart item", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, mockCartItems);
 
       // Assert
       const removeButtons = screen.getAllByText("Remove");
       expect(removeButtons).toHaveLength(2);
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
   });
 
   describe("Remove Cart Item", () => {
     // Rayyan, A0259275R
-    it("should remove item from cart when Remove button is clicked", () => {
+    it("should remove item from cart when Remove button is clicked", async () => {
       // Arrange
       renderCartPage(mockAuthLoggedIn, mockCartItems);
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
       const removeButtons = screen.getAllByText("Remove");
 
       // Act
@@ -307,9 +328,10 @@ describe("CartPage", () => {
     });
 
     // Rayyan, A0259275R
-    it("should remove the correct item when second Remove button is clicked", () => {
+    it("should remove the correct item when second Remove button is clicked", async () => {
       // Arrange
       renderCartPage(mockAuthLoggedIn, mockCartItems);
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
       const removeButtons = screen.getAllByText("Remove");
 
       // Act
@@ -324,10 +346,11 @@ describe("CartPage", () => {
     });
 
     // Rayyan, A0259275R
-    it("should result in empty cart when removing the only item", () => {
+    it("should result in empty cart when removing the only item", async () => {
       // Arrange
       const singleItemCart = [mockCartItems[0]];
       renderCartPage(mockAuthLoggedIn, singleItemCart);
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
 
       // Act
       fireEvent.click(screen.getByText("Remove"));
@@ -341,7 +364,7 @@ describe("CartPage", () => {
     });
 
     // Rayyan, A0259275R
-    it("should handle error in removeCartItem gracefully", () => {
+    it("should handle error in removeCartItem gracefully", async () => {
       // Arrange - use a cart that will cause the spread operator to fail
       // when trying to remove. We mock setCart to throw.
       const throwingSetCart = jest.fn(() => { throw new Error("removeCartItem error"); });
@@ -356,6 +379,7 @@ describe("CartPage", () => {
           </Routes>
         </MemoryRouter>
       );
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
 
       // Act
       const removeButtons = screen.getAllByText("Remove");
@@ -368,7 +392,7 @@ describe("CartPage", () => {
 
   describe("Total Price", () => {
     // Rayyan, A0259275R
-    it("should display the correct total price formatted as USD", () => {
+    it("should display the correct total price formatted as USD", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, mockCartItems);
 
@@ -376,19 +400,21 @@ describe("CartPage", () => {
       const totalHeading = screen.getByRole("heading", { level: 4, name: /Total :/ });
       expect(totalHeading).toBeInTheDocument();
       expect(totalHeading).toHaveTextContent("$79.98");
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should display $0.00 when cart is empty", () => {
+    it("should display $0.00 when cart is empty", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, []);
 
       // Assert
       expect(screen.getByText(/\$0\.00/)).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should handle error in totalPrice gracefully", () => {
+    it("should handle error in totalPrice gracefully", async () => {
       // Arrange - mock toLocaleString to throw so the catch block in totalPrice is hit
       const toLocaleSpy = jest.spyOn(Number.prototype, "toLocaleString").mockImplementation(() => {
         throw new Error("toLocaleString error");
@@ -399,6 +425,7 @@ describe("CartPage", () => {
 
       // Assert
       expect(consoleLogSpy).toHaveBeenCalledWith(expect.any(Error));
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
 
       // Cleanup
       toLocaleSpy.mockRestore();
@@ -407,28 +434,31 @@ describe("CartPage", () => {
 
   describe("Address Section", () => {
     // Rayyan, A0259275R
-    it("should display current address when user has one", () => {
+    it("should display current address when user has one", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, mockCartItems);
 
       // Assert
       expect(screen.getByText("Current Address")).toBeInTheDocument();
       expect(screen.getByText("123 Main St")).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should show Update Address button when user has address", () => {
+    it("should show Update Address button when user has address", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, mockCartItems);
 
       // Assert
       expect(screen.getByText("Update Address")).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should navigate to profile when Update Address is clicked", () => {
+    it("should navigate to profile when Update Address is clicked", async () => {
       // Arrange
       renderCartPage(mockAuthLoggedIn, mockCartItems);
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
 
       // Act
       fireEvent.click(screen.getByText("Update Address"));
@@ -440,18 +470,20 @@ describe("CartPage", () => {
     });
 
     // Rayyan, A0259275R
-    it("should show Update Address button when logged in user has no address", () => {
+    it("should show Update Address button when logged in user has no address", async () => {
       // Arrange & Act
       renderCartPage(mockAuthNoAddress, mockCartItems);
 
       // Assert
       expect(screen.getByText("Update Address")).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should navigate to profile when Update Address is clicked for user with no address", () => {
+    it("should navigate to profile when Update Address is clicked for user with no address", async () => {
       // Arrange
       renderCartPage(mockAuthNoAddress, mockCartItems);
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
 
       // Act
       fireEvent.click(screen.getByText("Update Address"));
@@ -503,7 +535,7 @@ describe("CartPage", () => {
 
   describe("DropIn Payment", () => {
     // Rayyan, A0259275R
-    it("should not render DropIn when there is no client token", () => {
+    it("should not render DropIn when there is no client token", async () => {
       // Arrange
       useAuth.mockReturnValue([mockAuthLoggedIn, mockSetAuth]);
       useCart.mockReturnValue([mockCartItems, mockSetCart]);
@@ -519,24 +551,27 @@ describe("CartPage", () => {
       );
 
       // Assert
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
       expect(screen.queryByTestId("dropin")).not.toBeInTheDocument();
     });
 
     // Rayyan, A0259275R
-    it("should not render DropIn when user is not logged in", () => {
+    it("should not render DropIn when user is not logged in", async () => {
       // Arrange & Act
       renderCartPage(mockAuthGuest, mockCartItems);
 
       // Assert
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
       expect(screen.queryByTestId("dropin")).not.toBeInTheDocument();
     });
 
     // Rayyan, A0259275R
-    it("should not render DropIn when cart is empty", () => {
+    it("should not render DropIn when cart is empty", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, []);
 
       // Assert
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
       expect(screen.queryByTestId("dropin")).not.toBeInTheDocument();
     });
 
@@ -614,9 +649,10 @@ describe("CartPage", () => {
       // Act
       fireEvent.click(screen.getByText("Make Payment"));
 
-      // Assert
+      // Assert - wait for both console.log and setLoading(false) to settle
       await waitFor(() => {
         expect(consoleLogSpy).toHaveBeenCalledWith(error);
+        expect(screen.getByText("Make Payment")).toBeInTheDocument();
       });
     });
 
@@ -647,8 +683,11 @@ describe("CartPage", () => {
         expect(screen.getByText("Processing ....")).toBeInTheDocument();
       });
 
-      // Cleanup - resolve the pending promise
+      // Cleanup - resolve the pending promise and wait for state updates to settle
       resolvePayment({ data: { success: true } });
+      await waitFor(() => {
+        expect(screen.getByText("Make Payment")).toBeInTheDocument();
+      });
     });
   });
 
@@ -674,16 +713,17 @@ describe("CartPage", () => {
 
   describe("Cart Summary Section", () => {
     // Rayyan, A0259275R
-    it("should display Cart Summary heading", () => {
+    it("should display Cart Summary heading", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, mockCartItems);
 
       // Assert
       expect(screen.getByText("Cart Summary")).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
 
     // Rayyan, A0259275R
-    it("should display 'Total | Checkout | Payment' text", () => {
+    it("should display 'Total | Checkout | Payment' text", async () => {
       // Arrange & Act
       renderCartPage(mockAuthLoggedIn, mockCartItems);
 
@@ -691,6 +731,7 @@ describe("CartPage", () => {
       expect(
         screen.getByText("Total | Checkout | Payment")
       ).toBeInTheDocument();
+      await waitFor(() => { expect(axios.get).toHaveBeenCalled(); });
     });
   });
 });
