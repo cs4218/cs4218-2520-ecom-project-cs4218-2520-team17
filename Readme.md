@@ -10,7 +10,7 @@
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=cs4218-2520-g17_ecom)](https://sonarcloud.io/summary/new_code?id=cs4218-2520-g17_ecom)
 
 ## MS1 CI URL
-https://github.com/cs4218/cs4218-2520-ecom-project-cs4218-2520-team17/actions/runs/21795485541/job/62882258560
+https://github.com/cs4218/cs4218-2520-ecom-project-cs4218-2520-team17/actions/runs/22290351579/job/64476379009
 
 ## Workload Distribution
 
