@@ -1,22 +1,13 @@
-// Mock braintree before importing productController (must be first)
-jest.mock("braintree", () => {
-  const mockGenerate = jest.fn();
-  const mockSale = jest.fn();
-  return {
-    BraintreeGateway: jest.fn().mockReturnValue({
-      clientToken: { generate: mockGenerate },
-      transaction: { sale: mockSale },
-    }),
-    Environment: { Sandbox: "sandbox" },
-  };
-});
-
+import fs from "node:fs";
+import { join } from "node:path";
 import braintree from "braintree";
-import fs from "fs";
+import { MongoMemoryServer } from "mongodb-memory-server";
 import slugify from "slugify";
+import connectDB from "../config/db.js";
 import categoryModel from "../models/categoryModel.js";
 import orderModel from "../models/orderModel.js";
 import productModel from "../models/productModel.js";
+import { cleanupAndSeedDb, disconnectDb } from "../test/utils.js";
 import {
   braintreePaymentController,
   braintreeTokenController,
@@ -34,13 +25,6 @@ import {
   updateProductController,
 } from "./productController.js";
 
-// Mock dependencies
-jest.mock("../models/productModel.js");
-jest.mock("fs");
-jest.mock("slugify");
-jest.mock("../models/categoryModel.js");
-jest.mock("../models/orderModel.js");
-
 // Helper Functions
 const makeRes = () => {
   const res = {};
@@ -51,12 +35,25 @@ const makeRes = () => {
   return res;
 };
 
-describe("Product Controller", () => {
+describe("Product Controller Integration Tests", () => {
   let req;
   let res;
   let consoleLogSpy;
+  let mongod;
 
-  beforeEach(() => {
+  // Start a single in-memory MongoDB instance for the whole test
+  beforeAll(async () => {
+    mongod = await MongoMemoryServer.create();
+    process.env.MONGO_URL = mongod.getUri();
+    await connectDB();
+  });
+
+  afterAll(async () => {
+    await disconnectDb();
+    await mongod.stop();
+  });
+
+  beforeEach(async () => {
     // Reset all mocks before each test
     jest.clearAllMocks();
 
@@ -75,10 +72,8 @@ describe("Product Controller", () => {
     // Setup response mock with chained methods
     res = makeRes();
 
-    // Default slugify mock behavior
-    slugify.mockImplementation((text) =>
-      text.toLowerCase().replace(/\s+/g, "-"),
-    );
+    // Seed the database with initial data before each test
+    await cleanupAndSeedDb();
   });
 
   afterEach(() => {
@@ -94,9 +89,18 @@ describe("Product Controller", () => {
       name: "Test Product",
       description: "A test product description",
       price: 12.34,
-      category: "123",
+      // Electronics category ID
+      category: "66db427fdb0119d9234b27ed",
       quantity: 1,
       shipping: "true",
+    };
+
+    const validPhotoFile = {
+      photo: {
+        size: 500000,
+        path: join(process.cwd(), "/test/img/red.jpg"),
+        type: "image/jpeg",
+      },
     };
 
     describe("Request Validation - Missing Required Fields", () => {
@@ -277,7 +281,7 @@ describe("Product Controller", () => {
       });
 
       // Li Jiakai, A0252287Y
-      it("should return 400 when shipping is empty", async () => {
+      it("should return 400 when shipping is empty string", async () => {
         // Arrange
         req.fields = { ...validProductFields, shipping: "" };
 
@@ -315,7 +319,10 @@ describe("Product Controller", () => {
         // Arrange
         req.fields = { ...validProductFields };
         req.files = {
-          photo: { size: 1000001, path: "/tmp/photo.jpg", type: "image/jpeg" },
+          photo: {
+            ...validPhotoFile.photo,
+            size: 1000001,
+          },
         };
 
         // Act
@@ -334,18 +341,11 @@ describe("Product Controller", () => {
         // Arrange
         req.fields = { ...validProductFields };
         req.files = {
-          photo: { size: 1000000, path: "/tmp/photo.jpg", type: "image/jpeg" },
+          photo: {
+            ...validPhotoFile.photo,
+            size: 1000000,
+          },
         };
-
-        const mockProduct = {
-          ...validProductFields,
-          slug: "test-product",
-          photo: {},
-          save: jest.fn().mockResolvedValue(true),
-        };
-
-        productModel.mockImplementation(() => mockProduct);
-        fs.readFileSync.mockReturnValue(Buffer.from("fake image data"));
 
         // Act
         await createProductController(req, res);
@@ -362,161 +362,114 @@ describe("Product Controller", () => {
         req.fields = { ...validProductFields };
         req.files = {};
 
-        const mockProduct = {
-          ...validProductFields,
-          slug: "test-product",
-          save: jest.fn().mockResolvedValue(true),
-        };
-
-        productModel.mockImplementation(() => mockProduct);
-
         // Act
         await createProductController(req, res);
 
         // Assert
-        expect(slugify).toHaveBeenCalledWith("Test Product");
-        expect(productModel).toHaveBeenCalledWith({
-          ...validProductFields,
-          slug: "test-product",
-        });
-        expect(mockProduct.save).toHaveBeenCalledTimes(1);
         expect(res.status).toHaveBeenCalledWith(201);
-        expect(res.send).toHaveBeenCalledWith({
-          success: true,
-          message: "Product created successfully",
-          products: mockProduct,
+
+        // Check response content
+        const response = res.send.mock.calls[0][0];
+        const { success, message, products } = response;
+        expect(success).toBe(true);
+        expect(message).toBe("Product created successfully");
+
+        Object.entries(req.fields).forEach(([key, value]) => {
+          expect(`${products[key]}`).toEqual(`${value}`);
         });
+        expect(products._id).toBeDefined();
+        expect(products.slug).toBe(slugify(req.fields.name));
+
+        // Database persistence check
+        const productInDb = await productModel.findOne({
+          name: req.fields.name,
+        });
+        expect(productInDb).not.toBeNull();
+        expect(productInDb._id).toStrictEqual(products._id);
+        Object.entries(req.fields).forEach(([key, value]) => {
+          expect(`${products[key]}`).toEqual(`${value}`);
+        });
+        expect(productInDb.slug).toBe(slugify(req.fields.name));
       });
 
       // Li Jiakai, A0252287Y
       it("should create product successfully with valid photo", async () => {
         // Arrange
         req.fields = { ...validProductFields };
-        req.files = {
-          photo: { size: 500000, path: "/tmp/photo.jpg", type: "image/jpeg" },
-        };
-
-        const photoBuffer = Buffer.from("fake image data");
-        fs.readFileSync.mockReturnValue(photoBuffer);
-
-        const mockProduct = {
-          ...validProductFields,
-          slug: "test-product",
-          photo: {},
-          save: jest.fn().mockResolvedValue(true),
-        };
-        productModel.mockImplementation(() => mockProduct);
+        req.files = validPhotoFile;
 
         // Act
         await createProductController(req, res);
 
         // Assert
-        expect(fs.readFileSync).toHaveBeenCalledWith("/tmp/photo.jpg");
-        expect(mockProduct.photo.data).toEqual(photoBuffer);
-        expect(mockProduct.photo.contentType).toBe("image/jpeg");
-        expect(mockProduct.save).toHaveBeenCalledTimes(1);
         expect(res.status).toHaveBeenCalledWith(201);
-        expect(res.send).toHaveBeenCalledWith({
-          success: true,
-          message: "Product created successfully",
-          products: mockProduct,
+
+        // Check response content
+        const response = res.send.mock.calls[0][0];
+        const { success, message, products } = response;
+        expect(success).toBe(true);
+        expect(message).toBe("Product created successfully");
+
+        Object.entries(req.fields).forEach(([key, value]) => {
+          expect(`${products[key]}`).toEqual(`${value}`);
         });
+        expect(products._id).toBeDefined();
+        expect(products.slug).toBe(slugify(req.fields.name));
+
+        const photo = products.photo;
+        expect(photo).toBeDefined();
+        expect(photo.contentType).toBe(validPhotoFile.photo.type);
+        expect(Buffer.from(photo.data).toString("base64")).toBe(
+          fs.readFileSync(validPhotoFile.photo.path).toString("base64"),
+        );
+
+        // Database persistence check
+        const productInDb = await productModel.findOne({
+          name: req.fields.name,
+        });
+        expect(productInDb).not.toBeNull();
+        expect(productInDb._id).toStrictEqual(products._id);
+        Object.entries(req.fields).forEach(([key, value]) => {
+          expect(`${products[key]}`).toEqual(`${value}`);
+        });
+        expect(productInDb.slug).toBe(slugify(req.fields.name));
       });
 
       // Li Jiakai, A0252287Y
       it("should create product with name containing special characters", async () => {
         // Arrange
-        req.fields = { ...validProductFields, name: "NUS 120 T-Shirt" };
+        const productName = "NUS 120 T-Shirt";
+        req.fields = { ...validProductFields, name: productName };
         req.files = {};
-
-        slugify.mockReturnValue("nus-120-t-shirt");
-
-        const mockProduct = {
-          ...validProductFields,
-          name: "NUS 120 T-Shirt",
-          slug: "nus-120-t-shirt",
-          photo: {},
-          save: jest.fn().mockResolvedValue(true),
-        };
-
-        productModel.mockImplementation(() => mockProduct);
 
         // Act
         await createProductController(req, res);
 
         // Assert
-        expect(slugify).toHaveBeenCalledWith("NUS 120 T-Shirt");
         expect(res.status).toHaveBeenCalledWith(201);
-        expect(res.send).toHaveBeenCalledWith({
-          success: true,
-          message: "Product created successfully",
-          products: mockProduct,
+
+        // Check response content
+        const response = res.send.mock.calls[0][0];
+        const { success, message, products } = response;
+        expect(success).toBe(true);
+        expect(message).toBe("Product created successfully");
+
+        Object.entries(req.fields).forEach(([key, value]) => {
+          expect(`${products[key]}`).toEqual(`${value}`);
         });
-      });
-    });
+        expect(products._id).toBeDefined();
+        expect(products.slug).toBe(slugify(req.fields.name));
 
-    describe("Error Handling", () => {
-      // Li Jiakai, A0252287Y
-      it("should return 500 and log error when save throws", async () => {
-        // Arrange
-        req.fields = { ...validProductFields };
-        req.files = {};
-
-        const saveError = new Error("Database save failed");
-        const mockProduct = {
-          ...validProductFields,
-          slug: "test-product",
-          photo: {},
-          save: jest.fn().mockRejectedValue(saveError),
-        };
-
-        productModel.mockImplementation(() => mockProduct);
-
-        // Act
-        await createProductController(req, res);
-
-        // Assert
-        expect(consoleLogSpy).toHaveBeenCalledWith(saveError);
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith({
-          success: false,
-          error: saveError,
-          message: "Error while creating product",
+        // Database persistence check
+        const productInDb = await productModel.findOne({
+          name: req.fields.name,
         });
-      });
-
-      // Li Jiakai, A0252287Y
-      it("should return 500 and log error when fs.readFileSync throws", async () => {
-        // Arrange
-        req.fields = { ...validProductFields };
-        req.files = {
-          photo: { size: 500000, path: "/tmp/photo.jpg", type: "image/jpeg" },
-        };
-
-        const fsError = new Error("File read failed");
-        const mockProduct = {
-          ...validProductFields,
-          slug: "test-product",
-          photo: {},
-          save: jest.fn(),
-        };
-
-        productModel.mockImplementation(() => mockProduct);
-        fs.readFileSync.mockImplementation(() => {
-          throw fsError;
+        expect(productInDb).not.toBeNull();
+        expect(productInDb._id).toStrictEqual(products._id);
+        Object.entries(req.fields).forEach(([key, value]) => {
+          expect(`${products[key]}`).toEqual(`${value}`);
         });
-
-        // Act
-        await createProductController(req, res);
-
-        // Assert
-        expect(consoleLogSpy).toHaveBeenCalledWith(fsError);
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith({
-          success: false,
-          error: fsError,
-          message: "Error while creating product",
-        });
+        expect(productInDb.slug).toBe(slugify(req.fields.name));
       });
     });
   });
@@ -529,75 +482,38 @@ describe("Product Controller", () => {
       // Li Jiakai, A0252287Y
       it("should delete product successfully with valid pid", async () => {
         // Arrange
-        req.params = { pid: "123" };
-
-        const mockQuery = {
-          select: jest
-            .fn()
-            .mockResolvedValue({ _id: "123", name: "Test Product" }),
-        };
-        productModel.findByIdAndDelete.mockReturnValue(mockQuery);
+        const productId = "66db427fdb0119d9234b27f1"; // Valid product ID from seed data
+        req.params = { pid: productId };
 
         // Act
         await deleteProductController(req, res);
 
         // Assert
-        expect(productModel.findByIdAndDelete).toHaveBeenCalledWith("123");
-        expect(mockQuery.select).toHaveBeenCalledWith("-photo");
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.send).toHaveBeenCalledWith({
           success: true,
           message: "Product deleted successfully",
         });
+
+        // Database deletion check
+        const deletedProduct = await productModel.findById(productId);
+        expect(deletedProduct).toBeNull();
       });
 
       // Li Jiakai, A0252287Y
       it("should return success even when product does not exist", async () => {
         // Arrange
-        req.params = { pid: "invalidId123" };
-
-        const mockQuery = {
-          select: jest.fn().mockResolvedValue(null),
-        };
-        productModel.findByIdAndDelete.mockReturnValue(mockQuery);
+        const productId = "000000000000000000000000"; // Non-existent product ID
+        req.params = { pid: productId };
 
         // Act
         await deleteProductController(req, res);
 
         // Assert
-        expect(productModel.findByIdAndDelete).toHaveBeenCalledWith(
-          "invalidId123",
-        );
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.send).toHaveBeenCalledWith({
           success: true,
           message: "Product deleted successfully",
-        });
-      });
-    });
-
-    describe("Error Handling", () => {
-      // Li Jiakai, A0252287Y
-      it("should return 500 and log error when database deletion fails", async () => {
-        // Arrange
-        req.params = { pid: "123" };
-        const dbError = new Error("Database deletion failed");
-
-        const mockQuery = {
-          select: jest.fn().mockRejectedValue(dbError),
-        };
-        productModel.findByIdAndDelete.mockReturnValue(mockQuery);
-
-        // Act
-        await deleteProductController(req, res);
-
-        // Assert
-        expect(consoleLogSpy).toHaveBeenCalledWith(dbError);
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith({
-          success: false,
-          message: "Error while deleting product",
-          error: dbError,
         });
       });
     });
@@ -607,13 +523,22 @@ describe("Product Controller", () => {
   // updateProductController Tests
   // ==========================================
   describe("updateProductController", () => {
+    const validProductId = "66db427fdb0119d9234b27f3"; // Valid product ID (Laptop) from seed data
     const validProductFields = {
       name: "Updated Product",
       description: "An updated product description",
       price: 123.45,
-      category: "456",
+      // Electronics category ID
+      category: "66db427fdb0119d9234b27ed",
       quantity: 20,
       shipping: "false",
+    };
+    const validPhotoFile = {
+      photo: {
+        size: 500000,
+        path: join(process.cwd(), "/test/img/red.jpg"),
+        type: "image/jpeg",
+      },
     };
 
     describe("Request Validation - Missing Required Fields", () => {
@@ -621,7 +546,7 @@ describe("Product Controller", () => {
       it("should return 400 when name is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, name: undefined };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -638,7 +563,7 @@ describe("Product Controller", () => {
       it("should return 400 when name is empty string", async () => {
         // Arrange
         req.fields = { ...validProductFields, name: "" };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -655,7 +580,7 @@ describe("Product Controller", () => {
       it("should return 400 when description is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, description: undefined };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -672,7 +597,7 @@ describe("Product Controller", () => {
       it("should return 400 when description is empty", async () => {
         // Arrange
         req.fields = { ...validProductFields, description: "" };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -689,7 +614,7 @@ describe("Product Controller", () => {
       it("should return 400 when price is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, price: undefined };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -706,7 +631,7 @@ describe("Product Controller", () => {
       it("should return 400 when price is zero", async () => {
         // Arrange
         req.fields = { ...validProductFields, price: 0 };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -723,7 +648,7 @@ describe("Product Controller", () => {
       it("should return 400 when category is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, category: undefined };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -740,7 +665,7 @@ describe("Product Controller", () => {
       it("should return 400 when category is empty", async () => {
         // Arrange
         req.fields = { ...validProductFields, category: "" };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -757,7 +682,7 @@ describe("Product Controller", () => {
       it("should return 400 when quantity is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, quantity: undefined };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -774,7 +699,7 @@ describe("Product Controller", () => {
       it("should return 400 when quantity is zero", async () => {
         // Arrange
         req.fields = { ...validProductFields, quantity: 0 };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -791,7 +716,7 @@ describe("Product Controller", () => {
       it("should return 400 when shipping is not provided", async () => {
         // Arrange
         req.fields = { ...validProductFields, shipping: undefined };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -808,7 +733,7 @@ describe("Product Controller", () => {
       it("should return 400 when shipping is empty", async () => {
         // Arrange
         req.fields = { ...validProductFields, shipping: "" };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -825,7 +750,7 @@ describe("Product Controller", () => {
       it("should return 400 when shipping is not a valid boolean string", async () => {
         // Arrange
         req.fields = { ...validProductFields, shipping: "invalid" };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
 
         // Act
         await updateProductController(req, res);
@@ -844,9 +769,12 @@ describe("Product Controller", () => {
       it("should return 400 when photo size exceeds 1mb", async () => {
         // Arrange
         req.fields = { ...validProductFields };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
         req.files = {
-          photo: { size: 1000001, path: "/tmp/photo.jpg", type: "image/jpeg" },
+          photo: {
+            ...validPhotoFile.photo,
+            size: 1000001,
+          },
         };
 
         // Act
@@ -864,20 +792,10 @@ describe("Product Controller", () => {
       it("should allow photo exactly at 1mb limit during update", async () => {
         // Arrange
         req.fields = { ...validProductFields };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
         req.files = {
-          photo: { size: 1000000, path: "/tmp/photo.jpg", type: "image/jpeg" },
+          photo: { ...validPhotoFile.photo, size: 1000000 },
         };
-
-        const mockProduct = {
-          ...validProductFields,
-          slug: "updated-product",
-          photo: {},
-          save: jest.fn().mockResolvedValue(true),
-        };
-
-        productModel.findByIdAndUpdate.mockResolvedValue(mockProduct);
-        fs.readFileSync.mockReturnValue(Buffer.from("fake image data"));
 
         // Act
         await updateProductController(req, res);
@@ -892,202 +810,79 @@ describe("Product Controller", () => {
       it("should update product successfully without photo", async () => {
         // Arrange
         req.fields = { ...validProductFields };
-        req.params = { pid: "456" };
+        req.params = { pid: validProductId };
         req.files = {};
-
-        const mockProduct = {
-          ...validProductFields,
-          _id: "456",
-          slug: "updated-product",
-          photo: {},
-          save: jest.fn().mockResolvedValue(true),
-        };
-
-        productModel.findByIdAndUpdate.mockResolvedValue(mockProduct);
 
         // Act
         await updateProductController(req, res);
 
         // Assert
-        expect(slugify).toHaveBeenCalledWith("Updated Product");
-        expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
-          "456",
-          { ...validProductFields, slug: "updated-product" },
-          { new: true },
-        );
-        expect(mockProduct.save).toHaveBeenCalled();
         expect(res.status).toHaveBeenCalledWith(201);
-        expect(res.send).toHaveBeenCalledWith({
-          success: true,
-          message: "Product Updated Successfully",
-          products: mockProduct,
+
+        const response = res.send.mock.calls[0][0];
+        const { success, message, products } = response;
+        expect(success).toBe(true);
+        expect(message).toBe("Product Updated Successfully");
+
+        Object.entries(req.fields).forEach(([key, value]) => {
+          expect(`${products[key]}`).toEqual(`${value}`);
         });
+        expect(products._id).toBeDefined();
+        expect(products.slug).toBe(slugify(req.fields.name));
+
+        // Database persistence check
+        const productInDb = await productModel.findOne({
+          name: req.fields.name,
+        });
+        expect(productInDb).not.toBeNull();
+        expect(productInDb._id).toStrictEqual(products._id);
+        Object.entries(req.fields).forEach(([key, value]) => {
+          expect(`${products[key]}`).toEqual(`${value}`);
+        });
+        expect(productInDb.slug).toBe(slugify(req.fields.name));
       });
 
       // Li Jiakai, A0252287Y
       it("should update product successfully with new photo", async () => {
         // Arrange
         req.fields = { ...validProductFields };
-        req.params = { pid: "456" };
-        req.files = {
-          photo: { size: 500000, path: "/tmp/newphoto.jpg", type: "image/png" },
-        };
-
-        const photoBuffer = Buffer.from("new fake image data");
-        fs.readFileSync.mockReturnValue(photoBuffer);
-
-        const mockProduct = {
-          ...validProductFields,
-          _id: "456",
-          slug: "updated-product",
-          photo: {},
-          save: jest.fn().mockResolvedValue(true),
-        };
-
-        productModel.findByIdAndUpdate.mockResolvedValue(mockProduct);
+        req.params = { pid: validProductId };
+        req.files = validPhotoFile;
 
         // Act
         await updateProductController(req, res);
 
         // Assert
-        expect(fs.readFileSync).toHaveBeenCalledWith("/tmp/newphoto.jpg");
-        expect(mockProduct.photo.data).toEqual(photoBuffer);
-        expect(mockProduct.photo.contentType).toBe("image/png");
-        expect(mockProduct.save).toHaveBeenCalled();
         expect(res.status).toHaveBeenCalledWith(201);
-        expect(res.send).toHaveBeenCalledWith({
-          success: true,
-          message: "Product Updated Successfully",
-          products: mockProduct,
+
+        const response = res.send.mock.calls[0][0];
+        const { success, message, products } = response;
+        expect(success).toBe(true);
+        expect(message).toBe("Product Updated Successfully");
+
+        Object.entries(req.fields).forEach(([key, value]) => {
+          expect(`${products[key]}`).toEqual(`${value}`);
         });
-      });
+        expect(products._id).toBeDefined();
+        expect(products.slug).toBe(slugify(req.fields.name));
 
-      // Li Jiakai, A0252287Y
-      it("should update product with different slug transformation", async () => {
-        // Arrange
-        req.fields = {
-          ...validProductFields,
-          name: "New & Improved Product v2!",
-        };
-        req.params = { pid: "456" };
-        req.files = {};
-
-        slugify.mockReturnValue("new-improved-product-v2");
-
-        const mockProduct = {
-          ...validProductFields,
-          _id: "456",
-          name: "New & Improved Product v2!",
-          slug: "new-improved-product-v2",
-          photo: {},
-          save: jest.fn().mockResolvedValue(true),
-        };
-
-        productModel.findByIdAndUpdate.mockResolvedValue(mockProduct);
-
-        // Act
-        await updateProductController(req, res);
-
-        // Assert
-        expect(slugify).toHaveBeenCalledWith("New & Improved Product v2!");
-        expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
-          "456",
-          expect.objectContaining({ slug: "new-improved-product-v2" }),
-          { new: true },
+        const photo = products.photo;
+        expect(photo).toBeDefined();
+        expect(photo.contentType).toBe(validPhotoFile.photo.type);
+        expect(Buffer.from(photo.data).toString("base64")).toBe(
+          fs.readFileSync(validPhotoFile.photo.path).toString("base64"),
         );
-        expect(res.status).toHaveBeenCalledWith(201);
-      });
-    });
 
-    describe("Error Handling", () => {
-      // Li Jiakai, A0252287Y
-      it("should return 500 and log error when findByIdAndUpdate throws", async () => {
-        // Arrange
-        req.fields = { ...validProductFields };
-        req.params = { pid: "456" };
-        req.files = {};
-
-        const dbError = new Error("Database update failed");
-        productModel.findByIdAndUpdate.mockRejectedValue(dbError);
-
-        // Act
-        await updateProductController(req, res);
-
-        // Assert
-        expect(consoleLogSpy).toHaveBeenCalledWith(dbError);
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith({
-          success: false,
-          error: dbError,
-          message: "Error while updating product",
+        // Database persistence check
+        const productInDb = await productModel.findOne({
+          name: req.fields.name,
         });
-      });
-
-      // Li Jiakai, A0252287Y
-      it("should return 500 and log error when save throws after update", async () => {
-        // Arrange
-        req.fields = { ...validProductFields };
-        req.params = { pid: "456" };
-        req.files = {};
-
-        const saveError = new Error("Save after update failed");
-        const mockProduct = {
-          ...validProductFields,
-          _id: "456",
-          slug: "updated-product",
-          photo: {},
-          save: jest.fn().mockRejectedValue(saveError),
-        };
-
-        productModel.findByIdAndUpdate.mockResolvedValue(mockProduct);
-
-        // Act
-        await updateProductController(req, res);
-
-        // Assert
-        expect(consoleLogSpy).toHaveBeenCalledWith(saveError);
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith({
-          success: false,
-          error: saveError,
-          message: "Error while updating product",
+        expect(productInDb).not.toBeNull();
+        expect(productInDb._id).toStrictEqual(products._id);
+        Object.entries(req.fields).forEach(([key, value]) => {
+          expect(`${products[key]}`).toEqual(`${value}`);
         });
-      });
-
-      // Li Jiakai, A0252287Y
-      it("should return 500 and log error when fs.readFileSync throws during update", async () => {
-        // Arrange
-        req.fields = { ...validProductFields };
-        req.params = { pid: "456" };
-        req.files = {
-          photo: { size: 500000, path: "/tmp/photo.jpg", type: "image/jpeg" },
-        };
-
-        const fsError = new Error("File read failed during update");
-        const mockProduct = {
-          ...validProductFields,
-          _id: "456",
-          slug: "updated-product",
-          photo: {},
-          save: jest.fn(),
-        };
-
-        productModel.findByIdAndUpdate.mockResolvedValue(mockProduct);
-        fs.readFileSync.mockImplementation(() => {
-          throw fsError;
-        });
-
-        // Act
-        await updateProductController(req, res);
-
-        // Assert
-        expect(consoleLogSpy).toHaveBeenCalledWith(fsError);
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith({
-          success: false,
-          error: fsError,
-          message: "Error while updating product",
-        });
+        expect(productInDb.slug).toBe(slugify(req.fields.name));
       });
     });
   });

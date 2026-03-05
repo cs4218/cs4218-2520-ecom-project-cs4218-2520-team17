@@ -42,7 +42,8 @@ function transformDoc(doc) {
 
 
 /**
- * Converts a string to a lowercase slug like in MongoDB.
+ * Converts a string to a lowercase slug.
+ * Used for category slugs.
  */
 export function createLowercaseSlug(text) {
   return slugify(text).toLowerCase();

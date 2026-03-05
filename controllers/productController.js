@@ -1,11 +1,10 @@
-import productModel from "../models/productModel.js";
-import categoryModel from "../models/categoryModel.js";
-import orderModel from "../models/orderModel.js";
-
-import fs from "fs";
-import slugify from "slugify";
 import braintree from "braintree";
 import dotenv from "dotenv";
+import fs from "fs";
+import slugify from "slugify";
+import categoryModel from "../models/categoryModel.js";
+import orderModel from "../models/orderModel.js";
+import productModel from "../models/productModel.js";
 
 dotenv.config();
 
@@ -25,21 +24,38 @@ export const createProductController = async (req, res) => {
     // validation
     switch (true) {
       case !name:
-        return res.status(400).send({ success: false, message: "Name is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Name is required" });
       case !description:
-        return res.status(400).send({ success: false, message: "Description is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Description is required" });
       case !price:
-        return res.status(400).send({ success: false, message: "Price is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Price is required" });
       case !category:
-        return res.status(400).send({ success: false, message: "Category is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Category is required" });
       case !quantity:
-        return res.status(400).send({ success: false, message: "Quantity is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Quantity is required" });
       case photo && photo.size > 1000000:
         return res
           .status(400)
           .send({ success: false, message: "Photo should be less than 1mb" });
       case !shipping:
-        return res.status(400).send({ success: false, message: "Shipping is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Shipping is required" });
+      case !["true", "false"].includes(shipping):
+        return res.status(400).send({
+          success: false,
+          message: "Shipping must be a true or false string",
+        });
     }
 
     const products = new productModel({ ...req.fields, slug: slugify(name) });
@@ -154,27 +170,44 @@ export const updateProductController = async (req, res) => {
     //validation
     switch (true) {
       case !name:
-        return res.status(400).send({ success: false, message: "Name is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Name is required" });
       case !description:
-        return res.status(400).send({ success: false, message: "Description is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Description is required" });
       case !price:
-        return res.status(400).send({ success: false, message: "Price is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Price is required" });
       case !category:
-        return res.status(400).send({ success: false, message: "Category is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Category is required" });
       case !quantity:
-        return res.status(400).send({ success: false, message: "Quantity is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Quantity is required" });
       case photo && photo.size > 1000000:
         return res
           .status(400)
           .send({ success: false, message: "Photo should be less than 1mb" });
       case !shipping:
-        return res.status(400).send({ success: false, message: "Shipping is required" });
+        return res
+          .status(400)
+          .send({ success: false, message: "Shipping is required" });
+      case !["true", "false"].includes(shipping):
+        return res.status(400).send({
+          success: false,
+          message: "Shipping must be a true or false string",
+        });
     }
 
     const products = await productModel.findByIdAndUpdate(
       req.params.pid,
       { ...req.fields, slug: slugify(name) },
-      { new: true }
+      { new: true },
     );
     if (photo) {
       products.photo.data = fs.readFileSync(photo.path);
@@ -373,7 +406,7 @@ export const braintreePaymentController = async (req, res) => {
         } else {
           res.status(500).send(error);
         }
-      }
+      },
     );
   } catch (error) {
     console.log(error);

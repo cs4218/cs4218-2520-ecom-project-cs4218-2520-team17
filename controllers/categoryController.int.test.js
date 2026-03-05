@@ -14,7 +14,7 @@ import {
   updateCategoryController,
 } from "./categoryController.js";
 
-describe("Category Controller", () => {
+describe("Category Controller Integration Tests", () => {
   let req;
   let res;
   let consoleLogSpy;
@@ -65,6 +65,56 @@ describe("Category Controller", () => {
   // createCategoryController Tests
   // ==========================================
   describe("createCategoryController", () => {
+    describe("Request Validation", () => {
+      // Li Jiakai, A0252287Y
+      it("should return 400 when name is not provided", async () => {
+        // Arrange
+        req.body = {};
+
+        // Act
+        await createCategoryController(req, res);
+
+        // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Name is required",
+        });
+      });
+
+      // Li Jiakai, A0252287Y
+      it("should return 400 when name is empty string", async () => {
+        // Arrange
+        req.body = { name: "" };
+
+        // Act
+        await createCategoryController(req, res);
+
+        // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Name is required",
+        });
+      });
+
+      // Li Jiakai, A0252287Y
+      it("should return 400 when name is null", async () => {
+        // Arrange
+        req.body = { name: null };
+
+        // Act
+        await createCategoryController(req, res);
+
+        // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Name is required",
+        });
+      });
+    });
+
     describe("Duplicate Category Check", () => {
       // Li Jiakai, A0252287Y
       it("should return 400 when category already exists", async () => {
