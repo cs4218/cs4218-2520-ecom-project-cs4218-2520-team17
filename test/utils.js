@@ -10,16 +10,16 @@ import mongoose from "mongoose";
 
 // Load Seed Data for MongoDB
 const seedCategories = JSON.parse(
-  readFileSync(join(process.cwd(), "mongo/seed/test.categories.json"), "utf-8")
+  readFileSync(join(process.cwd(), "test/seed/test.categories.json"), "utf-8")
 ).map(transformDoc);
 const seedUsers = JSON.parse(
-  readFileSync(join(process.cwd(), "mongo/seed/test.users.json"), "utf-8")
+  readFileSync(join(process.cwd(), "test/seed/test.users.json"), "utf-8")
 ).map(transformDoc);
 const seedProducts = JSON.parse(
-  readFileSync(join(process.cwd(), "mongo/seed/test.products.json"), "utf-8")
+  readFileSync(join(process.cwd(), "test/seed/test.products.json"), "utf-8")
 ).map(transformDoc);
 const seedOrders = JSON.parse(
-  readFileSync(join(process.cwd(), "mongo/seed/test.orders.json"), "utf-8")
+  readFileSync(join(process.cwd(), "test/seed/test.orders.json"), "utf-8")
 ).map(transformDoc);
 
 
