@@ -11,30 +11,28 @@ jest.mock("braintree", () => {
   };
 });
 
-import {
-  createProductController,
-  deleteProductController,
-  updateProductController,
-  getProductController,
-  getSingleProductController,
-  productPhotoController,
-  productFiltersController,
-  productCountController,
-  productListController,
-  searchProductController,
-  relatedProductController,
-  productCategoryController,
-  braintreeTokenController,
-  braintreePaymentController,
-} from "./productController.js";
-import productModel from "../models/productModel.js";
-import categoryModel from "../models/categoryModel.js";
+import braintree from "braintree";
 import fs from "fs";
 import slugify from "slugify";
-
-
-import braintree from "braintree";
+import categoryModel from "../models/categoryModel.js";
 import orderModel from "../models/orderModel.js";
+import productModel from "../models/productModel.js";
+import {
+  braintreePaymentController,
+  braintreeTokenController,
+  createProductController,
+  deleteProductController,
+  getProductController,
+  getSingleProductController,
+  productCategoryController,
+  productCountController,
+  productFiltersController,
+  productListController,
+  productPhotoController,
+  relatedProductController,
+  searchProductController,
+  updateProductController,
+} from "./productController.js";
 
 // Mock dependencies
 jest.mock("../models/productModel.js");
@@ -75,10 +73,12 @@ describe("Product Controller", () => {
     };
 
     // Setup response mock with chained methods
-    res = makeRes()
+    res = makeRes();
 
     // Default slugify mock behavior
-    slugify.mockImplementation((text) => text.toLowerCase().replace(/\s+/g, "-"));
+    slugify.mockImplementation((text) =>
+      text.toLowerCase().replace(/\s+/g, "-"),
+    );
   });
 
   afterEach(() => {
@@ -96,8 +96,7 @@ describe("Product Controller", () => {
       price: 12.34,
       category: "123",
       quantity: 1,
-      // Frontend uses "1" for true, "0" for false
-      shipping: "1"
+      shipping: "true",
     };
 
     describe("Request Validation - Missing Required Fields", () => {
@@ -111,7 +110,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Name is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -124,7 +126,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Name is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -137,7 +142,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Description is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Description is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -150,7 +158,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Description is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Description is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -163,7 +174,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Price is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Price is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -176,7 +190,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Price is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Price is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -189,7 +206,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Category is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Category is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -202,7 +222,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Category is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Category is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -215,7 +238,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Quantity is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Quantity is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -228,7 +254,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Quantity is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Quantity is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -241,7 +270,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Shipping is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Shipping is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -254,7 +286,26 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Shipping is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Shipping is required",
+        });
+      });
+
+      // Li Jiakai, A0252287Y
+      it("should return 400 when shipping is not a valid boolean string", async () => {
+        // Arrange
+        req.fields = { ...validProductFields, shipping: "invalid" };
+
+        // Act
+        await createProductController(req, res);
+
+        // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Shipping must be a true or false string",
+        });
       });
     });
 
@@ -272,7 +323,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Photo should be less than 1mb" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Photo should be less than 1mb",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -478,7 +532,9 @@ describe("Product Controller", () => {
         req.params = { pid: "123" };
 
         const mockQuery = {
-          select: jest.fn().mockResolvedValue({ _id: "123", name: "Test Product" }),
+          select: jest
+            .fn()
+            .mockResolvedValue({ _id: "123", name: "Test Product" }),
         };
         productModel.findByIdAndDelete.mockReturnValue(mockQuery);
 
@@ -509,7 +565,9 @@ describe("Product Controller", () => {
         await deleteProductController(req, res);
 
         // Assert
-        expect(productModel.findByIdAndDelete).toHaveBeenCalledWith("invalidId123");
+        expect(productModel.findByIdAndDelete).toHaveBeenCalledWith(
+          "invalidId123",
+        );
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.send).toHaveBeenCalledWith({
           success: true,
@@ -555,7 +613,7 @@ describe("Product Controller", () => {
       price: 123.45,
       category: "456",
       quantity: 20,
-      shipping: "0",
+      shipping: "false",
     };
 
     describe("Request Validation - Missing Required Fields", () => {
@@ -570,7 +628,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Name is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -584,7 +645,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Name is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -598,7 +662,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Description is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Description is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -612,7 +679,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Description is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Description is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -626,7 +696,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Price is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Price is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -640,7 +713,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Price is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Price is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -654,7 +730,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Category is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Category is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -668,7 +747,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Category is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Category is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -682,7 +764,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Quantity is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Quantity is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -696,7 +781,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Quantity is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Quantity is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -710,7 +798,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Shipping is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Shipping is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -724,7 +815,27 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Shipping is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Shipping is required",
+        });
+      });
+
+      // Li Jiakai, A0252287Y
+      it("should return 400 when shipping is not a valid boolean string", async () => {
+        // Arrange
+        req.fields = { ...validProductFields, shipping: "invalid" };
+        req.params = { pid: "456" };
+
+        // Act
+        await updateProductController(req, res);
+
+        // Assert
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Shipping must be a true or false string",
+        });
       });
     });
 
@@ -743,7 +854,10 @@ describe("Product Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Photo should be less than 1mb" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Photo should be less than 1mb",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -799,7 +913,7 @@ describe("Product Controller", () => {
         expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
           "456",
           { ...validProductFields, slug: "updated-product" },
-          { new: true }
+          { new: true },
         );
         expect(mockProduct.save).toHaveBeenCalled();
         expect(res.status).toHaveBeenCalledWith(201);
@@ -851,7 +965,10 @@ describe("Product Controller", () => {
       // Li Jiakai, A0252287Y
       it("should update product with different slug transformation", async () => {
         // Arrange
-        req.fields = { ...validProductFields, name: "New & Improved Product v2!" };
+        req.fields = {
+          ...validProductFields,
+          name: "New & Improved Product v2!",
+        };
         req.params = { pid: "456" };
         req.files = {};
 
@@ -876,7 +993,7 @@ describe("Product Controller", () => {
         expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
           "456",
           expect.objectContaining({ slug: "new-improved-product-v2" }),
-          { new: true }
+          { new: true },
         );
         expect(res.status).toHaveBeenCalledWith(201);
       });
@@ -975,7 +1092,7 @@ describe("Product Controller", () => {
     });
   });
 
-  describe(("Test getProductController"), () => {
+  describe("Test getProductController", () => {
     test("return 200 with products", async () => {
       // Arrange
       const req = {};
@@ -1011,7 +1128,7 @@ describe("Product Controller", () => {
         message: "All Products",
         products: fakeProducts,
       });
-    })
+    });
 
     test("returns 500 on error", async () => {
       // Arrange
@@ -1033,9 +1150,8 @@ describe("Product Controller", () => {
         message: "Error in getting products",
         error: err,
       });
-
     });
-  })
+  });
 
   describe("Test getSingleProductController", () => {
     test("returns 200 with single product", async () => {
@@ -1116,10 +1232,7 @@ describe("Product Controller", () => {
       expect(productModel.findById).toHaveBeenCalledWith("product123");
       expect(query.select).toHaveBeenCalledWith("photo");
 
-      expect(res.set).toHaveBeenCalledWith(
-        "Content-type",
-        "image/jpeg"
-      );
+      expect(res.set).toHaveBeenCalledWith("Content-type", "image/jpeg");
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.send).toHaveBeenCalledWith(fakePhotoData);
@@ -1181,7 +1294,9 @@ describe("Product Controller", () => {
       await productFiltersController(req, res);
 
       // Assert
-      expect(productModel.find).toHaveBeenCalledWith({ category: ["cat1", "cat2"] });
+      expect(productModel.find).toHaveBeenCalledWith({
+        category: ["cat1", "cat2"],
+      });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.send).toHaveBeenCalledWith({
         success: true,
@@ -1534,7 +1649,9 @@ describe("Product Controller", () => {
 
       // Assert
       expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "phones" });
-      expect(productModel.find).toHaveBeenCalledWith({ category: fakeCategory });
+      expect(productModel.find).toHaveBeenCalledWith({
+        category: fakeCategory,
+      });
       expect(query.populate).toHaveBeenCalledWith("category");
 
       expect(res.status).toHaveBeenCalledWith(200);
@@ -1589,7 +1706,6 @@ describe("Product Controller", () => {
     });
   });
 
-
   // ==========================================
   // braintreeTokenController Tests
   // ==========================================
@@ -1605,16 +1721,23 @@ describe("Product Controller", () => {
       // Rayyan Ismail, A0259275R
       it("should generate token successfully", async () => {
         // Arrange
-        gateway.clientToken.generate.mockImplementationOnce((options, callback) => {
-          callback(null, { clientToken: "fake-client-token" });
-        });
+        gateway.clientToken.generate.mockImplementationOnce(
+          (options, callback) => {
+            callback(null, { clientToken: "fake-client-token" });
+          },
+        );
 
         // Act
         await braintreeTokenController(req, res);
 
         // Assert
-        expect(gateway.clientToken.generate).toHaveBeenCalledWith({}, expect.any(Function));
-        expect(res.send).toHaveBeenCalledWith({ clientToken: "fake-client-token" });
+        expect(gateway.clientToken.generate).toHaveBeenCalledWith(
+          {},
+          expect.any(Function),
+        );
+        expect(res.send).toHaveBeenCalledWith({
+          clientToken: "fake-client-token",
+        });
       });
     });
 
@@ -1623,15 +1746,20 @@ describe("Product Controller", () => {
       it("should return 500 when token generation fails", async () => {
         // Arrange
         const generationError = new Error("Token generation failed");
-        gateway.clientToken.generate.mockImplementationOnce((options, callback) => {
-          callback(generationError, null);
-        });
+        gateway.clientToken.generate.mockImplementationOnce(
+          (options, callback) => {
+            callback(generationError, null);
+          },
+        );
 
         // Act
         await braintreeTokenController(req, res);
 
         // Assert
-        expect(gateway.clientToken.generate).toHaveBeenCalledWith({}, expect.any(Function));
+        expect(gateway.clientToken.generate).toHaveBeenCalledWith(
+          {},
+          expect.any(Function),
+        );
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.send).toHaveBeenCalledWith(generationError);
       });
@@ -1668,15 +1796,17 @@ describe("Product Controller", () => {
         // Arrange
         req.body = {
           nonce: "fake-nonce",
-          cart: [
-            { price: 10.00 },
-            { price: 15.50 },
-          ],
+          cart: [{ price: 10.0 }, { price: 15.5 }],
         };
         req.user = { _id: "user123" };
-        gateway.transaction.sale.mockImplementationOnce((saleRequest, callback) => {
-          callback(null, { success: true, transaction: { id: "fake-transaction-id" } });
-        });
+        gateway.transaction.sale.mockImplementationOnce(
+          (saleRequest, callback) => {
+            callback(null, {
+              success: true,
+              transaction: { id: "fake-transaction-id" },
+            });
+          },
+        );
 
         // Act
         await braintreePaymentController(req, res);
@@ -1688,16 +1818,17 @@ describe("Product Controller", () => {
             paymentMethodNonce: "fake-nonce",
             options: { submitForSettlement: true },
           },
-          expect.any(Function)
+          expect.any(Function),
         );
         expect(orderModel).toHaveBeenCalledWith({
           products: req.body.cart,
-          payment: { success: true,
-                     transaction: { id: "fake-transaction-id" }
-                   },
+          payment: {
+            success: true,
+            transaction: { id: "fake-transaction-id" },
+          },
           buyer: "user123",
         });
-        expect(res.json).toHaveBeenCalledWith({ok: true });
+        expect(res.json).toHaveBeenCalledWith({ ok: true });
       });
       // Rayyan Ismail, A0259275R
       it("should process payment successfully with empty cart as a total of 0", async () => {
@@ -1707,9 +1838,14 @@ describe("Product Controller", () => {
           cart: [],
         };
         req.user = { _id: "user123" };
-        gateway.transaction.sale.mockImplementationOnce((saleRequest, callback) => {
-          callback(null, { success: true, transaction: { id: "fake-transaction-id" } });
-        });
+        gateway.transaction.sale.mockImplementationOnce(
+          (saleRequest, callback) => {
+            callback(null, {
+              success: true,
+              transaction: { id: "fake-transaction-id" },
+            });
+          },
+        );
 
         // Act
         await braintreePaymentController(req, res);
@@ -1721,31 +1857,34 @@ describe("Product Controller", () => {
             paymentMethodNonce: "fake-nonce",
             options: { submitForSettlement: true },
           },
-          expect.any(Function)
+          expect.any(Function),
         );
         expect(orderModel).toHaveBeenCalledWith({
           products: req.body.cart,
-          payment: { success: true,
-                     transaction: { id: "fake-transaction-id" }
-                   },
+          payment: {
+            success: true,
+            transaction: { id: "fake-transaction-id" },
+          },
           buyer: "user123",
         });
-        expect(res.json).toHaveBeenCalledWith({ok: true });
+        expect(res.json).toHaveBeenCalledWith({ ok: true });
       });
       // Rayyan Ismail, A0259275R
       it("should process payment successfully with cart items having zero price", async () => {
         // Arrange
         req.body = {
           nonce: "fake-nonce",
-          cart: [
-            { price: 0 },
-            { price: 0 },
-          ],
+          cart: [{ price: 0 }, { price: 0 }],
         };
         req.user = { _id: "user123" };
-        gateway.transaction.sale.mockImplementationOnce((saleRequest, callback) => {
-          callback(null, { success: true, transaction: { id: "fake-transaction-id" } });
-        });
+        gateway.transaction.sale.mockImplementationOnce(
+          (saleRequest, callback) => {
+            callback(null, {
+              success: true,
+              transaction: { id: "fake-transaction-id" },
+            });
+          },
+        );
 
         // Act
         await braintreePaymentController(req, res);
@@ -1757,31 +1896,34 @@ describe("Product Controller", () => {
             paymentMethodNonce: "fake-nonce",
             options: { submitForSettlement: true },
           },
-          expect.any(Function)
+          expect.any(Function),
         );
         expect(orderModel).toHaveBeenCalledWith({
           products: req.body.cart,
-          payment: { success: true,
-                     transaction: { id: "fake-transaction-id" }
-                   },
+          payment: {
+            success: true,
+            transaction: { id: "fake-transaction-id" },
+          },
           buyer: "user123",
         });
-        expect(res.json).toHaveBeenCalledWith({ok: true });
+        expect(res.json).toHaveBeenCalledWith({ ok: true });
       });
       // Rayyan Ismail, A0259275R
-      it ("should process payment successfully with cart items having negative price", async () => {
+      it("should process payment successfully with cart items having negative price", async () => {
         // Arrange
         req.body = {
           nonce: "fake-nonce",
-          cart: [
-            { price: -5.00 },
-            { price: 10.00 },
-          ],
+          cart: [{ price: -5.0 }, { price: 10.0 }],
         };
         req.user = { _id: "user123" };
-        gateway.transaction.sale.mockImplementationOnce((saleRequest, callback) => {
-          callback(null, { success: true, transaction: { id: "fake-transaction-id" } });
-        });
+        gateway.transaction.sale.mockImplementationOnce(
+          (saleRequest, callback) => {
+            callback(null, {
+              success: true,
+              transaction: { id: "fake-transaction-id" },
+            });
+          },
+        );
 
         // Act
         await braintreePaymentController(req, res);
@@ -1793,16 +1935,17 @@ describe("Product Controller", () => {
             paymentMethodNonce: "fake-nonce",
             options: { submitForSettlement: true },
           },
-          expect.any(Function)
+          expect.any(Function),
         );
         expect(orderModel).toHaveBeenCalledWith({
           products: req.body.cart,
-          payment: { success: true,
-                     transaction: { id: "fake-transaction-id" }
-                   },
+          payment: {
+            success: true,
+            transaction: { id: "fake-transaction-id" },
+          },
           buyer: "user123",
         });
-        expect(res.json).toHaveBeenCalledWith({ok: true });
+        expect(res.json).toHaveBeenCalledWith({ ok: true });
       });
     });
     describe("Error Handling", () => {
@@ -1811,14 +1954,14 @@ describe("Product Controller", () => {
         // Arrange
         req.body = {
           nonce: "fake-nonce",
-          cart: [
-            { price: 10.00 },
-          ],
+          cart: [{ price: 10.0 }],
         };
         req.user = { _id: "user123" };
-        gateway.transaction.sale.mockImplementationOnce((saleRequest, callback) => {
-          callback(new Error("Payment processing failed"), null);
-        });
+        gateway.transaction.sale.mockImplementationOnce(
+          (saleRequest, callback) => {
+            callback(new Error("Payment processing failed"), null);
+          },
+        );
 
         // Act
         await braintreePaymentController(req, res);
@@ -1838,7 +1981,7 @@ describe("Product Controller", () => {
       req.user = { _id: "user123" };
       const gatewayError = new Error("Gateway crashed");
       gateway.transaction.sale.mockImplementationOnce(() => {
-          throw gatewayError;
+        throw gatewayError;
       });
 
       // Act
