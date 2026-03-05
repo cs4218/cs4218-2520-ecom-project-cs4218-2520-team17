@@ -325,50 +325,46 @@ describe("Category Controller", () => {
   // deleteCategoryController Tests
   // ==========================================
   describe("deleteCategoryController", () => {
-    describe("Successful Deletion", () => {
-      // Li Jiakai, A0252287Y
-      it("should delete category successfully with valid id", async () => {
-        // Arrange
-        req.params = { id: "123" };
-        categoryModel.findByIdAndDelete.mockResolvedValue({
-          _id: "123",
-          name: "Electronics",
-        });
+    // Li Jiakai, A0252287Y
+    it("should delete category successfully with valid id", async () => {
+      // Arrange
+      const categoryId = "66db427fdb0119d9234b27ed";
+      req.params = { id: categoryId };
 
-        // Act
-        await deleteCategoryController(req, res);
+      // Act
+      await deleteCategoryController(req, res);
 
-        // Assert
-        expect(categoryModel.findByIdAndDelete).toHaveBeenCalledWith("123");
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.send).toHaveBeenCalledWith({
-          success: true,
-          message: "Category deleted successfully",
-        });
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Category deleted successfully",
       });
+
+      // Verify deletion in DB
+      const deletedCategory = await categoryModel.findById(categoryId);
+      expect(deletedCategory).toBeNull();
+    });
+  });
+
+  // Li Jiakai, A0252287Y
+  it("should delete category successfully with invalid id", async () => {
+    // Arrange
+    const categoryId = "000000000000000000000000";
+    req.params = { id: categoryId };
+
+    // Act
+    await deleteCategoryController(req, res);
+
+    // Assert
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      success: true,
+      message: "Category deleted successfully",
     });
 
-    describe("Error Handling", () => {
-      // Li Jiakai, A0252287Y
-      it("should return 500 and log error when database deletion fails", async () => {
-        // Arrange
-        req.params = { id: "123" };
-        const dbError = new Error("Database deletion failed");
-
-        categoryModel.findByIdAndDelete.mockRejectedValue(dbError);
-
-        // Act
-        await deleteCategoryController(req, res);
-
-        // Assert
-        expect(consoleLogSpy).toHaveBeenCalledWith(dbError);
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith({
-          success: false,
-          message: "Error while deleting category",
-          error: dbError,
-        });
-      });
-    });
+    // Verify deletion in DB
+    const deletedCategory = await categoryModel.findById(categoryId);
+    expect(deletedCategory).toBeNull();
   });
 });
