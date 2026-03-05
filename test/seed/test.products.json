@@ -1,0 +1,174 @@
+[{
+  "_id": {
+    "$oid": "66db427fdb0119d9234b27f1"
+  },
+  "name": "Textbook",
+  "slug": "textbook",
+  "description": "A comprehensive textbook",
+  "price": 79.99,
+  "category": {
+    "$oid": "66db427fdb0119d9234b27ef"
+  },
+  "quantity": 50,
+  "photo": {
+    "data": {
+      "$binary": {
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=="
+      }
+    },
+    "contentType": "image/jpeg"
+  },
+  "shipping": false,
+  "createdAt": {
+    "$date": "2024-09-06T17:57:19.963Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-06T17:57:19.963Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66db427fdb0119d9234b27f3"
+  },
+  "name": "Laptop",
+  "slug": "laptop",
+  "description": "A powerful laptop",
+  "price": 1499.99,
+  "category": {
+    "$oid": "66db427fdb0119d9234b27ed"
+  },
+  "quantity": 30,
+  "photo": {
+    "data": {
+      "$binary": {
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=="
+      }
+    },
+    "contentType": "image/jpeg"
+  },
+  "shipping": true,
+  "createdAt": {
+    "$date": "2024-09-06T17:57:19.971Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-06T17:57:19.971Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66db427fdb0119d9234b27f5"
+  },
+  "name": "Smartphone",
+  "slug": "smartphone",
+  "description": "A high-end smartphone",
+  "price": 999.99,
+  "category": {
+    "$oid": "66db427fdb0119d9234b27ed"
+  },
+  "quantity": 50,
+  "photo": {
+    "data": {
+      "$binary": {
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=="
+      }
+    },
+    "contentType": "image/jpeg"
+  },
+  "shipping": false,
+  "createdAt": {
+    "$date": "2024-09-06T17:57:19.978Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-06T17:57:19.978Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66db427fdb0119d9234b27f9"
+  },
+  "name": "Novel",
+  "slug": "novel",
+  "description": "A bestselling novel",
+  "price": 14.99,
+  "category": {
+    "$oid": "66db427fdb0119d9234b27ef"
+  },
+  "quantity": 200,
+  "photo": {
+    "data": {
+      "$binary": {
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=="
+      }
+    },
+    "contentType": "image/jpeg"
+  },
+  "shipping": true,
+  "createdAt": {
+    "$date": "2024-09-06T17:57:19.992Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-06T17:57:19.992Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67a2171ea6d9e00ef2ac0229"
+  },
+  "name": "The Law of Contract in Singapore",
+  "slug": "the-law-of-contract-in-singapore",
+  "description": "A bestselling book in Singapore",
+  "price": 54.99,
+  "category": {
+    "$oid": "66db427fdb0119d9234b27ef"
+  },
+  "quantity": 200,
+  "photo": {
+    "data": {
+      "$binary": {
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=="
+      }
+    },
+    "contentType": "image/jpeg"
+  },
+  "shipping": true,
+  "createdAt": {
+    "$date": "2024-09-06T17:57:19.992Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-06T17:57:19.992Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67a21772a6d9e00ef2ac022a"
+  },
+  "name": "NUS T-shirt",
+  "slug": "nus-tshirt",
+  "description": "Plain NUS T-shirt for sale",
+  "price": 4.99,
+  "category": {
+    "$oid": "66db427fdb0119d9234b27ee"
+  },
+  "quantity": 200,
+  "photo": {
+    "data": {
+      "$binary": {
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=="
+      }
+    },
+    "contentType": "image/jpeg"
+  },
+  "shipping": true,
+  "createdAt": {
+    "$date": "2024-09-06T17:57:19.992Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-06T17:57:19.992Z"
+  },
+  "__v": 0
+}]
