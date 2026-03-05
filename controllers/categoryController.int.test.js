@@ -89,7 +89,6 @@ describe("Category Controller", () => {
         // Arrange
         const categoryName = "Computers";
         const expectedSlug = createLowercaseSlug(categoryName);
-        console.warn("Expected Slug:", expectedSlug);
         req.body = { name: categoryName };
 
         // Act
