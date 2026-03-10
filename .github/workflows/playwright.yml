@@ -9,12 +9,17 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - name: Checkout repository
+      uses: actions/checkout@v5
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
       with:
-        node-version: lts/*
-    - name: Install dependencies
+        node-version: 24.13.0
+        cache: "npm"
+    - name: Install root dependencies
       run: npm ci
+    - name: Install client dependencies
+      run: npm ci --prefix ./client
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
