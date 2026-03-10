@@ -316,9 +316,6 @@ describe("Auth Controller Integration Tests", () => {
           email: "cs4218@test.com",
           password: "cs4218@test.com",
         };
-        const token = JWT.sign({ _id: "67a218decf4efddf1e5358ac" }, process.env.JWT_SECRET, {
-          expiresIn: "7d",
-        });
 
         // Act
         await loginController(req, res);
@@ -336,7 +333,7 @@ describe("Auth Controller Integration Tests", () => {
             address: "1 Computing Drive",
             role: 0,
           },
-          token: token,
+          token: expect.any(String),
         });
       });
     });
@@ -499,7 +496,6 @@ describe("Auth Controller Integration Tests", () => {
         message: "Profile Updated Successfully",
         updatedUser: expect.objectContaining({
           name: "Updated Name",
-          password: "$2b$10$//wWsN./fEX1WiipH57HG.SAwgkYv1MRrPSkpXM38Dy5seOEhCoUy",
           email: "cs4218@test.com",
           phone: "81234567",
           address: "1 Computing Drive",

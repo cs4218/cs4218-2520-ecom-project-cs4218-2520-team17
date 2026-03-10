@@ -130,8 +130,10 @@ describe("Auth Middleware Integration Tests", () => {
       expect(next).not.toHaveBeenCalled();
     });
     
-    it("should handle error for non-existent user and log it", async () => {
+    it("should handle any error and log it", async () => {
       // Arrange
+      // userModel.findById returns null for a non-existent user and 
+      // the middleware then tries to access null.role, throwing a TypeError.
       req.user._id = "123456789abcdef123456789"; // Non-existent user ID
 
       // Act

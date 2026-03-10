@@ -15,10 +15,11 @@ async function deleteTestUser() {
   }
 }
 
+test.describe.configure({ mode: 'serial' });
+
 test.beforeAll(deleteTestUser);
 test.afterAll(deleteTestUser);
 
-// All tests must be run in order
 test('register and login user', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'Register' }).click();
