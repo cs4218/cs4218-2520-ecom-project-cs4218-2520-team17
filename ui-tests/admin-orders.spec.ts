@@ -16,6 +16,8 @@ test.describe("Admin order management", () => {
     await logInAsAdmin(page);
     await openAdminDashboard(page);
     await page.getByRole("link", { name: "Orders" }).click();
+    // Early fail if fetch orders fails
+    await expect(page.getByText("Failed to fetch orders")).not.toBeVisible();
     await expect(page.getByTestId("admin-orders-content-col")).toBeVisible();
   });
 
