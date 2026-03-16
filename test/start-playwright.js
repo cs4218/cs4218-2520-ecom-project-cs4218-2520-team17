@@ -88,6 +88,8 @@ async function main() {
 
   // Use client/.env
   const frontendEnv = {
+    ...process.env,
+    PORT: "3000",   // Override the PORT inherited from process.env
     REACT_APP_API_URL: "http://localhost:6060",
     DANGEROUSLY_DISABLE_HOST_CHECK: "true",
     BROWSER: 'none',
