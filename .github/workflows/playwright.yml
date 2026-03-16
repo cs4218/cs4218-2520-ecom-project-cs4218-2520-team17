@@ -20,6 +20,12 @@ jobs:
       run: npm ci
     - name: Install client dependencies
       run: npm ci --prefix ./client
+    - name: Build frontend for production
+      run: npm run build:client
+      env:
+        NODE_ENV: production
+        CI: false # prevent lint warnings from failing the build
+        DISABLE_ESLINT_PLUGIN: true
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests

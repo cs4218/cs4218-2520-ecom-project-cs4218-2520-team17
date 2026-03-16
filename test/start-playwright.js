@@ -84,19 +84,11 @@ async function main() {
   const backendEnv = {
     ...process.env,
     MONGO_URL: mongoUri,
+    NODE_ENV: 'production',
   };
 
-  // Use client/.env
-  const frontendEnv = {
-    ...process.env,
-    PORT: "3000",   // Override the PORT inherited from process.env
-    REACT_APP_API_URL: "http://localhost:6060",
-    DANGEROUSLY_DISABLE_HOST_CHECK: "true",
-    BROWSER: 'none',
-  };
-
+  // Need to build the frontend first before serving it - use npm run build:client
   backendProcess = startChildProcess("npm", ["run", "start"], backendEnv, "Backend server");
-  frontendProcess = startChildProcess("npm", ["run", "client"], frontendEnv, "Frontend server");
 
   process.on("SIGINT", () => {
     void shutdown(0);
@@ -107,6 +99,6 @@ async function main() {
 }
 
 void main().catch((error) => {
-  console.error("Failed to start Playwright in-memory harness:", error);
+  console.error("Failed to start Playwright:", error);
   void shutdown(1);
 });
