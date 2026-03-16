@@ -20,6 +20,8 @@ jobs:
       run: npm ci
     - name: Install client dependencies
       run: npm ci --prefix ./client
+    - name: Build frontend for production
+      run: npm run build:client
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests

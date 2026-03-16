@@ -8,6 +8,11 @@ import categoryRoutes from './routes/categoryRoutes.js'
 import productRoutes from './routes/productRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // configure env
 dotenv.config();
@@ -28,11 +33,17 @@ app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/order", orderRoutes);
 
-// rest api
+// Only serve static files if we are in production (or E2E testing)
+if (process.env.NODE_ENV === 'production') {
+  // Serve the React build folder
+  console.log("Serving static files from React build...".bgGreen.white, __dirname);
+  app.use(express.static(path.join(__dirname, 'client/build')));
 
-app.get('/', (req,res) => {
-    res.send("<h1>Welcome to ecommerce app</h1>");
-});
+  // Catch-all to let React Router handle frontend URLs
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
 
 const PORT = process.env.PORT || 6060;
 
