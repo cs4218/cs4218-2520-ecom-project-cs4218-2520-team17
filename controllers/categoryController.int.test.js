@@ -267,6 +267,28 @@ describe("Category Controller Integration Tests", () => {
         });
         expect(createdCategory).toBeNull();
       });
+
+      describe("Duplicate Category Check", () => {
+        // Li Jiakai, A0252287Y
+        it("should return 400 when category name already exists", async () => {
+          // Arrange
+          const newCategoryName = "Electronics";
+          // Get from seed data - ID for Book
+          const categoryId = "66db427fdb0119d9234b27ef";
+
+          req.body = { name: newCategoryName };
+          req.params = { id: categoryId };
+
+          // Act
+          await updateCategoryController(req, res);
+
+          // Assert
+          expect(res.status).toHaveBeenCalledWith(400);
+          const response = res.send.mock.calls[0][0];
+          expect(response.success).toBe(false);
+          expect(response.message).toBe("Category already exists");
+        });
+      });
     });
   });
 

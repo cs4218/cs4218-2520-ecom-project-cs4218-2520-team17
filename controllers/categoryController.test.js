@@ -1,12 +1,13 @@
-import {
-  createCategoryController,
-  updateCategoryController,
-  categoryControlller,
-  singleCategoryController,
-  deleteCategoryController,
-} from "./categoryController.js";
-import categoryModel from "../models/categoryModel.js";
+import { expect } from "@playwright/test";
 import slugify from "slugify";
+import categoryModel from "../models/categoryModel.js";
+import {
+  categoryControlller,
+  createCategoryController,
+  deleteCategoryController,
+  singleCategoryController,
+  updateCategoryController,
+} from "./categoryController.js";
 
 // Mock dependencies
 jest.mock("../models/categoryModel.js");
@@ -39,7 +40,9 @@ describe("Category Controller", () => {
     };
 
     // Default slugify mock behavior
-    slugify.mockImplementation((text) => text.toLowerCase().replace(/\s+/g, "-"));
+    slugify.mockImplementation((text) =>
+      text.toLowerCase().replace(/\s+/g, "-"),
+    );
   });
 
   afterEach(() => {
@@ -61,7 +64,10 @@ describe("Category Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Name is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -74,7 +80,10 @@ describe("Category Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Name is required",
+        });
       });
 
       // Li Jiakai, A0252287Y
@@ -87,7 +96,10 @@ describe("Category Controller", () => {
 
         // Assert
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith({ success: false, message: "Name is required" });
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Name is required",
+        });
       });
     });
 
@@ -96,14 +108,20 @@ describe("Category Controller", () => {
       it("should return 400 when category already exists", async () => {
         // Arrange
         req.body = { name: "Electronics" };
-        const existingCategory = { _id: "123", name: "Electronics", slug: "electronics" };
+        const existingCategory = {
+          _id: "123",
+          name: "Electronics",
+          slug: "electronics",
+        };
         categoryModel.findOne.mockResolvedValue(existingCategory);
 
         // Act
         await createCategoryController(req, res);
 
         // Assert
-        expect(categoryModel.findOne).toHaveBeenCalledWith({ name: "Electronics" });
+        expect(categoryModel.findOne).toHaveBeenCalledWith({
+          name: "Electronics",
+        });
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({
           success: false,
@@ -117,7 +135,11 @@ describe("Category Controller", () => {
       it("should create category successfully with valid name", async () => {
         // Arrange
         req.body = { name: "Electronics" };
-        const savedCategory = { _id: "123", name: "Electronics", slug: "electronics" };
+        const savedCategory = {
+          _id: "123",
+          name: "Electronics",
+          slug: "electronics",
+        };
 
         categoryModel.findOne.mockResolvedValue(null);
         const saveMock = jest.fn().mockResolvedValue(savedCategory);
@@ -129,7 +151,9 @@ describe("Category Controller", () => {
         await createCategoryController(req, res);
 
         // Assert
-        expect(categoryModel.findOne).toHaveBeenCalledWith({ name: "Electronics" });
+        expect(categoryModel.findOne).toHaveBeenCalledWith({
+          name: "Electronics",
+        });
         expect(slugify).toHaveBeenCalledWith("Electronics");
         expect(categoryModel).toHaveBeenCalledWith({
           name: "Electronics",
@@ -148,7 +172,11 @@ describe("Category Controller", () => {
       it("should create category with name containing spaces", async () => {
         // Arrange
         req.body = { name: "Home Appliances" };
-        const savedCategory = { _id: "456", name: "Home Appliances", slug: "home-appliances" };
+        const savedCategory = {
+          _id: "456",
+          name: "Home Appliances",
+          slug: "home-appliances",
+        };
 
         categoryModel.findOne.mockResolvedValue(null);
         const saveMock = jest.fn().mockResolvedValue(savedCategory);
@@ -227,7 +255,11 @@ describe("Category Controller", () => {
         // Arrange
         req.body = { name: "Updated Electronics" };
         req.params = { id: "123" };
-        const updatedCategory = { _id: "123", name: "Updated Electronics", slug: "updated-electronics" };
+        const updatedCategory = {
+          _id: "123",
+          name: "Updated Electronics",
+          slug: "updated-electronics",
+        };
 
         categoryModel.findByIdAndUpdate.mockResolvedValue(updatedCategory);
 
@@ -238,7 +270,7 @@ describe("Category Controller", () => {
         expect(categoryModel.findByIdAndUpdate).toHaveBeenCalledWith(
           "123",
           { name: "Updated Electronics", slug: "updated-electronics" },
-          { new: true }
+          { new: true },
         );
         expect(slugify).toHaveBeenCalledWith("Updated Electronics");
         expect(res.status).toHaveBeenCalledWith(200);
@@ -265,7 +297,7 @@ describe("Category Controller", () => {
         expect(categoryModel.findByIdAndUpdate).toHaveBeenCalledWith(
           "123",
           { name: "Updated Electronics", slug: "updated-electronics" },
-          { new: true }
+          { new: true },
         );
         expect(slugify).toHaveBeenCalledWith("Updated Electronics");
         expect(res.status).toHaveBeenCalledWith(200);
@@ -274,6 +306,36 @@ describe("Category Controller", () => {
           message: "Category updated successfully",
           category: null,
         });
+      });
+    });
+
+    describe("Duplicate Category Check", () => {
+      // Li Jiakai, A0252287Y
+      it("should return 400 when category name already exists", async () => {
+        // Arrange
+        req.body = { name: "Electronics" };
+        req.params = { id: "456" };
+
+        const existingCategory = {
+          _id: "123",
+          name: "Electronics",
+          slug: "electronics",
+        };
+        categoryModel.findOne.mockResolvedValue(existingCategory);
+
+        // Act
+        await updateCategoryController(req, res);
+
+        // Assert
+        expect(categoryModel.findOne).toHaveBeenCalledWith({
+          name: "Electronics",
+        });
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          message: "Category already exists",
+        });
+        expect(categoryModel.findByIdAndUpdate).not.toHaveBeenCalled();
       });
     });
 
@@ -347,7 +409,7 @@ describe("Category Controller", () => {
           error: dbError,
           message: "Error while getting all categories",
         });
-      })
+      });
     });
   });
 
@@ -367,7 +429,9 @@ describe("Category Controller", () => {
         await singleCategoryController(req, res);
 
         // Assert
-        expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "electronics" });
+        expect(categoryModel.findOne).toHaveBeenCalledWith({
+          slug: "electronics",
+        });
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.send).toHaveBeenCalledWith({
           success: true,
@@ -409,7 +473,10 @@ describe("Category Controller", () => {
       it("should delete category successfully with valid id", async () => {
         // Arrange
         req.params = { id: "123" };
-        categoryModel.findByIdAndDelete.mockResolvedValue({ _id: "123", name: "Electronics" });
+        categoryModel.findByIdAndDelete.mockResolvedValue({
+          _id: "123",
+          name: "Electronics",
+        });
 
         // Act
         await deleteCategoryController(req, res);
