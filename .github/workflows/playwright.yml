@@ -4,13 +4,6 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-
-env:
-  # https://github.com/typegoose/typegoose/blob/1637a5247a2543d3088e04579f26294dc7260043/.github/workflows/tests.yml
-  # Download mongodb binaries to ~/.cache/mongodb-binaries instead of local node_modules
-  # Used for separate cache
-  MONGOMS_PREFER_GLOBAL_PATH: true
-
 jobs:
   test:
     timeout-minutes: 60
@@ -23,15 +16,6 @@ jobs:
       with:
         node-version: 24.13.0
         cache: "npm"
-
-    # https://github.com/typegoose/typegoose/blob/1637a5247a2543d3088e04579f26294dc7260043/.github/workflows/tests.yml
-    - name: Load MongoDB binary cache
-      id: cache-mongodb-binaries
-      uses: actions/cache@v5
-      with:
-        path: ~/.cache/mongodb-binaries
-        key: ${{ runner.os }}-mongodb-binaries-${{ hashFiles('**/package-lock.json') }}
-
     - name: Install root dependencies
       run: npm ci
     - name: Install client dependencies
