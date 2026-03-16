@@ -14,7 +14,9 @@
       "helpers/**/*.js",
       "middlewares/**/*.js",
       "models/**/*.js",
-      "routes/**/*.js"
+      "routes/**/*.js",
+      "ui-tests/**/*.js",
+      "ui-tests/**/*.ts"
     ]
   },
   "formatter": {
