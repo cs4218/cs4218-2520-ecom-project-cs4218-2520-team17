@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 
 export async function logInAsAdmin(page: Page) {
-  await page.goto("http://localhost:3000/login");
+  await page.goto("/login");
   await page
     .getByRole("textbox", { name: "Enter Your Email" })
     .fill("test@admin.com");
