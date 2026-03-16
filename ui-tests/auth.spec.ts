@@ -1,11 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'fs';
 import { MongoClient } from 'mongodb';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 async function deleteTestUser() {
-  const client = new MongoClient(process.env.MONGO_URL as string);
+  const uri = readFileSync('.mongo-test-uri', 'utf-8').trim();
+  const client = new MongoClient(uri);
   try {
     await client.connect();
     const db = client.db();
@@ -32,7 +31,7 @@ test('register and login user', async ({ page }) => {
   await page.getByPlaceholder('Enter Your DOB').fill('2001-01-01');
   await page.getByRole('textbox', { name: 'What is Your Favorite sports' }).fill('basketball');
   await page.getByRole('button', { name: 'REGISTER' }).click();
-  
+
   await page.waitForURL('**/login');
   await page.getByRole('textbox', { name: 'Enter Your Email' }).fill('user1@example.com');
   await page.getByRole('textbox', { name: 'Enter Your Password' }).fill('Password123');
