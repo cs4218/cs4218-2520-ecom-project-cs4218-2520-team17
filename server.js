@@ -39,6 +39,11 @@ if (process.env.NODE_ENV === 'production') {
   console.log("Serving static files from React build...".bgGreen.white, __dirname);
   app.use(express.static(path.join(__dirname, 'client/build')));
 
+  // JSON 404 handler for unknown API routes in production
+  app.use('/api', (req, res) => {
+    res.status(404).json({ error: 'API route not found' });
+  });
+
   // Catch-all to let React Router handle frontend URLs
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
