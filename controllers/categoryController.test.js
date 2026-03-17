@@ -261,6 +261,7 @@ describe("Category Controller", () => {
           slug: "updated-electronics",
         };
 
+        categoryModel.findOne.mockResolvedValue(null);
         categoryModel.findByIdAndUpdate.mockResolvedValue(updatedCategory);
 
         // Act
@@ -288,6 +289,7 @@ describe("Category Controller", () => {
         req.params = { id: "123" };
         const updatedCategory = null;
 
+        categoryModel.findOne.mockResolvedValue(null);
         categoryModel.findByIdAndUpdate.mockResolvedValue(updatedCategory);
 
         // Act
@@ -347,6 +349,7 @@ describe("Category Controller", () => {
         req.params = { id: "cat123" };
         const dbError = new Error("Database update failed");
 
+        categoryModel.findOne.mockResolvedValue(null);
         categoryModel.findByIdAndUpdate.mockRejectedValue(dbError);
 
         // Act
