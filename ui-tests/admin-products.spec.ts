@@ -22,6 +22,7 @@ test.describe("Admin product management", () => {
     await page.close();
   });
 
+  // Li Jiakai, A0252287Y
   test("Product Creation: create product with image and verify success", async ({
     page,
   }) => {
@@ -63,6 +64,7 @@ test.describe("Admin product management", () => {
     ).toBeVisible();
   });
 
+  // Li Jiakai, A0252287Y
   test("Product Creation: create product without image and verify success", async ({
     page,
   }) => {
@@ -95,6 +97,7 @@ test.describe("Admin product management", () => {
     ).toBeVisible();
   });
 
+  // Li Jiakai, A0252287Y
   test("Product Creation: create product shows error if required fields are empty", async ({
     page,
   }) => {
@@ -149,6 +152,7 @@ test.describe("Admin product management", () => {
     ).toBeVisible();
   });
 
+  // Li Jiakai, A0252287Y
   test("Product Update: check pre-filled product details and verify edit success", async ({
     page,
   }) => {
@@ -226,6 +230,7 @@ test.describe("Admin product management", () => {
     ).toBeVisible();
   });
 
+  // Li Jiakai, A0252287Y
   test("Product Update: update product shows error if required fields are empty", async ({
     page,
   }) => {
@@ -300,6 +305,7 @@ test.describe("Admin product management", () => {
     ).toBeVisible();
   });
 
+  // Li Jiakai, A0252287Y
   test("Product Deletion: cancel deletion dialog", async ({ page }) => {
     const productName = generateUniqueProductName("DeleteCancel");
 
@@ -348,6 +354,7 @@ test.describe("Admin product management", () => {
     ).toBeVisible();
   });
 
+  // Li Jiakai, A0252287Y
   test("Product Deletion: accept deletion dialog and verify removal", async ({
     page,
   }) => {
