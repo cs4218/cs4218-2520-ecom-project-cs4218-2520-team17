@@ -23,7 +23,7 @@ export const getAllOrdersController = async (req, res) => {
       .find({})
       .populate("products", "-photo")
       .populate("buyer", "name")
-      .sort({ createdAt: "-1" });
+      .sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     console.error(error);
@@ -45,6 +45,14 @@ export const updateOrderStatusController = async (req, res) => {
       { status },
       { new: true }
     );
+
+    if (!orders) {
+      return res.status(404).send({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
     res.json(orders);
   } catch (error) {
     console.error(error);

@@ -119,4 +119,35 @@ describe("Order Controller Integration Tests", () => {
             expect(orders.map((order) => order.buyer._id).length).toBeGreaterThan(1); //Multiple buyers in seeded data
         });
     });
+
+    describe("updateOrderStatusController", () => {
+        //  Sebastian Tay Yong Xun, A0252864X
+        it("should update order status successfully for a valid existing order", async () => {
+            const orderId = "67a21938cf4efddf1e5358d1";
+            req.params = { orderId };
+            req.body = { status: "Processing" }; // Initial status of "Not Process"
+
+            await updateOrderStatusController(req, res);
+
+            expect(res.json).toHaveBeenCalledTimes(1);
+            const updatedOrder = res.json.mock.calls[0][0];
+            expect(updatedOrder).not.toBeNull();
+            expect(updatedOrder._id.toString()).toBe(orderId);
+            expect(updatedOrder.status).toBe("Processing");
+
+            const orderInDb = await orderModel.findById(orderId);
+            expect(orderInDb.status).toBe("Processing");
+        });
+
+        //  Sebastian Tay Yong Xun, A0252864X
+        it("should return 404 when order does not exist", async () => {
+            req.params = { orderId: "000000000000000000000000" }; //Valid but non-existent ID
+            req.body = { status: "Delivered" };
+
+            await updateOrderStatusController(req, res);
+
+            expect(res.json).not.toHaveBeenCalled();
+            expect(res.status).toHaveBeenCalledWith(404);
+        });
+    });
 });
