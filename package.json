@@ -19,7 +19,7 @@
     "pw": "playwright test",
     "pw:ui": "playwright test --ui",
     "pw:report": "playwright show-report",
-    "pw:codegen": "playwright codegen localhost:3000"
+    "pw:codegen": "playwright codegen localhost:6060"
   },
   "keywords": [],
   "author": "RP",
