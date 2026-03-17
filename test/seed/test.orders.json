@@ -68,4 +68,28 @@
     "$date": "2025-02-04T13:42:16.741Z"
   },
   "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67a21938cf4efddf1e5358d2"
+  },
+  "products": [
+    {
+      "$oid": "66db427fdb0119d9234b27f1"
+    }
+  ],
+  "payment": {
+    "success": true
+  },
+  "buyer": {
+    "$oid": "67136d5416c8949aec627dd3"
+  },
+  "status": "Processing",
+  "createdAt": {
+    "$date": "2025-02-05T09:00:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2025-02-05T09:00:00.000Z"
+  },
+  "__v": 0
 }]
