@@ -37,8 +37,8 @@ test.describe("Admin order management", () => {
     await expect(
       page
         .getByTestId("admin-orders-content-col")
-        .locator("div")
-        .filter({ hasText: "#" }),
+        .locator("div.border.shadow")
+        .first(),
     ).toBeVisible();
 
     // Order Details
@@ -51,30 +51,43 @@ test.describe("Admin order management", () => {
 
     // Allow any valid status
     await expect(
-      page.getByRole("cell", {
-        name: validStatusRegex,
-        exact: true,
-      }),
+      page
+        .getByRole("cell", {
+          name: validStatusRegex,
+          exact: true,
+        })
+        .first(),
     ).toBeVisible();
 
     await expect(
-      page.getByRole("cell", { name: "CS 4218 Test Account", exact: true }),
+      page
+        .getByRole("cell", { name: "CS 4218 Test Account", exact: true })
+        .first(),
     ).toBeVisible();
 
-    await expect(page.getByRole("cell", { name: " ago" })).toBeVisible();
-
-    await expect(page.getByTestId("order-payment-status")).toBeVisible();
     await expect(
-      page.getByRole("cell", { name: "Failed", exact: true }),
+      page.getByRole("cell", { name: " ago" }).first(),
     ).toBeVisible();
 
-    await expect(page.getByTestId("order-product-count")).toBeVisible();
     await expect(
-      page.getByRole("cell", { name: "3", exact: true }),
+      page.getByTestId("order-payment-status").first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "Failed", exact: true }).first(),
     ).toBeVisible();
 
-    // Order Items
-    const orderItems = page.locator("div.row.mb-2.p-3.card.flex-row");
+    await expect(page.getByTestId("order-product-count").first()).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "3", exact: true }).first(),
+    ).toBeVisible();
+
+    // Order Items for a specific order
+    const specificOrder = page
+      .getByTestId("admin-orders-content-col")
+      .locator("div.border.shadow")
+      .filter({ hasText: "67a21938cf4efddf1e5358d1" });
+
+    const orderItems = specificOrder.locator("div.row.mb-2.p-3.card.flex-row");
     await expect(orderItems).toHaveCount(3);
 
     await expect(orderItems.nth(0)).toContainText("NUS T-shirt");
@@ -91,7 +104,8 @@ test.describe("Admin order management", () => {
   test("Update Order Status: verify update persistence", async ({ page }) => {
     const orderStatusCell = page
       .getByTestId("admin-orders-content-col")
-      .getByText(validStatusRegex, { exact: true });
+      .getByText(validStatusRegex, { exact: true })
+      .first();
 
     await expect(orderStatusCell).toBeVisible();
     const currentStatus = await orderStatusCell.textContent();
@@ -115,10 +129,10 @@ test.describe("Admin order management", () => {
     // Update status to new value
     await orderStatusCell.click();
     await page.getByTitle(newStatus).locator("div").click();
-    await expect(page.locator("tbody")).toContainText(newStatus);
+    await expect(page.locator("tbody").first()).toContainText(newStatus);
 
     // Verify persistence after reload
     await page.reload();
-    await expect(page.locator("tbody")).toContainText(newStatus);
+    await expect(page.locator("tbody").first()).toContainText(newStatus);
   });
 });
