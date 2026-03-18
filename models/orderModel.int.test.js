@@ -24,8 +24,8 @@ describe("Order Model Integration Tests", () => {
     beforeEach(async () => {
         await cleanupAndSeedDb();
         // Fetch seeded data for use in tests
-        user = await User.findOne({});
-        products = await Product.find({}).limit(5);
+        user = await User.findOne({}).sort({ _id: 1 });
+        products = await Product.find({}).sort({ _id: 1 }).limit(5);
     });
 
     describe("Schema Validation", () => {
