@@ -116,7 +116,9 @@ describe("Order Controller Integration Tests", () => {
             expect(orders.length).toBeGreaterThan(0);
             expect(orders[0]).toHaveProperty("status");
             expect(orders[0].buyer).toHaveProperty("name");
-            expect(orders.map((order) => order.buyer._id).length).toBeGreaterThan(1); //Multiple buyers in seeded data
+
+            const uniqueBuyerIds = new Set(orders.map((order) => order.buyer._id.toString()));
+            expect(uniqueBuyerIds.size).toBeGreaterThan(1); //Multiple unique buyers in seeded data
         });
     });
 
