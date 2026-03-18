@@ -51,16 +51,25 @@ export function createLowercaseSlug(text) {
 
 
 /**
- * Cleans up the mongodb database and seeds it with initial data for testing.
- * Used for integration tests to ensure a consistent database state before each test suite runs.
+ * Cleans up the MongoDB database by deleting all documents from relevant collections.
+ * Used for integration tests to ensure a clean state before seeding new data.
  */
-export async function cleanupAndSeedDb() {
+export async function cleanUpDb() {
   await Promise.all([
     categoryModel.deleteMany({}),
     userModel.deleteMany({}),
     productModel.deleteMany({}),
     orderModel.deleteMany({}),
   ]);
+}
+
+
+/**
+ * Cleans up the mongodb database and seeds it with initial data for testing.
+ * Used for integration tests to ensure a consistent database state before each test suite runs.
+ */
+export async function cleanupAndSeedDb() {
+  await cleanUpDb();
 
   await Promise.all([
     categoryModel.insertMany(seedCategories),
