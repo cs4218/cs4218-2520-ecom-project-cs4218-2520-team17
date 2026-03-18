@@ -53,7 +53,7 @@ export function createLowercaseSlug(text) {
 /**
  * Cleans up the MongoDB database by deleting all documents from relevant collections.
  * Used for integration tests to ensure a clean state before seeding new data.
-*/
+ */
 export async function cleanUpDb() {
   await Promise.all([
     categoryModel.deleteMany({}),
