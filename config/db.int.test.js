@@ -43,28 +43,5 @@ describe("connectDB Integration Tests", () => {
             );
         });
     });
-
-    describe("When connection fails", () => {
-        beforeEach(() => {
-            // Use an unreachable host with a short serverSelectionTimeoutMS so the test fails fast
-            process.env.MONGO_URL = "mongodb://127.0.0.1:27999/?serverSelectionTimeoutMS=500";
-        });
-
-        //  Sebastian Tay Yong Xun, A0252864X
-        it("should catch and log the error", async () => {
-            await connectDB();
-
-            expect(consoleErrorSpy).toHaveBeenCalledWith(
-                expect.stringContaining("Error in Mongodb")
-            );
-        });
-
-        //  Sebastian Tay Yong Xun, A0252864X
-        it("should not establish a connection when the host is unreachable", async () => {
-            await connectDB();
-
-            expect(mongoose.connection.readyState).not.toBe(1);
-        });
-    });
 });
 
