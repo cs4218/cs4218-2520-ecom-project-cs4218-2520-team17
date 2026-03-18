@@ -9,7 +9,7 @@ const VALID_ORDER_STATUSES = [
   "Cancelled",
 ] as const;
 
-const validStatusRegex = new RegExp(VALID_ORDER_STATUSES.join("|"));
+const validStatusRegex = new RegExp(`^(${VALID_ORDER_STATUSES.join("|")})$`);
 
 test.describe("Admin order management", () => {
   test.beforeEach(async ({ page }) => {
@@ -33,17 +33,18 @@ test.describe("Admin order management", () => {
       page.getByTestId("admin-orders-content-col").getByRole("heading"),
     ).toContainText("All Orders");
 
+    // Specify an known order
+    const specificOrder = page
+      .getByTestId("admin-orders-content-col")
+      .locator("div.border.shadow")
+      .filter({ hasText: "67a21938cf4efddf1e5358d1" });
+
     // Orders Table
-    await expect(
-      page
-        .getByTestId("admin-orders-content-col")
-        .locator("div")
-        .filter({ hasText: "#" }),
-    ).toBeVisible();
+    await expect(specificOrder).toBeVisible();
 
     // Order Details
     await expect(
-      page.getByRole("cell", {
+      specificOrder.getByRole("cell", {
         name: "67a21938cf4efddf1e5358d1",
         exact: true,
       }),
@@ -51,30 +52,38 @@ test.describe("Admin order management", () => {
 
     // Allow any valid status
     await expect(
-      page.getByRole("cell", {
+      specificOrder.getByRole("cell", {
         name: validStatusRegex,
+      }),
+    ).toBeVisible();
+
+    await expect(
+      specificOrder.getByRole("cell", {
+        name: "CS 4218 Test Account",
         exact: true,
       }),
     ).toBeVisible();
 
     await expect(
-      page.getByRole("cell", { name: "CS 4218 Test Account", exact: true }),
+      specificOrder.getByRole("cell", { name: " ago" }),
     ).toBeVisible();
 
-    await expect(page.getByRole("cell", { name: " ago" })).toBeVisible();
-
-    await expect(page.getByTestId("order-payment-status")).toBeVisible();
     await expect(
-      page.getByRole("cell", { name: "Failed", exact: true }),
+      specificOrder.getByTestId("order-payment-status"),
     ).toBeVisible();
-
-    await expect(page.getByTestId("order-product-count")).toBeVisible();
     await expect(
-      page.getByRole("cell", { name: "3", exact: true }),
+      specificOrder.getByRole("cell", { name: "Failed", exact: true }),
     ).toBeVisible();
 
-    // Order Items
-    const orderItems = page.locator("div.row.mb-2.p-3.card.flex-row");
+    await expect(
+      specificOrder.getByTestId("order-product-count"),
+    ).toBeVisible();
+    await expect(
+      specificOrder.getByRole("cell", { name: "3", exact: true }),
+    ).toBeVisible();
+
+    // Order Items in the known specific order
+    const orderItems = specificOrder.locator("div.row.mb-2.p-3.card.flex-row");
     await expect(orderItems).toHaveCount(3);
 
     await expect(orderItems.nth(0)).toContainText("NUS T-shirt");
@@ -89,9 +98,13 @@ test.describe("Admin order management", () => {
 
   // Li Jiakai, A0252287Y
   test("Update Order Status: verify update persistence", async ({ page }) => {
-    const orderStatusCell = page
+    // Order summary and items for a specific order
+    const specificOrder = page
       .getByTestId("admin-orders-content-col")
-      .getByText(validStatusRegex, { exact: true });
+      .locator("div.border.shadow")
+      .filter({ hasText: "67a21938cf4efddf1e5358d1" });
+
+    const orderStatusCell = specificOrder.getByText(validStatusRegex);
 
     await expect(orderStatusCell).toBeVisible();
     const currentStatus = await orderStatusCell.textContent();
@@ -115,10 +128,10 @@ test.describe("Admin order management", () => {
     // Update status to new value
     await orderStatusCell.click();
     await page.getByTitle(newStatus).locator("div").click();
-    await expect(page.locator("tbody")).toContainText(newStatus);
+    await expect(specificOrder.locator("tbody")).toContainText(newStatus);
 
     // Verify persistence after reload
     await page.reload();
-    await expect(page.locator("tbody")).toContainText(newStatus);
+    await expect(specificOrder.locator("tbody")).toContainText(newStatus);
   });
 });
