@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 import { logInAsUser, logInAsUserWithPassword, logOutAsUser, openDashboard } from "./utils/user";
 
+test.describe.configure({ mode: "serial" });
+
 test.beforeEach(async ({ page }) => {
     await logInAsUser(page);
     await openDashboard(page);
@@ -8,8 +10,13 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-    await logOutAsUser(page);
-    await page.close();
+    const userMenuButton = page.getByRole("button", {
+      name: "CS 4218 Test Account",
+    });
+
+    if (await userMenuButton.isVisible()) {
+      await logOutAsUser(page);
+    }
 });
 
 test.describe("User profile page", () => {
@@ -102,7 +109,6 @@ test.describe("Updating user profile", () => {
       name: "Enter Your New Password",
     });
     const updateButton = page.getByRole("button", { name: "UPDATE" });
-    const oldPassword = "cs4218@test.com";
 
     await passwordInput.fill("NewPassword123");
     await updateButton.click();
@@ -110,10 +116,10 @@ test.describe("Updating user profile", () => {
 
     await expect(passwordInput).toHaveValue("");
 
-    //Reset password back to old password for test isolation
+    // Reset password back to original for test isolation.  
+    const oldPassword = "cs4218@test.com";
     await passwordInput.fill(oldPassword);
     await updateButton.click();
-    await expect(page.getByText("Profile Updated Successfully")).toBeVisible();
   });
 
   // Sebastian Tay, A0252864X
@@ -139,5 +145,12 @@ test.describe("Updating user profile", () => {
         // New password should succeed.
         await logInAsUserWithPassword(page, newPassword);
         await expect(page.getByRole("button", { name: "CS 4218 Test Account" })).toBeVisible();
+
+        // Reset password so subsequent tests/hooks can log in with the default test credential.
+        await openDashboard(page);
+        await page.getByRole("link", { name: "Profile" }).click();
+        await passwordInput.fill(oldPassword);
+        await updateButton.click();
+        await expect(page.getByText("Profile Updated Successfully")).toBeVisible();
   });
 });
