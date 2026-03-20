@@ -1,7 +1,7 @@
-import fs from "node:fs";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
 import { logInAsAdmin, logOutAsAdmin, openAdminDashboard } from "./utils/admin";
+import { deleteProduct } from "./utils/product";
 
 const TEST_IMAGE_DIR = path.join(__dirname, "..", "test", "img");
 const TEST_IMAGE_BLUE = path.join(TEST_IMAGE_DIR, "blue.jpg");
@@ -62,6 +62,9 @@ test.describe("Admin product management", () => {
     await expect(
       page.getByRole("link", { name: new RegExp(productName, "i") }).first(),
     ).toBeVisible();
+
+    // Cleanup: Delete the created product
+    await deleteProduct(page, productName);
   });
 
   // Li Jiakai, A0252287Y
@@ -95,6 +98,9 @@ test.describe("Admin product management", () => {
     await expect(
       page.getByRole("link", { name: new RegExp(productName, "i") }).first(),
     ).toBeVisible();
+
+    // Cleanup: Delete the created product
+    await deleteProduct(page, productName);
   });
 
   // Li Jiakai, A0252287Y
@@ -150,6 +156,9 @@ test.describe("Admin product management", () => {
     await expect(
       page.getByRole("link", { name: new RegExp(productName, "i") }).first(),
     ).toBeVisible();
+
+    // Cleanup: Delete the created product
+    await deleteProduct(page, productName);
   });
 
   // Li Jiakai, A0252287Y
@@ -228,6 +237,9 @@ test.describe("Admin product management", () => {
     await expect(
       page.getByRole("link", { name: new RegExp(updatedName, "i") }).first(),
     ).toBeVisible();
+
+    // Cleanup: Delete the updated product
+    await deleteProduct(page, updatedName);
   });
 
   // Li Jiakai, A0252287Y
@@ -303,6 +315,9 @@ test.describe("Admin product management", () => {
     await expect(
       page.getByRole("link", { name: new RegExp(updatedName, "i") }).first(),
     ).toBeVisible();
+
+    // Cleanup: Delete the updated product
+    await deleteProduct(page, updatedName);
   });
 
   // Li Jiakai, A0252287Y
@@ -352,6 +367,9 @@ test.describe("Admin product management", () => {
     await expect(
       page.getByRole("link", { name: new RegExp(productName, "i") }).first(),
     ).toBeVisible();
+
+    // Cleanup: Delete the created product
+    await deleteProduct(page, productName);
   });
 
   // Li Jiakai, A0252287Y
@@ -374,31 +392,6 @@ test.describe("Admin product management", () => {
     await page.getByText("Yes", { exact: true }).click();
     await page.getByRole("button", { name: "Create Product" }).click();
 
-    // Click on the product
-    await page
-      .getByRole("link", { name: new RegExp(productName, "i") })
-      .first()
-      .click();
-
-    // Wait for product to be loaded
-    await expect(page.getByRole("textbox", { name: /name/i })).toHaveValue(
-      productName,
-    );
-
-    // Handle dialog: Accept
-    page.once("dialog", (dialog) => {
-      dialog.accept().catch(() => {});
-    });
-
-    await page.getByRole("button", { name: "Delete Product" }).click();
-
-    // Check for success message
-    await expect(page.getByText("Product Deleted Successfully")).toBeVisible();
-
-    // Verify product is removed from the list
-    await page.getByRole("link", { name: "Products" }).click();
-    await expect(
-      page.getByRole("link", { name: new RegExp(productName, "i") }),
-    ).toHaveCount(0);
+    await deleteProduct(page, productName);
   });
 });
