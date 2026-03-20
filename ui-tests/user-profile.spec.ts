@@ -102,12 +102,18 @@ test.describe("Updating user profile", () => {
       name: "Enter Your New Password",
     });
     const updateButton = page.getByRole("button", { name: "UPDATE" });
+    const oldPassword = "cs4218@test.com";
 
     await passwordInput.fill("NewPassword123");
     await updateButton.click();
     await expect(page.getByText("Profile Updated Successfully")).toBeVisible();
 
     await expect(passwordInput).toHaveValue("");
+
+    //Reset password back to old password for test isolation
+    await passwordInput.fill(oldPassword);
+    await updateButton.click();
+    await expect(page.getByText("Profile Updated Successfully")).toBeVisible();
   });
 
   // Sebastian Tay, A0252864X
