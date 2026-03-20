@@ -22,10 +22,6 @@ export async function deleteProduct(page: Page, productName: string) {
   page.once("dialog", (dialog) => {
     dialog.accept().catch(() => {});
   });
-  page.once("dialog", (dialog) => {
-    dialog.accept().catch(() => {});
-  });
-
   await page.getByRole("button", { name: "Delete Product" }).click();
 
   // Check for success message
