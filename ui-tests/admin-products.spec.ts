@@ -60,7 +60,7 @@ test.describe("Admin product management", () => {
     // Verify success and redirection to product listing
     await expect(page.getByText("Product Created Successfully")).toBeVisible();
     await expect(
-      page.getByRole("link", { name: new RegExp(productName, "i") }).first(),
+      page.getByRole("link", { name: productName }).first(),
     ).toBeVisible();
 
     // Cleanup: Delete the created product
@@ -96,7 +96,7 @@ test.describe("Admin product management", () => {
     // Verify success and redirection to product listing
     await expect(page.getByText("Product Created Successfully")).toBeVisible();
     await expect(
-      page.getByRole("link", { name: new RegExp(productName, "i") }).first(),
+      page.getByRole("link", { name: productName }).first(),
     ).toBeVisible();
 
     // Cleanup: Delete the created product
@@ -154,7 +154,7 @@ test.describe("Admin product management", () => {
     // Verify success after all fields are filled
     await expect(page.getByText("Product Created Successfully")).toBeVisible();
     await expect(
-      page.getByRole("link", { name: new RegExp(productName, "i") }).first(),
+      page.getByRole("link", { name: productName }).first(),
     ).toBeVisible();
 
     // Cleanup: Delete the created product
@@ -184,9 +184,7 @@ test.describe("Admin product management", () => {
     await page.getByRole("button", { name: "Create Product" }).click();
 
     // Navigate to edit screen
-    const productLink = page
-      .getByRole("link", { name: new RegExp(productName, "i") })
-      .first();
+    const productLink = page.getByRole("link", { name: productName }).first();
     await expect(productLink).toBeVisible();
     await productLink.click();
 
@@ -235,7 +233,7 @@ test.describe("Admin product management", () => {
     await page.reload();
     await page.getByRole("link", { name: "Products" }).click();
     await expect(
-      page.getByRole("link", { name: new RegExp(updatedName, "i") }).first(),
+      page.getByRole("link", { name: updatedName }).first(),
     ).toBeVisible();
 
     // Cleanup: Delete the updated product
@@ -264,9 +262,7 @@ test.describe("Admin product management", () => {
     await page.getByRole("button", { name: "Create Product" }).click();
 
     // Navigate to edit screen
-    const productLink = page
-      .getByRole("link", { name: new RegExp(productName, "i") })
-      .first();
+    const productLink = page.getByRole("link", { name: productName }).first();
     await expect(productLink).toBeVisible();
     await productLink.click();
 
@@ -313,7 +309,7 @@ test.describe("Admin product management", () => {
     await page.reload();
     await page.getByRole("link", { name: "Products" }).click();
     await expect(
-      page.getByRole("link", { name: new RegExp(updatedName, "i") }).first(),
+      page.getByRole("link", { name: updatedName }).first(),
     ).toBeVisible();
 
     // Cleanup: Delete the updated product
@@ -339,10 +335,7 @@ test.describe("Admin product management", () => {
     await page.getByRole("button", { name: "Create Product" }).click();
 
     // Click on the product to enter details/edit screen
-    await page
-      .getByRole("link", { name: new RegExp(productName, "i") })
-      .first()
-      .click();
+    await page.getByRole("link", { name: productName }).first().click();
 
     // Wait for product to be loaded
     await expect(page.getByRole("textbox", { name: /name/i })).toHaveValue(
@@ -365,7 +358,7 @@ test.describe("Admin product management", () => {
     // Check product still exists in the list
     await page.getByRole("link", { name: "Products" }).click();
     await expect(
-      page.getByRole("link", { name: new RegExp(productName, "i") }).first(),
+      page.getByRole("link", { name: productName }).first(),
     ).toBeVisible();
 
     // Cleanup: Delete the created product
