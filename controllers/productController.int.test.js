@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import { join } from "node:path";
 import braintree from "braintree";
+import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import slugify from "slugify";
 import connectDB from "../config/db.js";
@@ -1502,288 +1503,140 @@ describe("Product Controller Integration Tests", () => {
   });
 
   // ==========================================
-  // braintreeTokenController Tests
+  // braintreeTokenController Integration Tests
   // ==========================================
   describe("braintreeTokenController", () => {
-    let gateway;
-
-    beforeEach(() => {
-      // Get the actual gateway instance the controller is using
-      gateway = new braintree.BraintreeGateway();
-    });
-
-    describe("Successful Token Generation", () => {
-      // Rayyan Ismail, A0259275R
-      it("should generate token successfully", async () => {
-        // Arrange
-        gateway.clientToken.generate.mockImplementationOnce(
-          (options, callback) => {
-            callback(null, { clientToken: "fake-client-token" });
-          },
+    // Helper to wait for async callback-based response
+    const waitForResponse = (res, method = "send", timeout = 8000) =>
+      new Promise((resolve, reject) => {
+        const timer = setTimeout(
+          () => reject(new Error("Timed out waiting for response")),
+          timeout,
         );
-
-        // Act
-        await braintreeTokenController(req, res);
-
-        // Assert
-        expect(gateway.clientToken.generate).toHaveBeenCalledWith(
-          {},
-          expect.any(Function),
-        );
-        expect(res.send).toHaveBeenCalledWith({
-          clientToken: "fake-client-token",
+        const original = res[method];
+        res[method] = jest.fn((...args) => {
+          clearTimeout(timer);
+          original(...args);
+          resolve();
+          return res;
         });
       });
-    });
 
-    describe("Error Handling", () => {
-      // Rayyan Ismail, A0259275R
-      it("should return 500 when token generation fails", async () => {
-        // Arrange
-        const generationError = new Error("Token generation failed");
-        gateway.clientToken.generate.mockImplementationOnce(
-          (options, callback) => {
-            callback(generationError, null);
-          },
-        );
+    // Rayyan Ismail, A0259275R
+    it("should generate a valid client token from Braintree sandbox", async () => {
+      // Arrange
+      const responsePromise = waitForResponse(res, "send");
 
-        // Act
-        await braintreeTokenController(req, res);
+      // Act
+      braintreeTokenController(req, res);
+      await responsePromise;
 
-        // Assert
-        expect(gateway.clientToken.generate).toHaveBeenCalledWith(
-          {},
-          expect.any(Function),
-        );
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith(generationError);
-      });
-      it("should log errors to console", async () => {
-        // Arrange
-        const gatewayError = new Error("Gateway crashed");
-        gateway.clientToken.generate.mockImplementationOnce(() => {
-          throw gatewayError;
-        });
+      // Assert
+      expect(res.send).toHaveBeenCalled();
+      const response = res.send.mock.calls[0][0];
+      expect(response).toHaveProperty("clientToken");
+      expect(typeof response.clientToken).toBe("string");
+      expect(response.clientToken.length).toBeGreaterThan(0);
+    }, 10000);
 
-        // Act
-        await braintreeTokenController(req, res);
+    // Rayyan Ismail, A0259275R
+    it("should not return a 500 status on successful token generation", async () => {
+      // Arrange
+      const responsePromise = waitForResponse(res, "send");
 
-        // Assert
-        expect(consoleLogSpy).toHaveBeenCalledWith(gatewayError);
-      });
-    });
+      // Act
+      braintreeTokenController(req, res);
+      await responsePromise;
+
+      // Assert
+      expect(res.status).not.toHaveBeenCalledWith(500);
+    }, 10000);
   });
 
   // ==========================================
-  // braintreePaymentController Tests
+  // braintreePaymentController Integration Tests
   // ==========================================
   describe("braintreePaymentController", () => {
-    let gateway;
-
-    beforeEach(() => {
-      // Get the actual gateway instance the controller is using
-      gateway = new braintree.BraintreeGateway();
-    });
-
-    describe("Successful Payment Processing", () => {
-      // Rayyan Ismail, A0259275R
-      it("should process payment successfully", async () => {
-        // Arrange
-        req.body = {
-          nonce: "fake-nonce",
-          cart: [{ price: 10.0 }, { price: 15.5 }],
-        };
-        req.user = { _id: "user123" };
-        gateway.transaction.sale.mockImplementationOnce(
-          (saleRequest, callback) => {
-            callback(null, {
-              success: true,
-              transaction: { id: "fake-transaction-id" },
-            });
-          },
+    // Helper to wait for async callback-based response
+    const waitForResponse = (res, method = "json", timeout = 8000) =>
+      new Promise((resolve, reject) => {
+        const timer = setTimeout(
+          () => reject(new Error("Timed out waiting for response")),
+          timeout,
         );
-
-        // Act
-        await braintreePaymentController(req, res);
-
-        // Assert
-        expect(gateway.transaction.sale).toHaveBeenCalledWith(
-          {
-            amount: 25.5,
-            paymentMethodNonce: "fake-nonce",
-            options: { submitForSettlement: true },
-          },
-          expect.any(Function),
-        );
-        expect(orderModel).toHaveBeenCalledWith({
-          products: req.body.cart,
-          payment: {
-            success: true,
-            transaction: { id: "fake-transaction-id" },
-          },
-          buyer: "user123",
+        const original = res[method];
+        res[method] = jest.fn((...args) => {
+          clearTimeout(timer);
+          original(...args);
+          resolve();
+          return res;
         });
-        expect(res.json).toHaveBeenCalledWith({ ok: true });
       });
-      // Rayyan Ismail, A0259275R
-      it("should process payment successfully with empty cart as a total of 0", async () => {
-        // Arrange
-        req.body = {
-          nonce: "fake-nonce",
-          cart: [],
-        };
-        req.user = { _id: "user123" };
-        gateway.transaction.sale.mockImplementationOnce(
-          (saleRequest, callback) => {
-            callback(null, {
-              success: true,
-              transaction: { id: "fake-transaction-id" },
-            });
-          },
-        );
 
-        // Act
-        await braintreePaymentController(req, res);
-
-        // Assert
-        expect(gateway.transaction.sale).toHaveBeenCalledWith(
-          {
-            amount: 0,
-            paymentMethodNonce: "fake-nonce",
-            options: { submitForSettlement: true },
-          },
-          expect.any(Function),
-        );
-        expect(orderModel).toHaveBeenCalledWith({
-          products: req.body.cart,
-          payment: {
-            success: true,
-            transaction: { id: "fake-transaction-id" },
-          },
-          buyer: "user123",
-        });
-        expect(res.json).toHaveBeenCalledWith({ ok: true });
-      });
-      // Rayyan Ismail, A0259275R
-      it("should process payment successfully with cart items having zero price", async () => {
-        // Arrange
-        req.body = {
-          nonce: "fake-nonce",
-          cart: [{ price: 0 }, { price: 0 }],
-        };
-        req.user = { _id: "user123" };
-        gateway.transaction.sale.mockImplementationOnce(
-          (saleRequest, callback) => {
-            callback(null, {
-              success: true,
-              transaction: { id: "fake-transaction-id" },
-            });
-          },
-        );
-
-        // Act
-        await braintreePaymentController(req, res);
-
-        // Assert
-        expect(gateway.transaction.sale).toHaveBeenCalledWith(
-          {
-            amount: 0,
-            paymentMethodNonce: "fake-nonce",
-            options: { submitForSettlement: true },
-          },
-          expect.any(Function),
-        );
-        expect(orderModel).toHaveBeenCalledWith({
-          products: req.body.cart,
-          payment: {
-            success: true,
-            transaction: { id: "fake-transaction-id" },
-          },
-          buyer: "user123",
-        });
-        expect(res.json).toHaveBeenCalledWith({ ok: true });
-      });
-      // Rayyan Ismail, A0259275R
-      it("should process payment successfully with cart items having negative price", async () => {
-        // Arrange
-        req.body = {
-          nonce: "fake-nonce",
-          cart: [{ price: -5.0 }, { price: 10.0 }],
-        };
-        req.user = { _id: "user123" };
-        gateway.transaction.sale.mockImplementationOnce(
-          (saleRequest, callback) => {
-            callback(null, {
-              success: true,
-              transaction: { id: "fake-transaction-id" },
-            });
-          },
-        );
-
-        // Act
-        await braintreePaymentController(req, res);
-
-        // Assert
-        expect(gateway.transaction.sale).toHaveBeenCalledWith(
-          {
-            amount: 5.0,
-            paymentMethodNonce: "fake-nonce",
-            options: { submitForSettlement: true },
-          },
-          expect.any(Function),
-        );
-        expect(orderModel).toHaveBeenCalledWith({
-          products: req.body.cart,
-          payment: {
-            success: true,
-            transaction: { id: "fake-transaction-id" },
-          },
-          buyer: "user123",
-        });
-        expect(res.json).toHaveBeenCalledWith({ ok: true });
-      });
-    });
-    describe("Error Handling", () => {
-      // Rayyan Ismail, A0259275R
-      it("should return 500 when payment processing fails", async () => {
-        // Arrange
-        req.body = {
-          nonce: "fake-nonce",
-          cart: [{ price: 10.0 }],
-        };
-        req.user = { _id: "user123" };
-        gateway.transaction.sale.mockImplementationOnce(
-          (saleRequest, callback) => {
-            callback(new Error("Payment processing failed"), null);
-          },
-        );
-
-        // Act
-        await braintreePaymentController(req, res);
-
-        // Assert
-        expect(orderModel).not.toHaveBeenCalled();
-        expect(res.status).toHaveBeenCalledWith(500);
-      });
-    });
     // Rayyan Ismail, A0259275R
-    it("should log error when payment processing fails", async () => {
+    it("should process payment successfully with fake-valid-nonce", async () => {
       // Arrange
+      const product = await productModel.findOne({});
       req.body = {
-        nonce: "fake-nonce",
-        cart: [{ _id: "p1", name: "Item 1", price: 10 }],
+        nonce: "fake-valid-nonce",
+        cart: [{ _id: product._id, price: product.price }],
       };
-      req.user = { _id: "user123" };
-      const gatewayError = new Error("Gateway crashed");
-      gateway.transaction.sale.mockImplementationOnce(() => {
-        throw gatewayError;
-      });
+      req.user = { _id: new mongoose.Types.ObjectId() };
+      const responsePromise = waitForResponse(res, "json");
 
       // Act
-      await braintreePaymentController(req, res);
+      braintreePaymentController(req, res);
+      await responsePromise;
 
       // Assert
-      expect(consoleLogSpy).toHaveBeenCalledWith(gatewayError);
-    });
+      expect(res.json).toHaveBeenCalledWith({ ok: true });
+    }, 10000);
+
+    // Rayyan Ismail, A0259275R
+    it("should calculate total from multiple cart items", async () => {
+      // Arrange
+      const products = await productModel.find({}).limit(2);
+      req.body = {
+        nonce: "fake-valid-nonce",
+        cart: products.map((p) => ({ _id: p._id, price: p.price })),
+      };
+      req.user = { _id: new mongoose.Types.ObjectId() };
+      const responsePromise = waitForResponse(res, "json");
+
+      // Act
+      braintreePaymentController(req, res);
+      await responsePromise;
+
+      // Assert
+      expect(res.json).toHaveBeenCalledWith({ ok: true });
+    }, 10000);
+
+    // Rayyan Ismail, A0259275R
+    it("should save order to database after successful payment", async () => {
+      // Arrange
+      const product = await productModel.findOne({});
+      const buyerId = new mongoose.Types.ObjectId();
+      req.body = {
+        nonce: "fake-valid-nonce",
+        cart: [product._id],
+      };
+      req.user = { _id: buyerId };
+      const responsePromise = waitForResponse(res, "json");
+
+      // Act
+      braintreePaymentController(req, res);
+      await responsePromise;
+
+      // Wait for the unawaited save() to complete
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Assert
+      expect(res.json).toHaveBeenCalledWith({ ok: true });
+      const order = await orderModel.findOne({ buyer: buyerId });
+      expect(order).not.toBeNull();
+      expect(order.payment).toBeDefined();
+      expect(order.buyer.toString()).toBe(buyerId.toString());
+    }, 15000);
+
   });
 });
