@@ -11,6 +11,7 @@ const Profile = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
 
@@ -21,6 +22,7 @@ const Profile = () => {
     setPhone(phone);
     setEmail(email);
     setAddress(address);
+    setPassword("");
   }, [auth?.user]);
 
   // form function
@@ -83,13 +85,21 @@ const Profile = () => {
                 </div>
                 <div className="mb-3">
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="form-control"
                     id="exampleInputPassword1"
                     placeholder="Enter Your New Password"
                   />
+                  <button
+                    type="button"
+                    className="btn btn-link p-0 mt-1"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-pressed={showPassword}
+                  >
+                    {showPassword ? "Hide password" : "Show password"}
+                  </button>
                 </div>
                 <div className="mb-3">
                   <input
