@@ -1,5 +1,7 @@
 // Rayyan Ismail. A0259275R
+// Sebastian Tay, A0252864X
 import { test, expect } from "@playwright/test";
+import { logInAsUser, logOutAsUser } from "./utils/user";
 
 test.describe.configure({ mode: "serial" });
 
@@ -164,5 +166,143 @@ test.describe("Homepage", () => {
     await expect(
       page.getByRole("heading", { name: "Novel" })
     ).not.toBeVisible();
+  });
+});
+
+test.describe("Components testing on Home page", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+  });
+
+  test.describe("Header", () =>{
+    // Sebastian Tay. A0252864X
+    test("should render Header with brand and primary navigation links if logged out", async ({
+      page,
+    }) => {
+      await expect(page.locator(".navbar")).toBeVisible();
+      await expect(page.getByRole("link", { name: "Virtual Vault" })).toBeVisible();
+
+      await expect(page.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/");
+      await expect(page.getByRole("link", { name: "Categories" })).toHaveAttribute("href", "/categories");
+      await expect(page.getByRole("link", { name: "Register" })).toHaveAttribute("href", "/register");
+      await expect(page.getByRole("link", { name: "Login" })).toHaveAttribute("href", "/login");
+      await expect(page.getByRole("link", { name: "Cart" })).toHaveAttribute("href", "/cart");
+    });
+
+    // Sebastian Tay. A0252864X
+    test("should redirect correctly when header links are clicked", async ({ page }) => {
+      await page.getByRole("link", { name: "Register" }).click();
+      await expect(page).toHaveURL(/\/register$/);
+
+      await page.goto("/");
+      await page.getByRole("link", { name: "Login" }).click();
+      await expect(page).toHaveURL(/\/login$/);
+
+      await page.goto("/");
+      await page.getByRole("link", { name: "Cart" }).click();
+      await expect(page).toHaveURL(/\/cart$/);
+
+      await page.goto("/");
+      await page.getByRole('link', { name: 'Categories' }).click();
+      await page.getByRole('link', { name: 'All Categories' }).click();
+      await expect(page).toHaveURL(/\/categories$/);
+      await expect(page).toHaveTitle("All Categories");
+    });
+
+    // Sebastian Tay. A0252864X
+    test("should show different header views for unauthenticated and authenticated users", async ({
+      page,
+    }) => {
+      //Unauthenticated view
+      await expect(page.getByRole("link", { name: "Register" })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Login" })).toBeVisible();
+
+      await logInAsUser(page);
+      // Authenticated view
+      await expect(page.getByRole("button", { name: "CS 4218 Test Account" })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Register" })).not.toBeVisible();
+      await expect(page.getByRole("link", { name: "Login" })).not.toBeVisible();
+      await expect(page.locator(".ant-badge")).toContainText("0");
+    });
+
+    // Sebastian Tay. A0252864X
+    test("should execute handleLogout by clearing auth and redirecting to login", async ({
+      page,
+    }) => {
+      await logInAsUser(page);
+
+      await logOutAsUser(page);
+
+      await expect(page).toHaveURL(/\/login$/);
+      await expect(page.getByRole("link", { name: "Register" })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Login" })).toBeVisible();
+
+      const storedAuth = await page.evaluate(() => localStorage.getItem("auth"));
+      expect(storedAuth).toBeNull();
+    });
+
+    // Sebastian Tay. A0252864X
+    test("should render all categories from API in header dropdown", async ({ page }) => {
+      const categoryResponse = await page.request.get("/api/v1/category/get-category");
+      const categoryBody = await categoryResponse.json();
+      const categoryNames = (categoryBody?.category ?? []).map((c:{ name: string, slug: string }) => c.slug);
+
+      await page.getByRole("link", { name: "Categories" }).click();
+      await expect(page.getByRole("link", { name: "All Categories" })).toBeVisible();
+
+      for (const categoryName of categoryNames) {
+        await expect(page.getByRole("link", { name: categoryName })).toBeVisible();
+      }
+    });
+
+    // Sebastian Tay. A0252864X
+    test("should filter products through SearchInput based on user input", async ({ page }) => {
+      await page.getByRole("searchbox", { name: "Search" }).fill("Laptop");
+      await page.getByRole("button", { name: "Search" }).click();
+
+      await expect(page).toHaveURL(/\/search$/);
+      await expect(page.getByRole("heading", { name: "Search Results" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Laptop" })).toBeVisible();
+    });
+  });
+
+  test.describe("Footer", () => {
+    // Sebastian Tay. A0252864X
+    test("should render Footer with copyright text and footer links", async ({
+      page,
+    }) => {
+      const footer = page.locator(".footer");
+
+      await expect(footer).toBeVisible();
+      await expect(footer.getByText("All Rights Reserved")).toBeVisible();
+
+      await expect(footer.getByRole("link", { name: "About" })).toHaveAttribute("href", "/about");
+      await expect(footer.getByRole("link", { name: "Contact" })).toHaveAttribute("href", "/contact");
+      await expect(footer.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute("href", "/policy");
+    });
+
+    // Sebastian Tay. A0252864X
+    test("should navigate to About page via footer link", async ({ page }) => {
+      const footer = page.locator(".footer");
+
+      await footer.getByRole("link", { name: "About" }).click();
+      await expect(page).toHaveURL(/\/about$/);
+    });
+
+    // Sebastian Tay. A0252864X
+    test("should navigate to Contact page via footer link", async ({ page }) => {
+      const footer = page.locator(".footer");
+
+      await footer.getByRole("link", { name: "Contact" }).click();
+      await expect(page).toHaveURL(/\/contact$/);
+    });
+
+    // Sebastian Tay. A0252864X
+    test("should navigate to Policy page via footer link", async ({ page }) => {
+      const footer = page.locator(".footer");
+
+      await footer.getByRole("link", { name: "Privacy Policy" }).click();
+      await expect(page).toHaveURL(/\/policy$/);
+    });
   });
 });
