@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { logInAsAdmin, logOutAsAdmin, openAdminDashboard } from "./utils/admin";
+import { deleteCategory } from "./utils/categories";
 
 // Helper to generate unique category names
 function generateUniqueCategoryName(prefix: string): string {
@@ -68,6 +69,9 @@ test.describe
 
       // Verify new category appears in list
       await expect(page.locator("tbody")).toContainText(newCategoryName);
+
+      // Cleanup: Delete the created category
+      await deleteCategory(page, newCategoryName);
     });
 
     // Li Jiakai, A0252287Y
@@ -125,6 +129,9 @@ test.describe
       await expect(page.locator("tbody")).toContainText(
         categoryWithSpecialChars,
       );
+
+      // Cleanup: Delete the created category
+      await deleteCategory(page, categoryWithSpecialChars);
     });
 
     // Li Jiakai, A0252287Y
@@ -146,10 +153,15 @@ test.describe
       await expect(page.locator("tbody")).toContainText(originalName);
 
       // Find and click Edit button for the category
-      const editButtons = page.getByRole("button", { name: "Edit" });
-      const editButtonCount = await editButtons.count();
-      // Click the last edit button (our newly created category)
-      await editButtons.nth(editButtonCount - 1).click();
+      const categoryRow = page
+        .getByTestId("category-row")
+        .filter({ hasText: originalName });
+      await expect(categoryRow).toBeVisible();
+
+      const editButton = categoryRow.getByRole("button", { name: "Edit" });
+      await expect(editButton).toBeVisible();
+
+      await editButton.click();
 
       // Update the category name in modal
       const dialogInput = page
@@ -175,6 +187,9 @@ test.describe
       // Reload page and verify persistence
       await page.reload();
       await expect(page.locator("tbody")).toContainText(updatedName);
+
+      // Cleanup: Delete the updated category
+      await deleteCategory(page, updatedName);
     });
 
     // Li Jiakai, A0252287Y
@@ -194,14 +209,8 @@ test.describe
       ).toBeVisible();
       await expect(page.locator("tbody")).toContainText(categoryToDelete);
 
-      // Find and click Delete button (use nth to get the correct one)
-      const deleteButtons = page.getByRole("button", { name: "Delete" });
-      const deleteButtonCount = await deleteButtons.count();
-      // Click the last delete button (our newly created category)
-      await deleteButtons.nth(deleteButtonCount - 1).click();
-
-      // Verify deletion success message
-      await expect(page.getByText(`Category is deleted`)).toBeVisible();
+      // Find and click Delete button for our specific category
+      await deleteCategory(page, categoryToDelete);
 
       // Verify category is removed from list
       await expect(page.locator("tbody")).not.toContainText(categoryToDelete);
@@ -229,10 +238,15 @@ test.describe
       await expect(page.locator("tbody")).toContainText(tempCategoryName);
 
       // Find and click Edit button for the category
-      const editButtons = page.getByRole("button", { name: "Edit" });
-      const editButtonCount = await editButtons.count();
-      // Click the last edit button (our newly created category)
-      await editButtons.nth(editButtonCount - 1).click();
+      const categoryRow = page
+        .getByTestId("category-row")
+        .filter({ hasText: tempCategoryName });
+      await expect(categoryRow).toBeVisible();
+
+      const editButton = categoryRow.getByRole("button", { name: "Edit" });
+      await expect(editButton).toBeVisible();
+
+      await editButton.click();
 
       // Update the category name in modal
       const dialogInput = page
@@ -253,6 +267,10 @@ test.describe
         page.getByText(`Category Clothing is updated`),
       ).not.toBeVisible();
 
+      // Force close the modal
       await page.reload();
+
+      // Cleanup: Delete the temp category
+      await deleteCategory(page, tempCategoryName);
     });
   });
