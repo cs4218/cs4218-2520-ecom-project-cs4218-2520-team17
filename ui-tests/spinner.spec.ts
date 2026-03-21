@@ -7,6 +7,6 @@ test.describe("Spinner route guard behavior", () => {
 
         await expect(page.getByRole("status")).toBeVisible();
         await expect(page.getByText(/redirecting to you in 3 second/i)).toBeVisible();
-        await expect(page).toHaveURL(/\/$/, { timeout: 7000 });
+        await expect(page).toHaveURL(/\/$/, { timeout: 7000 }); //Checking for successful redirection
     });
 });
