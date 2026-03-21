@@ -95,7 +95,7 @@ const Profile = () => {
                   <button
                     type="button"
                     className="btn btn-link p-0 mt-1"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPassword((prev) => !prev)}
                     aria-pressed={showPassword}
                   >
                     {showPassword ? "Hide password" : "Show password"}
