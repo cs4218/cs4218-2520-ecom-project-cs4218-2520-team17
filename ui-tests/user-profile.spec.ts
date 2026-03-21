@@ -101,6 +101,13 @@ test.describe("Updating user profile", () => {
     await page.reload();
     await expect(phoneInput).toHaveValue(updatedPhone);
     await expect(addressInput).toHaveValue(updatedAddress);
+
+    const originalPhone = "81234567";
+    const originalAddress = "1 Computing Drive";
+    // Reset profile details back to original for test isolation.
+    await phoneInput.fill(originalPhone);
+    await addressInput.fill(originalAddress);
+    await updateButton.click();
   });
 
   // Sebastian Tay, A0252864X
