@@ -125,6 +125,51 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
 3. `pages/Auth/Login.js`
 
 
+### Milestone 2
+
+#### Li Jiakai
+
+**Server Related Files**
+ 
+
+**Client Related Files**
+
+#### Rayyan Ismail
+**Server Related Files**
+
+**Client Related Files**
+
+#### Sebastian Tay Yong Xun
+**Server Related Files**
+1. `controllers/orderController.js`
+   - getOrdersController
+   - getAllOrdersController
+   - updateOrderStatusController
+2. `config/db.js`
+
+**Client Related Files**
+1. `pages/user/Orders.js`
+2. `pages/user/Profile.js`
+3. `pages/Contact.js`
+4. `pages/Policy.js`
+5. `pages/About.js`
+6. `pages/Pagenotfound.js`
+7. `components/Footer.js`
+8. `components/Header.js`
+9. `components/Layout.js`
+10. `components/Spinner.js`
+
+
+#### Tan Shi Yu
+**Server Related Files**
+
+**Client Related Files**
+
+#### Tan Zhi Heng
+**Server Related Files**
+
+**Client Related Files**
+
 ---
 
 ## 1. Project Introduction
