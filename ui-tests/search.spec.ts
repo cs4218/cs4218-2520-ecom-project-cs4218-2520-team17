@@ -4,9 +4,12 @@ test.describe('Search Functionality', () => {
   test.beforeEach(async ({ page }) => {
     // Arrange
     await page.goto('/');
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
   });
 
-  // Testing if Search bar exists
   test('Search Display: search bar is visible on homepage', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
@@ -18,7 +21,6 @@ test.describe('Search Functionality', () => {
     await expect(searchBar).toBeVisible();
   });
 
-  // Test if search bar initialized properly
   test('Search Display: search bar initializes with empty value', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
@@ -30,7 +32,6 @@ test.describe('Search Functionality', () => {
     expect(value).toBe('');
   });
 
-  // Test if search button is visible and in correct state
   test('Search Display: search button is visible and enabled', async ({ page }) => {
     // Arrange
     const searchButton = page.getByRole('button', { name: 'Search' });
@@ -68,7 +69,6 @@ test.describe('Search Functionality', () => {
     await expect(searchBar).toHaveValue('');
   });
 
-  // Test if user is properly redirected to new page after search
   test('Search Submit: pressing Search with valid keyword redirects to search results page', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
@@ -132,7 +132,7 @@ test.describe('Search Functionality', () => {
 
     await expect(page).toHaveURL(/\/search$/);
     await expect(
-      page.getByRole('heading', { name: new RegExp(`^${exactProductName}$`, 'i') })
+      page.getByRole('heading', { name: 'Novel' })
     ).toBeVisible();
   });
 
@@ -162,8 +162,9 @@ test.describe('Search Functionality', () => {
 
     // Assert
     await expect(page).toHaveURL(/\/search$/);
-    await expect(page.getByRole('button', { name: 'More Details' }).first()).toBeVisible();
-  });
+    await expect(
+      page.getByRole('heading', { name: 'Novel' })
+    ).toBeVisible();  });
 
   test('Search No Results: searching nonexistent product shows "No Products Found"', async ({ page }) => {
     // Arrange
@@ -179,17 +180,20 @@ test.describe('Search Functionality', () => {
     await expect(page.getByText('No Products Found')).toBeVisible();
   });
 
+  
   test('Search Results Display: results page shows correct result count', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
     const searchButton = page.getByRole('button', { name: 'Search' });
 
     // Act
-    await searchBar.fill('novel');
+    await searchBar.fill('e');
     await searchButton.click();
 
     // Assert
-    await expect(page.getByText(/Found \d+/)).toBeVisible();
+    // await expect(page.getByText(/Found \d+/)).toBeVisible();
+    const found = page.getByRole('heading', { name: 'Found' })
+    await expect(found).toHaveText('Found 6');
   });
 
   test('Search Results Display: each result shows product image, name, description, and price', async ({ page }) => {
@@ -216,7 +220,7 @@ test.describe('Search Functionality', () => {
     const searchButton = page.getByRole('button', { name: 'Search' });
 
     // Act
-    await searchBar.fill('novel');
+    await searchBar.fill('e');
     await searchButton.click();
 
     // Assert
@@ -225,24 +229,8 @@ test.describe('Search Functionality', () => {
     expect(await cards.count()).toBeGreaterThan(0);
   });
 
-  test('Search Navigation: user can click More Details from search results', async ({ page }) => {
-    // Arrange
-    const searchBar = page.getByRole('searchbox', { name: 'Search' });
-    const searchButton = page.getByRole('button', { name: 'Search' });
 
-    await searchBar.fill('novel');
-    await searchButton.click();
-
-    const moreDetailsButton = page.getByRole('button', { name: 'More Details' }).first();
-
-    // Act
-    await moreDetailsButton.click();
-
-    // Assert
-    await expect(page).not.toHaveURL(/\/search$/);
-  });
-
-  test('Search Navigation: More Details redirects to correct product details page', async ({ page }) => {
+  test('Search Navigation: After searching, More Details redirects to correct product details page', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
     const searchButton = page.getByRole('button', { name: 'Search' });
@@ -256,10 +244,7 @@ test.describe('Search Functionality', () => {
     await page.getByRole('button', { name: 'More Details' }).first().click();
 
     // Assert
-    await expect(page).not.toHaveURL(/\/search$/);
-    if (firstProductName) {
-      await expect(page.getByText(firstProductName, { exact: false })).toBeVisible();
-    }
+    await expect(page).toHaveURL(/\/product\/novel$/);  
   });
 
   test('Search Navigation: browser back from product details returns to search results', async ({ page }) => {
@@ -294,7 +279,7 @@ test.describe('Search Functionality', () => {
     await addToCartButton.click();
 
     // Assert
-    await expect(page.locator('body')).toBeVisible();
+    await expect(page.getByTitle('1')).toBeVisible();
   });
 
   test('Search Add to Cart: cart updates after adding searched product', async ({ page }) => {
