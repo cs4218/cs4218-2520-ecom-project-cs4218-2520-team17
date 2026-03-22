@@ -136,8 +136,20 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
 
 #### Rayyan Ismail
 **Server Related Files**
+1. `controllers/categoryController.js`
+   - categoryController
+   - singleCategoryController
+
+2. `controllers/productController.js`
+   - braintreeTokenController
+   - braintreePaymentController
 
 **Client Related Files**
+1. `pages/Homepage.js`
+2. `context/cart.js`
+3. `pages/CartPage.js`
+4. `hooks/useCategory.js`
+5. `pages/Categories.js`
 
 #### Sebastian Tay Yong Xun
 **Server Related Files**
