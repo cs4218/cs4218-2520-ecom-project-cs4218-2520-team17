@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 
 async function openFirstCategoryWithProducts(page: Page) {
-  await page.goto('http://localhost:3000/');
+  await page.goto('/');
 
   const categoryLinks = page.locator('a[href^="/category/"]');
   const categoryCount = await categoryLinks.count();
@@ -12,7 +12,7 @@ async function openFirstCategoryWithProducts(page: Page) {
     const href = await categoryLinks.nth(i).getAttribute('href');
     if (!href) continue;
 
-    await page.goto(`http://localhost:3000${href}`);
+    await page.goto(href);
     await expect(page.locator('body')).toBeVisible();
 
     const cards = page.locator('.card');
@@ -111,7 +111,7 @@ test.describe.serial('CategoryProduct Functionality', () => {
   });
 
   test('CategoryProduct Direct Access: direct access to category route behaves correctly', async ({ page }) => {
-    await page.goto(`http://localhost:3000${categoryPath}`);
+    await page.goto(categoryPath);
 
     await expect(page.locator('body')).toBeVisible();
     await expect(page.getByText(/Category - /i)).toBeVisible();

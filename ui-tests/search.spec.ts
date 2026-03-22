@@ -3,9 +3,10 @@ import { test, expect } from '@playwright/test';
 test.describe('Search Functionality', () => {
   test.beforeEach(async ({ page }) => {
     // Arrange
-    await page.goto('http://localhost:3000/');
+    await page.goto('/');
   });
 
+  // Testing if Search bar exists
   test('Search Display: search bar is visible on homepage', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
@@ -17,6 +18,7 @@ test.describe('Search Functionality', () => {
     await expect(searchBar).toBeVisible();
   });
 
+  // Test if search bar initialized properly
   test('Search Display: search bar initializes with empty value', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
@@ -28,6 +30,7 @@ test.describe('Search Functionality', () => {
     expect(value).toBe('');
   });
 
+  // Test if search button is visible and in correct state
   test('Search Display: search button is visible and enabled', async ({ page }) => {
     // Arrange
     const searchButton = page.getByRole('button', { name: 'Search' });
@@ -40,6 +43,7 @@ test.describe('Search Functionality', () => {
     await expect(searchButton).toBeEnabled();
   });
 
+  // Test if user can type into search bar
   test('Search Input: user can type into search bar', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
@@ -51,6 +55,7 @@ test.describe('Search Functionality', () => {
     await expect(searchBar).toHaveValue('novel');
   });
 
+  // Test if user can clear text they have used
   test('Search Input: user can clear typed keyword', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
@@ -63,6 +68,7 @@ test.describe('Search Functionality', () => {
     await expect(searchBar).toHaveValue('');
   });
 
+  // Test if user is properly redirected to new page after search
   test('Search Submit: pressing Search with valid keyword redirects to search results page', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
@@ -77,6 +83,7 @@ test.describe('Search Functionality', () => {
     await expect(page.getByRole('heading', { name: 'Search Results' })).toBeVisible();
   });
 
+  
   test('Search Submit: pressing Enter with valid keyword redirects to search results page', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
@@ -90,6 +97,7 @@ test.describe('Search Functionality', () => {
     await expect(page.getByRole('heading', { name: 'Search Results' })).toBeVisible();
   });
 
+  // 
   test('Search Empty: submitting empty search shows no results or stays on current page gracefully', async ({ page }) => {
     // Arrange
     const searchBar = page.getByRole('searchbox', { name: 'Search' });
@@ -366,8 +374,7 @@ test.describe('Search Functionality', () => {
 
   test('Search URL Access: direct access to /search behaves correctly with existing search state', async ({ page }) => {
     // Arrange
-    await page.goto('http://localhost:3000/search');
-
+    await page.goto('/search');
     // Act
     // No action needed
 
@@ -402,7 +409,7 @@ test.describe('Search Functionality', () => {
     const firstRunTitles = await page.locator('.card-title').allTextContents();
 
     // Act
-    await page.goto('http://localhost:3000/');
+    await page.goto('/');
     await page.getByRole('searchbox', { name: 'Search' }).fill('novel');
     await page.getByRole('button', { name: 'Search' }).click();
     const secondRunTitles = await page.locator('.card-title').allTextContents();

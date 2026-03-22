@@ -7,7 +7,7 @@ test.describe('ProductDetails Functionality', () => {
 
   test.beforeEach(async ({ page }) => {
     // Arrange
-    await page.goto(`http://localhost:3000/product/${PRODUCT_SLUG}`);
+    await page.goto(`/product/${PRODUCT_SLUG}`);
   });
 
   test('ProductDetails Display: product details page loads successfully', async ({ page }) => {
@@ -94,13 +94,13 @@ test.describe('ProductDetails Functionality', () => {
 
   test('ProductDetails Similar Products: similar products section is visible', async ({ page }) => {
     // Arrange
-    const similarProductsHeading = page.getByText(/Similar Products/i);
+    const similarProductsHeading = page.getByRole('heading', { name: /Similar Products/ });
 
     // Act
     // No action needed
 
     // Assert
-    await expect(similarProductsHeading).toBeVisible();
+    await expect(similarProductsHeading).toBeVisible();  
   });
 
   test('ProductDetails Similar Products: similar products area renders gracefully', async ({ page }) => {
@@ -154,7 +154,7 @@ test.describe('ProductDetails Functionality', () => {
 
   test('ProductDetails Direct Access: direct access to product route behaves correctly', async ({ page }) => {
     // Arrange
-    await page.goto(`http://localhost:3000/product/${PRODUCT_SLUG}`);
+    await page.goto(`/product/${PRODUCT_SLUG}`);
 
     // Act
     // No action needed
