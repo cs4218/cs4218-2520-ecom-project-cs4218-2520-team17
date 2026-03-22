@@ -296,47 +296,75 @@ describe("Category Controller Integration Tests", () => {
   // categoryController Tests
   // ==========================================
   describe("categoryControlller", () => {
-    describe("Successful Retrieval", () => {
+    describe("Integration Tests", () => {
       // Rayyan Ismail, A0259275R
-      it("should retrieve all categories successfully with status 200", async () => {
-        // Arrange
-        const mockCategories = [
-          { name: "Electronics", slug: "electronics" },
-          { name: "Books", slug: "books" },
-        ];
-        categoryModel.find.mockResolvedValue(mockCategories);
+      it("should retrieve all seeded categories from the database", async () => {
         // Act
         await categoryControlller(req, res);
 
         // Assert
-        expect(categoryModel.find).toHaveBeenCalledWith({});
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.send).toHaveBeenCalledWith({
-          success: true,
-          message: "All Categories List",
-          category: mockCategories,
-        });
-      });
-    });
+        const response = res.send.mock.calls[0][0];
+        expect(response.success).toBe(true);
+        expect(response.message).toBe("All Categories List");
+        expect(response.category).toHaveLength(3);
 
-    describe("Error Handling", () => {
+        const categoryNames = response.category.map((c) => c.name).sort();
+        expect(categoryNames).toEqual(["Book", "Clothing", "Electronics"]);
+      });
+
       // Rayyan Ismail, A0259275R
-      it("should return status 500 when database retrieval fails", async () => {
+      it("should return categories with correct slugs", async () => {
+        // Act
+        await categoryControlller(req, res);
+
+        // Assert
+        const response = res.send.mock.calls[0][0];
+        const categories = response.category;
+
+        const electronics = categories.find((c) => c.name === "Electronics");
+        expect(electronics.slug).toBe("electronics");
+
+        const book = categories.find((c) => c.name === "Book");
+        expect(book.slug).toBe("book");
+
+        const clothing = categories.find((c) => c.name === "Clothing");
+        expect(clothing.slug).toBe("clothing");
+      });
+
+      // Rayyan Ismail, A0259275R
+      it("should return empty array when no categories exist", async () => {
         // Arrange
-        const dbError = new Error("Database retrieval failed");
-        categoryModel.find.mockRejectedValue(dbError);
+        await categoryModel.deleteMany({});
 
         // Act
         await categoryControlller(req, res);
 
         // Assert
-        expect(consoleLogSpy).toHaveBeenCalledWith(dbError);
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith({
-          success: false,
-          error: dbError,
-          message: "Error while getting all categories",
-        });
+        expect(res.status).toHaveBeenCalledWith(200);
+        const response = res.send.mock.calls[0][0];
+        expect(response.success).toBe(true);
+        expect(response.category).toEqual([]);
+      });
+
+      // Rayyan Ismail, A0259275R
+      it("should include newly created categories in results", async () => {
+        // Arrange
+        await new categoryModel({ name: "Sports", slug: "sports" }).save();
+
+        // Act
+        await categoryControlller(req, res);
+
+        // Assert
+        const response = res.send.mock.calls[0][0];
+        expect(response.category).toHaveLength(4);
+        const categoryNames = response.category.map((c) => c.name).sort();
+        expect(categoryNames).toEqual([
+          "Book",
+          "Clothing",
+          "Electronics",
+          "Sports",
+        ]);
       });
     });
   });
@@ -345,49 +373,86 @@ describe("Category Controller Integration Tests", () => {
   // singleCategoryController Tests
   // ==========================================
   describe("singleCategoryController", () => {
-    describe("Successful Retrieval", () => {
+    describe("Integration Tests", () => {
       // Rayyan Ismail, A0259275R
-      it("should retrieve single category successfully with valid slug", async () => {
+      it("should retrieve a single category by slug from the database", async () => {
         // Arrange
         req.params = { slug: "electronics" };
-        const mockCategory = { name: "Electronics", slug: "electronics" };
-        categoryModel.findOne.mockResolvedValue(mockCategory);
 
         // Act
         await singleCategoryController(req, res);
 
         // Assert
-        expect(categoryModel.findOne).toHaveBeenCalledWith({
-          slug: "electronics",
-        });
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.send).toHaveBeenCalledWith({
-          success: true,
-          message: "Get single category successfully",
-          category: mockCategory,
-        });
+        const response = res.send.mock.calls[0][0];
+        expect(response.success).toBe(true);
+        expect(response.message).toBe("Get single category successfully");
+        expect(response.category.name).toBe("Electronics");
+        expect(response.category.slug).toBe("electronics");
       });
-    });
 
-    describe("Error Handling", () => {
       // Rayyan Ismail, A0259275R
-      it("should return 500 and log error when database retrieval fails", async () => {
+      it("should retrieve the Book category by slug", async () => {
         // Arrange
-        req.params = { slug: "electronics" };
-        const dbError = new Error("Database retrieval failed");
-        categoryModel.findOne.mockRejectedValue(dbError);
+        req.params = { slug: "book" };
 
         // Act
         await singleCategoryController(req, res);
 
         // Assert
-        expect(consoleLogSpy).toHaveBeenCalledWith(dbError);
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith({
-          success: false,
-          error: dbError,
-          message: "Error while getting single category",
-        });
+        expect(res.status).toHaveBeenCalledWith(200);
+        const response = res.send.mock.calls[0][0];
+        expect(response.category.name).toBe("Book");
+        expect(response.category.slug).toBe("book");
+      });
+
+      // Rayyan Ismail, A0259275R
+      it("should return null category for a non-existent slug", async () => {
+        // Arrange
+        req.params = { slug: "nonexistent" };
+
+        // Act
+        await singleCategoryController(req, res);
+
+        // Assert
+        expect(res.status).toHaveBeenCalledWith(200);
+        const response = res.send.mock.calls[0][0];
+        expect(response.success).toBe(true);
+        expect(response.category).toBeNull();
+      });
+
+      // Rayyan Ismail, A0259275R
+      it("should return the correct category after it has been updated", async () => {
+        // Arrange
+        await categoryModel.findOneAndUpdate(
+          { slug: "electronics" },
+          { name: "Gadgets", slug: "gadgets" },
+        );
+        req.params = { slug: "gadgets" };
+
+        // Act
+        await singleCategoryController(req, res);
+
+        // Assert
+        expect(res.status).toHaveBeenCalledWith(200);
+        const response = res.send.mock.calls[0][0];
+        expect(response.category.name).toBe("Gadgets");
+        expect(response.category.slug).toBe("gadgets");
+      });
+
+      // Rayyan Ismail, A0259275R
+      it("should not find a category after it has been deleted", async () => {
+        // Arrange
+        await categoryModel.deleteOne({ slug: "electronics" });
+        req.params = { slug: "electronics" };
+
+        // Act
+        await singleCategoryController(req, res);
+
+        // Assert
+        expect(res.status).toHaveBeenCalledWith(200);
+        const response = res.send.mock.calls[0][0];
+        expect(response.category).toBeNull();
       });
     });
   });
