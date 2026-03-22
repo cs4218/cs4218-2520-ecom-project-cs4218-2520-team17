@@ -211,6 +211,11 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
 4. `pages/ProductDetails.js`
 5. `pages/CategoryProduct.js`
 
+**UI Tests**
+1. `ui-tests/productDetails.spec.ts`: UI tests Product Details
+2. `ui-tests/search.spec.ts`: UI Test for search bar and functionalities
+3. `ui-tests/categoryProduct.spec.ts`: UI Test for category product view
+
 #### Tan Zhi Heng
 **Integration Tests**
 1. `helpers/authHelper.int.test.js`: Integrate `authHelper` with `bcrypt`.

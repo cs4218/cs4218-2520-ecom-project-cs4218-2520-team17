@@ -29,14 +29,15 @@ const makeRes = () => {
   return res;
 };
 
-    const validPhotoFile = {
-      photo: {
-        size: 500000,
-        path: join(process.cwd(), "/test/img/red.jpg"),
-        type: "image/jpeg",
-      },
-    };
+const validPhotoFile = {
+  photo: {
+    size: 500000,
+    path: join(process.cwd(), "/test/img/red.jpg"),
+    type: "image/jpeg",
+  },
+};
 
+// Tan Shi Yu, A0251681E
 describe("Product Controller Additional Integration Tests", () => {
   let req;
   let res;
