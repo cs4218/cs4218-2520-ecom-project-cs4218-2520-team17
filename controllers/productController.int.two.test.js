@@ -288,6 +288,34 @@ describe("Product Controller Additional Integration Tests", () => {
       expect(res.status).not.toHaveBeenCalled();
       expect(res.send).not.toHaveBeenCalled();
     });
+
+    it("productPhotoController + productModel findById null-result integration: returns 500 when the product does not exist", async () => {
+      req.params = { pid: "507f1f77bcf86cd799439011" }; // valid ObjectId format, but not in DB
+
+      await productPhotoController(req, res);
+
+      expect(res.set).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(500);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(false);
+      expect(payload.message).toBe("Error while getting photo");
+      expect(payload.error).toBeDefined();
+    });
+
+    it("productPhotoController + invalid ObjectId integration: returns 500 for malformed product id", async () => {
+      req.params = { pid: "invalid-id" };
+
+      await productPhotoController(req, res);
+
+      expect(res.set).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(500);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(false);
+      expect(payload.message).toBe("Error while getting photo");
+      expect(payload.error).toBeDefined();
+    });
   });
 
   // =========================================
@@ -410,17 +438,84 @@ describe("Product Controller Additional Integration Tests", () => {
         expect(product.price).toBeLessThanOrEqual(150);
       });
     });
+
+    it("productFiltersController + empty filters integration: returns all products when no category or price filter is provided", async () => {
+      const product1 = await createProduct({
+        name: "All Products 1",
+        price: 50,
+      });
+
+      const product2 = await createProduct({
+        name: "All Products 2",
+        price: 300,
+      });
+
+      req.body = {
+        checked: [],
+        radio: [],
+      };
+
+      await productFiltersController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(true);
+      expect(Array.isArray(payload.products)).toBe(true);
+
+      expect(
+        payload.products.some((product) => `${product._id}` === `${product1._id}`)
+      ).toBe(true);
+      expect(
+        payload.products.some((product) => `${product._id}` === `${product2._id}`)
+      ).toBe(true);
+    });
+
+    it("productFiltersController + unmatched filters integration: returns an empty array when no products satisfy the filters", async () => {
+      await createProduct({
+        name: "Existing Product",
+        price: 50,
+      });
+
+      req.body = {
+        checked: [],
+        radio: [100000, 200000],
+      };
+
+      await productFiltersController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(true);
+      expect(Array.isArray(payload.products)).toBe(true);
+      expect(payload.products).toHaveLength(0);
+    });
+
+    it("productFiltersController + malformed req.body integration: returns 500 when checked or radio is missing", async () => {
+      req.body = {};
+
+      await productFiltersController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(false);
+      expect(payload.message).toBe("Error While Filtering Products");
+      expect(payload.error).toBeDefined();
+    });
+
   });
 
   // =========================================
   // 5. productCountController
   // =========================================
   describe("productCountController", () => {
-    it("productCountController + productModel estimatedDocumentCount integration: returns 200 with the total seeded product count", async () => {
+    it("productCountController + productModel estimatedDocumentCount integration: returns 200 with the total product count", async () => {
       await createProduct({ name: "Count Product 1" });
       await createProduct({ name: "Count Product 2" });
 
-      const expectedTotal = await productModel.countDocuments();
+      const expectedTotal = await productModel.estimatedDocumentCount();
 
       await productCountController(req, res);
 
@@ -430,6 +525,57 @@ describe("Product Controller Additional Integration Tests", () => {
         total: expectedTotal,
       });
     });
+
+    it("productCountController + productModel estimatedDocumentCount error handling: returns 500 when count query fails", async () => {
+      const originalFind = productModel.find;
+
+      productModel.find = jest.fn(() => ({
+        estimatedDocumentCount: jest.fn(() => {
+          throw new Error("Count failed");
+        }),
+      }));
+
+      await productCountController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(false);
+      expect(payload.message).toBe("Error in product count");
+      expect(payload.error).toBeDefined();
+
+      productModel.find = originalFind;
+    });
+
+    it("searchProductController + req.params keyword integration: returns an empty array when no products match the keyword", async () => {
+      await createProduct({
+        name: "Laptop",
+        description: "A powerful laptop",
+      });
+
+      req.params = { keyword: "definitelynomatchkeyword123" };
+
+      await searchProductController(req, res);
+
+      const payload = res.json.mock.calls[0][0];
+      expect(Array.isArray(payload)).toBe(true);
+      expect(payload).toHaveLength(0);
+    });
+
+    it("searchProductController + malformed req.params integration: returns 500 when keyword is missing", async () => {
+      req.params = {};
+
+      await searchProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(false);
+      expect(payload.message).toBe("Error In Search Product API");
+      expect(payload.error).toBeDefined();
+    });
+
+
   });
 
   // =========================================
@@ -482,6 +628,73 @@ describe("Product Controller Additional Integration Tests", () => {
 
       const responseIds = payload.products.map((product) => `${product._id}`);
       expect(responseIds.some((id) => createdIds.includes(id))).toBe(true);
+    });
+
+    it("productListController + req.params pagination integration: returns an empty array when the requested page has no products", async () => {
+      for (let i = 0; i < 3; i += 1) {
+        await createProduct({ name: `Only Product ${i}` });
+      }
+
+      req.params = { page: "999" };
+
+      await productListController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(true);
+      expect(Array.isArray(payload.products)).toBe(true);
+      expect(payload.products).toHaveLength(0);
+    });
+
+    it("productListController + productModel sort integration: returns products in descending createdAt order", async () => {
+      const first = await createProduct({ name: "Older Product" });
+      const second = await createProduct({ name: "Newer Product" });
+      const third = await createProduct({ name: "Newest Product" });
+
+      req.params = {};
+
+      await productListController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(true);
+
+      for (let i = 0; i < payload.products.length - 1; i += 1) {
+        const current = new Date(payload.products[i].createdAt).getTime();
+        const next = new Date(payload.products[i + 1].createdAt).getTime();
+        expect(current).toBeGreaterThanOrEqual(next);
+      }
+    });
+
+    it("productListController + productModel query failure handling: returns 500 when the paginated query fails", async () => {
+      const originalFind = productModel.find;
+
+      productModel.find = jest.fn(() => ({
+        select: jest.fn(() => ({
+          skip: jest.fn(() => ({
+            limit: jest.fn(() => ({
+              sort: jest.fn(() => {
+                throw new Error("Pagination failed");
+              }),
+            })),
+          })),
+        })),
+      }));
+
+      req.params = {};
+
+      await productListController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(false);
+      expect(payload.message).toBe("Error in per page ctrl");
+      expect(payload.error).toBeDefined();
+
+      productModel.find = originalFind;
     });
   });
 
@@ -594,12 +807,138 @@ describe("Product Controller Additional Integration Tests", () => {
         const plainProduct = product.toObject ? product.toObject() : product;
 
         expect(`${plainProduct.category._id || plainProduct.category}`).toBe(
-          electronicsCategoryId,
+          electronicsCategoryId
         );
         expect(`${plainProduct._id}`).not.toBe(`${currentProduct._id}`);
-        expect(Object.prototype.hasOwnProperty.call(plainProduct, "photo")).toBe(false);
+        expect(
+          Object.prototype.hasOwnProperty.call(plainProduct, "photo")
+        ).toBe(false);
         expect(plainProduct.category).toBeDefined();
       });
+    });
+
+    it("relatedProductController + req.params pid/cid + productModel filter/select/limit/populate integration: should return fewer than 3 related products when only 2 matching products exist", async () => {
+      const isolatedCategory = await categoryModel.create({
+        name: "Isolated Related Category",
+        slug: "isolated-related-category",
+      });
+
+      const currentProduct = await createProduct({
+        name: "Current Product Two Related",
+        category: isolatedCategory._id,
+      });
+
+      const related1 = await createProduct({
+        name: "Only Related Product 1",
+        category: isolatedCategory._id,
+      });
+
+      const related2 = await createProduct({
+        name: "Only Related Product 2",
+        category: isolatedCategory._id,
+      });
+
+      const otherCategory = await categoryModel.create({
+        name: "Unrelated Category Two Related",
+        slug: "unrelated-category-two-related",
+      });
+
+      await createProduct({
+        name: "Different Category Product",
+        category: otherCategory._id,
+      });
+
+      req.params = {
+        pid: `${currentProduct._id}`,
+        cid: `${isolatedCategory._id}`,
+      };
+
+      await relatedProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(true);
+      expect(Array.isArray(payload.products)).toBe(true);
+      expect(payload.products).toHaveLength(2);
+
+      const responseIds = payload.products.map((product) => `${product._id}`);
+      expect(responseIds).toContain(`${related1._id}`);
+      expect(responseIds).toContain(`${related2._id}`);
+      expect(responseIds).not.toContain(`${currentProduct._id}`);
+
+      payload.products.forEach((product) => {
+        const plainProduct = product.toObject ? product.toObject() : product;
+
+        expect(`${plainProduct.category._id || plainProduct.category}`).toBe(
+          `${isolatedCategory._id}`
+        );
+        expect(`${plainProduct._id}`).not.toBe(`${currentProduct._id}`);
+        expect(
+          Object.prototype.hasOwnProperty.call(plainProduct, "photo")
+        ).toBe(false);
+        expect(plainProduct.category).toBeDefined();
+        expect(typeof plainProduct.category).toBe("object");
+      });
+    });
+
+    it("relatedProductController + req.params pid/cid + productModel filter/select/limit/populate integration: should return an empty array when no related products exist in the same category", async () => {
+      const soloCategory = await categoryModel.create({
+        name: "Solo Related Category",
+        slug: "solo-related-category",
+      });
+
+      const currentProduct = await createProduct({
+        name: "Solo Category Product",
+        category: soloCategory._id,
+      });
+
+      await createProduct({
+        name: "Electronics Product But Not Same Category",
+      });
+
+      req.params = {
+        pid: `${currentProduct._id}`,
+        cid: `${soloCategory._id}`,
+      };
+
+      await relatedProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(true);
+      expect(Array.isArray(payload.products)).toBe(true);
+      expect(payload.products).toHaveLength(0);
+    });
+
+    it("relatedProductController + productModel find throws integration: should return 500 when database query fails", async () => {
+      req.params = {
+        pid: "507f1f77bcf86cd799439011",
+        cid: `${electronicsCategoryId}`,
+      };
+
+      const findSpy = jest
+        .spyOn(productModel, "find")
+        .mockImplementationOnce(() => {
+          throw new Error("Database query failed");
+        });
+
+      await relatedProductController(req, res);
+
+      expect(findSpy).toHaveBeenCalledWith({
+        category: `${electronicsCategoryId}`,
+        _id: { $ne: "507f1f77bcf86cd799439011" },
+      });
+
+      expect(res.status).toHaveBeenCalledWith(500);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(false);
+      expect(payload.message).toBe("Error while getting related product");
+      expect(payload.error).toBeDefined();
+
+      findSpy.mockRestore();
     });
   });
 
@@ -643,12 +982,12 @@ describe("Product Controller Additional Integration Tests", () => {
         expect.arrayContaining([
           `${matchingProduct1._id}`,
           `${matchingProduct2._id}`,
-        ]),
+        ])
       );
 
       payload.products.forEach((product) => {
         expect(`${product.category._id || product.category}`).toBe(
-          `${targetCategory._id}`,
+          `${targetCategory._id}`
         );
       });
     });
@@ -664,6 +1003,55 @@ describe("Product Controller Additional Integration Tests", () => {
         category: null,
         products: [],
       });
+    });
+
+    it("productCategoryController + categoryModel findOne + productModel find/populate integration: should return the category and an empty products array when the category exists but has no products", async () => {
+      const emptyCategory = await categoryModel.create({
+        name: "Empty Category Controller Target",
+        slug: "empty-category-controller-target",
+      });
+
+      await createProduct({
+        name: "Product In Another Category",
+      });
+
+      req.params = { slug: "empty-category-controller-target" };
+
+      await productCategoryController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(true);
+      expect(payload.category).toBeDefined();
+      expect(payload.category._id.toString()).toBe(emptyCategory._id.toString());
+      expect(payload.category.slug).toBe("empty-category-controller-target");
+      expect(Array.isArray(payload.products)).toBe(true);
+      expect(payload.products).toHaveLength(0);
+    });
+
+    it("productCategoryController + categoryModel findOne throws integration: should return 500 when category lookup fails", async () => {
+      req.params = { slug: "category-controller-target" };
+
+      const findOneSpy = jest
+        .spyOn(categoryModel, "findOne")
+        .mockImplementationOnce(() => {
+          throw new Error("Category lookup failed");
+        });
+
+      await productCategoryController(req, res);
+
+      expect(findOneSpy).toHaveBeenCalledWith({
+        slug: "category-controller-target",
+      });
+      expect(res.status).toHaveBeenCalledWith(500);
+
+      const payload = res.send.mock.calls[0][0];
+      expect(payload.success).toBe(false);
+      expect(payload.message).toBe("Error While Getting products");
+      expect(payload.error).toBeDefined();
+
+      findOneSpy.mockRestore();
     });
   });
 });
