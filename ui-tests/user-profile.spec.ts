@@ -162,15 +162,16 @@ test.describe("Updating user profile", () => {
   });
 
   // Sebastian Tay, A0252864X
-  test("will not update password when field is cleared after receive unintended input", async ({ page }) => {
-    const passwordInput = page.getByRole('textbox', { name: 'Enter Your New Password' });
+  test("will not update password when field is cleared after receiving unintended input", async ({ page }) => {
+    const passwordInput = page.getByRole("textbox", { name: "Enter Your New Password" });
     await passwordInput.click();
-    await passwordInput.fill('passwordToRemove');
+    await passwordInput.fill("passwordToRemove");
     await passwordInput.click();
-    await passwordInput.fill('');
+    await passwordInput.fill("");
 
     
-    await page.getByRole('button', { name: 'UPDATE' }).click();
+    await page.getByRole("button", { name: "UPDATE" }).click();
+    await expect(page.getByText("Profile Updated Successfully")).toBeVisible();
     await logOutAsUser(page);
 
     await logInAsUser(page);
