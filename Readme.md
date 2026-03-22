@@ -193,8 +193,23 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
 
 #### Tan Shi Yu
 **Server Related Files**
+1. `controllers/productController.js`
+   - getProductController
+   - getSingleProductController
+   - productPhotoController
+   - productFiltersController
+   - productCountController
+   - productListController
+   - searchProductController
+   - relatedProductController
+   - productCategoryController
 
 **Client Related Files**
+1. `components/Form/SearchInput.js`
+2. `context/search.js`
+3. `pages/Search.js`
+4. `pages/ProductDetails.js`
+5. `pages/CategoryProduct.js`
 
 #### Tan Zhi Heng
 **Integration Tests**
