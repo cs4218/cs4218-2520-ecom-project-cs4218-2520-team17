@@ -2,7 +2,19 @@ import React from "react";
 import { useSearch } from "../../context/search";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-const SearchInput = () => {
+
+/*
+// When submit, sends a GET request via Axios
+Return value is prob
+{
+  keyword: "",
+  results: []
+}
+const navigate = useNavigate();
+I move to another
+
+*/
+function SearchInput() {
   const [values, setValues] = useSearch();
   const navigate = useNavigate();
 
@@ -27,14 +39,13 @@ const SearchInput = () => {
           placeholder="Search"
           aria-label="Search"
           value={values.keyword}
-          onChange={(e) => setValues({ ...values, keyword: e.target.value })}
-        />
+          onChange={(e) => setValues({ ...values, keyword: e.target.value })} />
         <button className="btn btn-outline-success" type="submit">
           Search
         </button>
       </form>
     </div>
   );
-};
+}
 
 export default SearchInput;
