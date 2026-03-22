@@ -8,26 +8,21 @@ test.describe('ProductDetails Functionality', () => {
   test.beforeEach(async ({ page }) => {
     // Arrange
     await page.goto(`/product/${PRODUCT_SLUG}`);
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
   });
+
+
+
 
   test('ProductDetails Display: product details page loads successfully', async ({ page }) => {
-    // Act
-    // No action needed
-
     // Assert
-    await expect(page.locator('body')).toBeVisible();
+    await expect(page).toHaveURL(/\/product\/novel$/);
+    await expect(page.getByRole('heading', { name: 'Product Details' })).toBeVisible();
   });
 
-  test('ProductDetails Display: page heading is visible', async ({ page }) => {
-    // Arrange
-    const heading = page.getByRole('heading', { name: 'Product Details' });
-
-    // Act
-    // No action needed
-
-    // Assert
-    await expect(heading).toBeVisible();
-  });
 
   test('ProductDetails Display: main product image is visible', async ({ page }) => {
     // Arrange
@@ -77,19 +72,8 @@ test.describe('ProductDetails Functionality', () => {
     await addToCartButton.click();
 
     // Assert
-    await expect(page.locator('body')).toBeVisible();
-  });
+    await expect(page.getByTitle('1')).toBeVisible();
 
-  test('ProductDetails Add to Cart: cart updates after adding product', async ({ page }) => {
-    // Arrange
-    const addToCartButton = page.getByRole('button', { name: 'ADD TO CART' });
-
-    // Act
-    await addToCartButton.click();
-    await page.getByRole('link', { name: /cart/i }).click();
-
-    // Assert
-    await expect(page).toHaveURL(/cart/i);
   });
 
   test('ProductDetails Similar Products: similar products section is visible', async ({ page }) => {
@@ -102,6 +86,7 @@ test.describe('ProductDetails Functionality', () => {
     // Assert
     await expect(similarProductsHeading).toBeVisible();  
   });
+
 
   test('ProductDetails Similar Products: similar products area renders gracefully', async ({ page }) => {
     // Arrange
@@ -138,6 +123,8 @@ test.describe('ProductDetails Functionality', () => {
       await relatedButtons.first().click();
       await expect(page).toHaveURL(/\/product\//);
       await expect(page.getByRole('heading', { name: 'Product Details' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Name : Textbook' })).toBeVisible();
+ 
     } else {
       await expect(page.getByText('No Similar Products found')).toBeVisible();
     }
@@ -162,5 +149,13 @@ test.describe('ProductDetails Functionality', () => {
     // Assert
     await expect(page.locator('body')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Product Details' })).toBeVisible();
+  });
+
+  test('ProductDetails Display: no similar product found', async ({ page }) => {
+    await page.goto('/product/nus-tshirt');
+
+    await expect(page).toHaveURL(/\/product\/nus-tshirt$/);
+    await expect(page.getByRole('heading', { name: 'Product Details' })).toBeVisible();
+    await expect(page.getByText('No Similar Products found')).toBeVisible();
   });
 });

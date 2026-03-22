@@ -1,52 +1,70 @@
 import { test, expect, Page } from '@playwright/test';
 
-async function openFirstCategoryWithProducts(page: Page) {
-  await page.goto('/');
-
-  const categoryLinks = page.locator('a[href^="/category/"]');
-  const categoryCount = await categoryLinks.count();
-
-  expect(categoryCount).toBeGreaterThan(0);
-
-  for (let i = 0; i < categoryCount; i++) {
-    const href = await categoryLinks.nth(i).getAttribute('href');
-    if (!href) continue;
-
-    await page.goto(href);
-    await expect(page.locator('body')).toBeVisible();
-
-    const cards = page.locator('.card');
-    const cardCount = await cards.count();
-
-    if (cardCount > 0) {
-      return href;
-    }
-  }
-
-  throw new Error('No category page with products was found.');
-}
 
 test.describe.serial('CategoryProduct Functionality', () => {
   let categoryPath: string;
 
   test.beforeEach(async ({ page }) => {
-    categoryPath = await openFirstCategoryWithProducts(page);
+    // Arrange
+    await page.goto('/');
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
   });
 
-  test('CategoryProduct Display: category page loads successfully', async ({ page }) => {
-    await expect(page.locator('body')).toBeVisible();
-    await expect(page).toHaveURL(new RegExp(`${categoryPath}$`));
+  test('CategoryProduct Display: all category page loads successfully', async ({ page }) => {
+    await page.getByRole('link', { name: '🛒 Virtual Vault' }).click();
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'All Categories' }).click();
+
+    // Assert
+    await expect(page).toHaveURL(/\/categories$/);
+    await expect(page.getByRole('link', { name: 'Electronics' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Book' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Clothing' })).toBeVisible();
   });
 
-  test('CategoryProduct Display: category heading is visible', async ({ page }) => {
-    await expect(page.getByText(/Category - /i)).toBeVisible();
+  test('CategoryProduct Navigation: Navigation from navbar to specific product category', async ({ page }) => {
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'Electronics' }).click();
+    await expect(page.getByRole('heading', { name: 'Category - Electronics' })).toBeVisible()
   });
+
+  test('CategoryProduct Navigation: all category direction to product page', async ({ page }) => {
+    await page.getByRole('link', { name: '🛒 Virtual Vault' }).click();
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'All Categories' }).click();
+    await page.getByRole('main').getByRole('link', { name: 'Electronics' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Category - Electronics' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'More Details' }).first()).toBeEnabled()
+
+  });
+
+  test('CategoryProduct Navigation: navigating from specific category to product detail', async ({ page }) => {
+    await page.getByRole('link', { name: '🛒 Virtual Vault' }).click();
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'All Categories' }).click();
+    await page.getByRole('main').getByRole('link', { name: 'Electronics' }).click();
+
+    await page.getByRole('button', { name: 'More Details' }).first().click()
+
+    await expect(page.getByRole('heading', { name: 'Product Details' })).toBeVisible();
+  });
+
 
   test('CategoryProduct Display: result count is visible', async ({ page }) => {
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'Electronics' }).click();
+
     await expect(page.getByText(/\d+\s+result found/i)).toBeVisible();
   });
 
   test('CategoryProduct Display: product cards are rendered when category has products', async ({ page }) => {
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'Electronics' }).click();
+
     const cards = page.locator('.card');
 
     await expect(cards.first()).toBeVisible();
@@ -54,16 +72,22 @@ test.describe.serial('CategoryProduct Functionality', () => {
   });
 
   test('CategoryProduct Display: each product card shows image, name, description, and price', async ({ page }) => {
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'Electronics' }).click();
+
     const firstCard = page.locator('.card').first();
 
     await expect(firstCard).toBeVisible();
     await expect(firstCard.locator('img')).toBeVisible();
     await expect(firstCard.locator('.card-title').first()).toBeVisible();
-    await expect(firstCard.locator('.card-title').nth(1)).toBeVisible();
-    await expect(firstCard.locator('.card-text')).toBeVisible();
+    await expect(firstCard.locator('.card-text').first()).toBeVisible();
+    await expect(firstCard.getByText(/\$/)).toBeVisible();
   });
 
   test('CategoryProduct Navigation: More Details button is visible for product card', async ({ page }) => {
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'Electronics' }).click();
+
     const moreDetailsButton = page.getByRole('button', { name: 'More Details' }).first();
 
     await expect(moreDetailsButton).toBeVisible();
@@ -71,6 +95,9 @@ test.describe.serial('CategoryProduct Functionality', () => {
   });
 
   test('CategoryProduct Navigation: user can click More Details from category page', async ({ page }) => {
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'Electronics' }).click();
+
     const moreDetailsButton = page.getByRole('button', { name: 'More Details' }).first();
 
     await moreDetailsButton.click();
@@ -79,6 +106,9 @@ test.describe.serial('CategoryProduct Functionality', () => {
   });
 
   test('CategoryProduct Navigation: More Details redirects to product details page', async ({ page }) => {
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'Electronics' }).click();
+
     const firstProductName = await page.locator('.card-title').first().textContent();
 
     await page.getByRole('button', { name: 'More Details' }).first().click();
@@ -94,6 +124,11 @@ test.describe.serial('CategoryProduct Functionality', () => {
   });
 
   test('CategoryProduct Navigation: browser back from product details returns to category page', async ({ page }) => {
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'Electronics' }).click();
+
+    categoryPath = new URL(page.url()).pathname;
+
     await page.getByRole('button', { name: 'More Details' }).first().click();
     await expect(page).toHaveURL(/\/product\//);
 
@@ -104,6 +139,9 @@ test.describe.serial('CategoryProduct Functionality', () => {
   });
 
   test('CategoryProduct Refresh: refreshing category page does not crash the app', async ({ page }) => {
+    await page.getByRole('link', { name: 'Categories' }).click();
+    await page.getByRole('link', { name: 'Electronics' }).click();
+
     await page.reload();
 
     await expect(page.locator('body')).toBeVisible();
@@ -111,6 +149,8 @@ test.describe.serial('CategoryProduct Functionality', () => {
   });
 
   test('CategoryProduct Direct Access: direct access to category route behaves correctly', async ({ page }) => {
+    categoryPath = '/category/electronics';
+
     await page.goto(categoryPath);
 
     await expect(page.locator('body')).toBeVisible();
