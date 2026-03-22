@@ -166,9 +166,13 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
 **Client Related Files**
 
 #### Tan Zhi Heng
-**Server Related Files**
+**Integration Tests**
+1. `helpers/authHelper.int.test.js`: Integrate `authHelper` with `bcrypt`.
+2. `middlewares/authMiddleware.int.test.js`: Integrate `authMiddleware` with `userModel` and `jsonwebtoken`.
+3. `controllers/authController.int.test.js`: Integrate `authController` with `authHelper`, `userModel` and `jsonwebtoken`.
 
-**Client Related Files**
+**UI Tests**
+1. `ui-tests/auth.spec.ts`: UI tests for registration, login and updating user profile.
 
 ---
 

@@ -19,6 +19,7 @@ test.describe.configure({ mode: 'serial' });
 test.beforeAll(deleteTestUser);
 test.afterAll(deleteTestUser);
 
+// Tan Zhi Heng, A0252037M
 test('register and login user', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'Register' }).click();
@@ -50,6 +51,7 @@ test('register and login user', async ({ page }) => {
   await page.getByRole('link', { name: 'Logout' }).click();
 });
 
+// Tan Zhi Heng, A0252037M
 test('login and update username, address and password', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'Login' }).click();
@@ -84,6 +86,7 @@ test('login and update username, address and password', async ({ page }) => {
   await page.getByRole('link', { name: 'Logout' }).click();
 });
 
+// Tan Zhi Heng, A0252037M
 test('login with new password', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'Login' }).click();
