@@ -160,4 +160,22 @@ test.describe("Updating user profile", () => {
         await updateButton.click();
         await expect(page.getByText("Profile Updated Successfully")).toBeVisible();
   });
+
+  // Sebastian Tay, A0252864X
+  test("will not update password when field is cleared after receive unintended input", async ({ page }) => {
+    const passwordInput = page.getByRole('textbox', { name: 'Enter Your New Password' });
+    await passwordInput.click();
+    await passwordInput.fill('passwordToRemove');
+    await passwordInput.click();
+    await passwordInput.fill('');
+
+    
+    await page.getByRole('button', { name: 'UPDATE' }).click();
+    await logOutAsUser(page);
+
+    await logInAsUser(page);
+    await openDashboard(page);
+    await page.getByRole("link", { name: "Profile" }).click();
+    await expect(page.getByRole("button", { name: "CS 4218 Test Account" })).toBeVisible();
+  });
 });
