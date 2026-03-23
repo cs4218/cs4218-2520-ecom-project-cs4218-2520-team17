@@ -17,11 +17,12 @@ const Profile = () => {
 
   //get user data
   useEffect(() => {
-    const { email, name, phone, address } = auth?.user;
-    setName(name);
-    setPhone(phone);
-    setEmail(email);
-    setAddress(address);
+    const user = auth && auth.user ? auth.user : {};
+    const { email, name, phone, address } = user;
+    setName(name || "");
+    setPhone(phone || "");
+    setEmail(email || "");
+    setAddress(address || "");
     setPassword("");
   }, [auth?.user]);
 
