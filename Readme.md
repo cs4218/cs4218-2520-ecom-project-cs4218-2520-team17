@@ -129,10 +129,29 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
 
 #### Li Jiakai
 
-**Server Related Files**
- 
+**Server Related Files (Integration Tests)**
+1. Admin Actions
+   - `controllers/categoryController.js`
+      - createCategoryController
+      - updateCategoryController
+      - deleteCategoryController
+  
+2. Admin View Products
+   - `controllers/productController.js`
+      - createProductController
+      - deleteProductController
+      - updateProductController 
 
-**Client Related Files**
+**UI Tests**
+1. Admin Dashboard - Display and Navigation
+   - `ui-tests\admin-dashboard.spec.ts`
+2. Admin Actions - CRUD Categories
+   - `ui-tests\admin-categories.spec.ts` 
+3. Admin Actions - Orders - Read Orders and Update Order Status
+   - `ui-tests\admin-orders.spec.ts`
+5. Admin Actions - Products - CRUD Products
+   - `ui-tests\admin-products.spec.ts`
+
 
 #### Rayyan Ismail
 **Server Related Files**
