@@ -17,7 +17,7 @@ const Profile = () => {
 
   //get user data
   useEffect(() => {
-    const user = auth && auth.user ? auth.user : {};
+    const user = auth?.user || {};
     const { email, name, phone, address } = user;
     setName(name || "");
     setPhone(phone || "");
