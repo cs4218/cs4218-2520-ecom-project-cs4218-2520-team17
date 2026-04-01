@@ -3,6 +3,7 @@ import { render, fireEvent, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../context/auth';
 import Profile from './Profile';
 
 jest.mock('axios');
@@ -106,6 +107,19 @@ describe('Profile Component', () => {
             expect(getByPlaceholderText('Enter Your Address').value).toBe('123 Main Street');
             expect(getByPlaceholderText('Enter Your New Password').value).toBe('');
         });
+
+        //  Sebastian Tay Yong Xun, A0252864X
+        it('should default form fields to empty strings when auth has no user field', async () => {
+          useAuth.mockImplementationOnce(() => [{ token: 'mockToken' }, mockSetAuth]);
+
+            const { getByPlaceholderText } = await renderAndWaitForLoad();
+
+            expect(getByPlaceholderText('Enter Your Name').value).toBe('');
+            expect(getByPlaceholderText('Enter Your Email').value).toBe('');
+            expect(getByPlaceholderText('Enter Your Phone Number').value).toBe('');
+            expect(getByPlaceholderText('Enter Your Address').value).toBe('');
+            expect(getByPlaceholderText('Enter Your New Password').value).toBe('');
+          });
     });
 
     describe('Form Functionality', () => {
