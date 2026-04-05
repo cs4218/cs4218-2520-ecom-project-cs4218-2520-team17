@@ -63,9 +63,12 @@ fs.mkdirSync(path.dirname(memoryLogFile), { recursive: true });
 
 setInterval(() => {
   const { heapUsed, heapTotal, rss } = process.memoryUsage();
+  const localTimestamp = new Date().toLocaleString("sv-SE", {
+    timeZoneName: "short",
+  });
 
   const line =
-    `[${new Date().toISOString()}] ` +
+    `[${localTimestamp}] ` +
     `heapUsed=${(heapUsed / 1024 / 1024).toFixed(2)}MB ` +
     `heapTotal=${(heapTotal / 1024 / 1024).toFixed(2)}MB ` +
     `rss=${(rss / 1024 / 1024).toFixed(2)}MB\n`;
