@@ -9,6 +9,7 @@ import productRoutes from './routes/productRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -55,3 +56,23 @@ const PORT = process.env.PORT || 6060;
 app.listen(PORT, () => {
     console.log(`Server running on ${process.env.DEV_MODE} mode on ${PORT}`.bgCyan.white);
 });
+
+// Memory usage logging for soak testing
+const memoryLogFile = path.join(__dirname, "logs", "memory-usage.log");
+fs.mkdirSync(path.dirname(memoryLogFile), { recursive: true });
+
+setInterval(() => {
+  const { heapUsed, heapTotal, rss } = process.memoryUsage();
+
+  const line =
+    `[${new Date().toISOString()}] ` +
+    `heapUsed=${(heapUsed / 1024 / 1024).toFixed(2)}MB ` +
+    `heapTotal=${(heapTotal / 1024 / 1024).toFixed(2)}MB ` +
+    `rss=${(rss / 1024 / 1024).toFixed(2)}MB\n`;
+
+  fs.appendFile(memoryLogFile, line, (error) => {
+    if (error) {
+      console.error("Failed to write memory usage log", error);
+    }
+  });
+}, 5000);
