@@ -1,6 +1,6 @@
 import http from "k6/http";
 import { check, sleep } from "k6";
-import { Counter, Rate, Trend } from "k6/metrics";
+import { Rate, Trend } from "k6/metrics";
 
 // Sebastian Tay, A0252864X
 //TODO verify the VU scenarios flow before commencing long soak test - just want to check the calling of API endpoints, no need simulate user interaction flows
@@ -41,7 +41,6 @@ const productDetailResponseDuration = new Trend("product_detail_response_duratio
 const relatedProductResponseDuration = new Trend("related_product_response_duration", true);
 const apiErrorRate = new Rate("product_api_error_rate");
 const successRate = new Rate("product_success_rate");
-const scenarioErrors = new Counter("product_scenario_errors");
 
 function loginAndGetToken(email, password, label) {
   const loginRes = http.post(
@@ -203,7 +202,6 @@ export function browseProducts() {
     if (!listCheck) {
       apiErrorRate.add(1);
       successRate.add(false);
-      scenarioErrors.add(1);
     } else {
       apiErrorRate.add(0);
       successRate.add(true);
@@ -226,7 +224,6 @@ export function browseProducts() {
     if (!countCheck) {
       apiErrorRate.add(1);
       successRate.add(false);
-      scenarioErrors.add(1);
     } else {
       apiErrorRate.add(0);
     }
@@ -267,7 +264,6 @@ export function browseProducts() {
   } catch {
     apiErrorRate.add(1);
     successRate.add(false);
-    scenarioErrors.add(1);
   }
 
   sleep(THINK_TIME);
@@ -296,7 +292,6 @@ export function searchProducts() {
     if (!searchCheck) {
       apiErrorRate.add(1);
       successRate.add(false);
-      scenarioErrors.add(1);
     } else {
       apiErrorRate.add(0);
       successRate.add(true);
@@ -320,14 +315,12 @@ export function searchProducts() {
     if (!listCheck) {
       apiErrorRate.add(1);
       successRate.add(false);
-      scenarioErrors.add(1);
     } else {
       apiErrorRate.add(0);
     }
   } catch {
     apiErrorRate.add(1);
     successRate.add(false);
-    scenarioErrors.add(1);
   }
 
   sleep(THINK_TIME);
@@ -359,7 +352,6 @@ export function filterProducts() {
     if (!filterCheck) {
       apiErrorRate.add(1);
       successRate.add(false);
-      scenarioErrors.add(1);
     } else {
       apiErrorRate.add(0);
       successRate.add(true);
@@ -405,7 +397,6 @@ export function filterProducts() {
   } catch {
     apiErrorRate.add(1);
     successRate.add(false);
-    scenarioErrors.add(1);
   }
 
   sleep(THINK_TIME);

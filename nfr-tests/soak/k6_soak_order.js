@@ -1,6 +1,6 @@
 import http from "k6/http";
 import { check, sleep } from "k6";
-import { Counter, Rate, Trend } from "k6/metrics";
+import { Rate, Trend } from "k6/metrics";
 
 // Sebastian Tay, A0252864X
 //TODO verify the VU scenarios flow before commencing long soak test - just want to check the calling of API endpoints, no need simulate user interaction flows
@@ -30,7 +30,6 @@ const allOrdersResponseDuration = new Trend("all_orders_response_duration", true
 const orderStatusUpdateResponseDuration = new Trend("order_status_update_response_duration", true);
 const apiErrorRate = new Rate("order_api_error_rate");
 const successRate = new Rate("order_success_rate");
-const scenarioErrors = new Counter("order_scenario_errors");
 
 function safeJson(res) {
   try {
@@ -154,7 +153,6 @@ export function getUserOrders(data) {
     if (!checkResult) {
       apiErrorRate.add(1);
       successRate.add(false);
-      scenarioErrors.add(1);
     } else {
       apiErrorRate.add(0);
       successRate.add(true);
@@ -162,7 +160,6 @@ export function getUserOrders(data) {
   } catch {
     apiErrorRate.add(1);
     successRate.add(false);
-    scenarioErrors.add(1);
   }
 
   sleep(THINK_TIME);
@@ -198,7 +195,6 @@ export function adminOrderOperations(data) {
     if (!getAllCheck) {
       apiErrorRate.add(1);
       successRate.add(false);
-      scenarioErrors.add(1);
       sleep(THINK_TIME);
       return;
     }
@@ -231,7 +227,6 @@ export function adminOrderOperations(data) {
       if (!statusCheck) {
         apiErrorRate.add(1);
         successRate.add(false);
-        scenarioErrors.add(1);
       } else {
         apiErrorRate.add(0);
         successRate.add(true);
@@ -243,7 +238,6 @@ export function adminOrderOperations(data) {
   } catch {
     apiErrorRate.add(1);
     successRate.add(false);
-    scenarioErrors.add(1);
   }
 
   sleep(THINK_TIME);
