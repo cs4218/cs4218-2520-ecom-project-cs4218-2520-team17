@@ -3,9 +3,10 @@ import { check, sleep } from "k6";
 import { Counter, Rate, Trend } from "k6/metrics";
 
 // Sebastian Tay, A0252864X
+//TODO verify the VU scenarios flow before commencing long soak test - just want to check the calling of API endpoints, no need simulate user interaction flows
 
 const BASE_URL = "http://localhost:6060";
-const TARGET_VUS = 30;
+const TARGET_VUS = 100;
 // const WARM_UP = "10m";
 // const SOAK_HOLD = "700m";
 // const COOL_DOWN = "10m";
@@ -24,9 +25,20 @@ const SEARCH_KEYWORDS = "phone,laptop,shoe,bag,watch,headphone,camera,tablet"
   .map((k) => k.trim())
   .filter(Boolean);
 
-const browseLatency = new Trend("product_browse_latency", true);
-const searchLatency = new Trend("product_search_latency", true);
-const filterLatency = new Trend("product_filter_latency", true);
+ 
+//Monitored metrics - Throughput, Response Time, HTTP Error Rate
+//TODO might need to refine the metrics collection for response time, throughput
+//Throughput = total successful requests / total duration in seconds
+//Error Rate = % of total failed requests out of total requests
+const productBrowseResponseDuration = new Trend("product_browse_response_duration", true);
+const productCountResponseDuration = new Trend("product_count_response_duration", true);
+const productPhotoResponseDuration = new Trend("product_photo_response_duration", true);
+const productCategoryResponseDuration = new Trend("product_category_response_duration", true);
+const productSearchResponseDuration = new Trend("product_search_response_duration", true);
+const productListResponseDuration = new Trend("product_list_response_duration", true);
+const productFilterResponseDuration = new Trend("product_filter_response_duration", true);
+const productDetailResponseDuration = new Trend("product_detail_response_duration", true);
+const relatedProductResponseDuration = new Trend("related_product_response_duration", true);
 const apiErrorRate = new Rate("product_api_error_rate");
 const successRate = new Rate("product_success_rate");
 const scenarioErrors = new Counter("product_scenario_errors");
@@ -171,13 +183,12 @@ export function setup() {
 }
 
 export function browseProducts() {
-  const start = Date.now();
-
   try {
     // Get all products
     const listRes = http.get(`${BASE_URL}/api/v1/product/get-product`, {
       tags: { endpoint: "product_browse" },
     });
+    productBrowseResponseDuration.add(listRes.timings.duration);
 
     const listBody = safeJson(listRes);
 
@@ -202,6 +213,7 @@ export function browseProducts() {
     const countRes = http.get(`${BASE_URL}/api/v1/product/product-count`, {
       tags: { endpoint: "product_count" },
     });
+    productCountResponseDuration.add(countRes.timings.duration);
 
     const countBody = safeJson(countRes);
 
@@ -229,6 +241,7 @@ export function browseProducts() {
           `${BASE_URL}/api/v1/product/product-photo/${sampledProduct._id}`,
           { tags: { endpoint: "product_photo" } },
         );
+        productPhotoResponseDuration.add(photoRes.timings.duration);
 
         check(photoRes, {
           "browse: product-photo status is 200": (r) => r.status === 200,
@@ -241,6 +254,7 @@ export function browseProducts() {
           `${BASE_URL}/api/v1/product/product-category/${categorySlug}`,
           { tags: { endpoint: "product_category" } },
         );
+        productCategoryResponseDuration.add(categoryRes.timings.duration);
 
         const categoryBody = safeJson(categoryRes);
         check(categoryRes, {
@@ -254,15 +268,12 @@ export function browseProducts() {
     apiErrorRate.add(1);
     successRate.add(false);
     scenarioErrors.add(1);
-  } finally {
-    browseLatency.add(Date.now() - start);
   }
 
   sleep(THINK_TIME);
 }
 
 export function searchProducts() {
-  const start = Date.now();
   const keyword = randomItem(SEARCH_KEYWORDS);
 
   try {
@@ -273,6 +284,7 @@ export function searchProducts() {
         tags: { endpoint: "product_search" },
       },
     );
+    productSearchResponseDuration.add(searchRes.timings.duration);
 
     const searchBody = safeJson(searchRes);
 
@@ -295,6 +307,7 @@ export function searchProducts() {
     const listRes = http.get(`${BASE_URL}/api/v1/product/product-list/${page}`, {
       tags: { endpoint: "product_list" },
     });
+    productListResponseDuration.add(listRes.timings.duration);
 
     const listBody = safeJson(listRes);
 
@@ -315,16 +328,12 @@ export function searchProducts() {
     apiErrorRate.add(1);
     successRate.add(false);
     scenarioErrors.add(1);
-  } finally {
-    searchLatency.add(Date.now() - start);
   }
 
   sleep(THINK_TIME);
 }
 
 export function filterProducts() {
-  const start = Date.now();
-
   try {
     // Filter products by price or category
     const filterRes = http.post(
@@ -338,6 +347,7 @@ export function filterProducts() {
         tags: { endpoint: "product_filter" },
       },
     );
+    productFilterResponseDuration.add(filterRes.timings.duration);
 
     const filterBody = safeJson(filterRes);
 
@@ -363,6 +373,7 @@ export function filterProducts() {
       const singleRes = http.get(
         `${BASE_URL}/api/v1/product/get-product/${slug}`,
       );
+      productDetailResponseDuration.add(singleRes.timings.duration);
 
       const singleBody = safeJson(singleRes);
 
@@ -382,6 +393,7 @@ export function filterProducts() {
           `${BASE_URL}/api/v1/product/related-product/${productId}/${categoryId}`,
           { tags: { endpoint: "related_product" } },
         );
+        relatedProductResponseDuration.add(relatedRes.timings.duration);
 
         const relatedBody = safeJson(relatedRes);
         check(relatedRes, {
@@ -394,8 +406,6 @@ export function filterProducts() {
     apiErrorRate.add(1);
     successRate.add(false);
     scenarioErrors.add(1);
-  } finally {
-    filterLatency.add(Date.now() - start);
   }
 
   sleep(THINK_TIME);

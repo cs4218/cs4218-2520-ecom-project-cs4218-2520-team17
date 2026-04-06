@@ -3,9 +3,10 @@ import { check, sleep } from "k6";
 import { Counter, Rate, Trend } from "k6/metrics";
 
 // Sebastian Tay, A0252864X
+//TODO verify the VU scenarios flow before commencing long soak test - just want to check the calling of API endpoints, no need simulate user interaction flows
 
 const BASE_URL = "http://localhost:6060";
-const TARGET_VUS = 30;
+const TARGET_VUS = 100;
 const WARM_UP = "10m";
 const SOAK_HOLD = "700m";
 const COOL_DOWN = "10m";
@@ -20,8 +21,13 @@ const USER_PASSWORD = "cs4218@test.com";
 const ADMIN_EMAIL = "test@admin.com";
 const ADMIN_PASSWORD = "test@admin.com";
 
-const userOrdersLatency = new Trend("user_orders_latency", true);
-const orderStatusLatency = new Trend("order_status_latency", true);
+//Monitored metrics - Throughput, Response Time, HTTP Error Rate
+//TODO might need to refine the metrics collection for response time, throughput
+//Throughput = total successful requests / total duration in seconds
+//Error Rate = % of total failed requests out of total requests
+const userOrdersResponseDuration = new Trend("user_orders_response_duration", true);
+const allOrdersResponseDuration = new Trend("all_orders_response_duration", true);
+const orderStatusUpdateResponseDuration = new Trend("order_status_update_response_duration", true);
 const apiErrorRate = new Rate("order_api_error_rate");
 const successRate = new Rate("order_success_rate");
 const scenarioErrors = new Counter("order_scenario_errors");
@@ -127,13 +133,12 @@ export function getUserOrders(data) {
     return;
   }
 
-  const start = Date.now();
-
   try {
     const ordersRes = http.get(`${BASE_URL}/api/v1/order/orders`, {
       headers: jsonHeaders(userToken),
       tags: { endpoint: "user_orders" },
     });
+    userOrdersResponseDuration.add(ordersRes.timings.duration);
 
     const ordersBody = safeJson(ordersRes);
 
@@ -158,8 +163,6 @@ export function getUserOrders(data) {
     apiErrorRate.add(1);
     successRate.add(false);
     scenarioErrors.add(1);
-  } finally {
-    userOrdersLatency.add(Date.now() - start);
   }
 
   sleep(THINK_TIME);
@@ -173,14 +176,13 @@ export function adminOrderOperations(data) {
     return;
   }
 
-  const start = Date.now();
-
   try {
     // Get all orders first
     const allOrdersRes = http.get(`${BASE_URL}/api/v1/order/all-orders`, {
       headers: jsonHeaders(adminToken),
       tags: { endpoint: "all_orders" },
     });
+    allOrdersResponseDuration.add(allOrdersRes.timings.duration);
 
     const allOrdersBody = safeJson(allOrdersRes);
 
@@ -217,6 +219,7 @@ export function adminOrderOperations(data) {
           tags: { endpoint: "order_status" },
         },
       );
+      orderStatusUpdateResponseDuration.add(statusRes.timings.duration);
 
       const statusBody = safeJson(statusRes);
 
@@ -241,8 +244,6 @@ export function adminOrderOperations(data) {
     apiErrorRate.add(1);
     successRate.add(false);
     scenarioErrors.add(1);
-  } finally {
-    orderStatusLatency.add(Date.now() - start);
   }
 
   sleep(THINK_TIME);
