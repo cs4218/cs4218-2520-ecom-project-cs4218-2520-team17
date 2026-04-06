@@ -24,12 +24,12 @@ const ADMIN_PASSWORD = "test@admin.com";
 //Monitored metrics - Throughput, Response Time, HTTP Error Rate
 //TODO might need to refine the metrics collection for response time, throughput
 //Throughput = total successful requests / total duration in seconds
-//Error Rate = % of total failed requests out of total requests
 const userOrdersResponseDuration = new Trend("user_orders_response_duration", true);
 const allOrdersResponseDuration = new Trend("all_orders_response_duration", true);
 const orderStatusUpdateResponseDuration = new Trend("order_status_update_response_duration", true);
-const apiErrorRate = new Rate("order_api_error_rate");
-const successRate = new Rate("order_success_rate");
+const userOrdersApiErrorRate = new Rate("user_orders_api_error_rate");
+const allOrdersApiErrorRate = new Rate("all_orders_api_error_rate");
+const orderStatusUpdateApiErrorRate = new Rate("order_status_update_api_error_rate");
 
 function safeJson(res) {
   try {
@@ -107,7 +107,9 @@ export const options = {
     "http_req_duration{endpoint:all_orders}": ["p(95)<1200", "p(99)<2000"],
     "http_req_failed{endpoint:order_status}": ["rate<0.10"],
     "http_req_duration{endpoint:order_status}": ["p(95)<1000", "p(99)<1800"],
-    order_success_rate: ["rate>0.85"],
+    user_orders_api_error_rate: ["rate<0.01"],
+    all_orders_api_error_rate: ["rate<0.10"],
+    order_status_update_api_error_rate: ["rate<0.10"],
     order_scenario_errors: ["count<150"],
   },
   summaryTrendStats: ["avg", "min", "med", "p(90)", "p(95)", "p(99)", "max"],
@@ -151,15 +153,12 @@ export function getUserOrders(data) {
     });
 
     if (!checkResult) {
-      apiErrorRate.add(1);
-      successRate.add(false);
+      userOrdersApiErrorRate.add(1);
     } else {
-      apiErrorRate.add(0);
-      successRate.add(true);
+      userOrdersApiErrorRate.add(0);
     }
   } catch {
-    apiErrorRate.add(1);
-    successRate.add(false);
+    userOrdersApiErrorRate.add(1);
   }
 
   sleep(THINK_TIME);
@@ -193,11 +192,11 @@ export function adminOrderOperations(data) {
     });
 
     if (!getAllCheck) {
-      apiErrorRate.add(1);
-      successRate.add(false);
+      allOrdersApiErrorRate.add(1);
       sleep(THINK_TIME);
       return;
     }
+    allOrdersApiErrorRate.add(0);
 
     // Optionally update order status (if we have a valid order ID)
     const orders = Array.isArray(allOrdersBody) ? allOrdersBody : (allOrdersBody?.orders || []);
@@ -225,19 +224,15 @@ export function adminOrderOperations(data) {
       });
 
       if (!statusCheck) {
-        apiErrorRate.add(1);
-        successRate.add(false);
+        orderStatusUpdateApiErrorRate.add(1);
       } else {
-        apiErrorRate.add(0);
-        successRate.add(true);
+        orderStatusUpdateApiErrorRate.add(0);
       }
     } else {
-      apiErrorRate.add(0);
-      successRate.add(true);
+      orderStatusUpdateApiErrorRate.add(0);
     }
   } catch {
-    apiErrorRate.add(1);
-    successRate.add(false);
+    allOrdersApiErrorRate.add(1);
   }
 
   sleep(THINK_TIME);

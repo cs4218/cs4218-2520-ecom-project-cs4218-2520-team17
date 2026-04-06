@@ -29,7 +29,6 @@ const SEARCH_KEYWORDS = "phone,laptop,shoe,bag,watch,headphone,camera,tablet"
 //Monitored metrics - Throughput, Response Time, HTTP Error Rate
 //TODO might need to refine the metrics collection for response time, throughput
 //Throughput = total successful requests / total duration in seconds
-//Error Rate = % of total failed requests out of total requests
 const productBrowseResponseDuration = new Trend("product_browse_response_duration", true);
 const productCountResponseDuration = new Trend("product_count_response_duration", true);
 const productPhotoResponseDuration = new Trend("product_photo_response_duration", true);
@@ -39,8 +38,15 @@ const productListResponseDuration = new Trend("product_list_response_duration", 
 const productFilterResponseDuration = new Trend("product_filter_response_duration", true);
 const productDetailResponseDuration = new Trend("product_detail_response_duration", true);
 const relatedProductResponseDuration = new Trend("related_product_response_duration", true);
-const apiErrorRate = new Rate("product_api_error_rate");
-const successRate = new Rate("product_success_rate");
+const productBrowseApiErrorRate = new Rate("product_browse_api_error_rate");
+const productCountApiErrorRate = new Rate("product_count_api_error_rate");
+const productPhotoApiErrorRate = new Rate("product_photo_api_error_rate");
+const productCategoryApiErrorRate = new Rate("product_category_api_error_rate");
+const productSearchApiErrorRate = new Rate("product_search_api_error_rate");
+const productListApiErrorRate = new Rate("product_list_api_error_rate");
+const productFilterApiErrorRate = new Rate("product_filter_api_error_rate");
+const productDetailApiErrorRate = new Rate("product_detail_api_error_rate");
+const relatedProductApiErrorRate = new Rate("related_product_api_error_rate");
 
 function loginAndGetToken(email, password, label) {
   const loginRes = http.post(
@@ -164,7 +170,15 @@ export const options = {
     "http_req_duration{endpoint:product_category}": ["p(95)<1000", "p(99)<1800"],
     "http_req_failed{endpoint:related_product}": ["rate<0.10"],
     "http_req_duration{endpoint:related_product}": ["p(95)<1000", "p(99)<1800"],
-    product_success_rate: ["rate>0.90"],
+    product_browse_api_error_rate: ["rate<0.01"],
+    product_count_api_error_rate: ["rate<0.01"],
+    product_photo_api_error_rate: ["rate<0.10"],
+    product_category_api_error_rate: ["rate<0.10"],
+    product_search_api_error_rate: ["rate<0.05"],
+    product_list_api_error_rate: ["rate<0.01"],
+    product_filter_api_error_rate: ["rate<0.05"],
+    product_detail_api_error_rate: ["rate<0.05"],
+    related_product_api_error_rate: ["rate<0.10"],
     product_scenario_errors: ["count<100"],
   },
   summaryTrendStats: ["avg", "min", "med", "p(90)", "p(95)", "p(99)", "max"],
@@ -200,11 +214,9 @@ export function browseProducts() {
     });
 
     if (!listCheck) {
-      apiErrorRate.add(1);
-      successRate.add(false);
+      productBrowseApiErrorRate.add(1);
     } else {
-      apiErrorRate.add(0);
-      successRate.add(true);
+      productBrowseApiErrorRate.add(0);
     }
 
     // Get product count
@@ -222,10 +234,9 @@ export function browseProducts() {
     });
 
     if (!countCheck) {
-      apiErrorRate.add(1);
-      successRate.add(false);
+      productCountApiErrorRate.add(1);
     } else {
-      apiErrorRate.add(0);
+      productCountApiErrorRate.add(0);
     }
 
     // Cover category and photo endpoints with a sampled product.
@@ -239,10 +250,15 @@ export function browseProducts() {
           { tags: { endpoint: "product_photo" } },
         );
         productPhotoResponseDuration.add(photoRes.timings.duration);
-
-        check(photoRes, {
+        const photoCheck = check(photoRes, {
           "browse: product-photo status is 200": (r) => r.status === 200,
         });
+
+        if (!photoCheck) {
+          productPhotoApiErrorRate.add(1);
+        } else {
+          productPhotoApiErrorRate.add(0);
+        }
       }
 
       const categorySlug = extractCategorySlug(sampledProduct);
@@ -254,16 +270,24 @@ export function browseProducts() {
         productCategoryResponseDuration.add(categoryRes.timings.duration);
 
         const categoryBody = safeJson(categoryRes);
-        check(categoryRes, {
+        const categoryCheck = check(categoryRes, {
           "browse: product-category status is 200": (r) => r.status === 200,
           "browse: product-category has products": () =>
             Boolean(categoryBody && Array.isArray(categoryBody.products)),
         });
+
+        if (!categoryCheck) {
+          productCategoryApiErrorRate.add(1);
+        } else {
+          productCategoryApiErrorRate.add(0);
+        }
       }
     }
   } catch {
-    apiErrorRate.add(1);
-    successRate.add(false);
+    productBrowseApiErrorRate.add(1);
+    productCountApiErrorRate.add(1);
+    productPhotoApiErrorRate.add(1);
+    productCategoryApiErrorRate.add(1);
   }
 
   sleep(THINK_TIME);
@@ -290,11 +314,9 @@ export function searchProducts() {
     });
 
     if (!searchCheck) {
-      apiErrorRate.add(1);
-      successRate.add(false);
+      productSearchApiErrorRate.add(1);
     } else {
-      apiErrorRate.add(0);
-      successRate.add(true);
+      productSearchApiErrorRate.add(0);
     }
 
     // Get paginated list
@@ -313,14 +335,13 @@ export function searchProducts() {
     });
 
     if (!listCheck) {
-      apiErrorRate.add(1);
-      successRate.add(false);
+      productListApiErrorRate.add(1);
     } else {
-      apiErrorRate.add(0);
+      productListApiErrorRate.add(0);
     }
   } catch {
-    apiErrorRate.add(1);
-    successRate.add(false);
+    productSearchApiErrorRate.add(1);
+    productListApiErrorRate.add(1);
   }
 
   sleep(THINK_TIME);
@@ -350,11 +371,9 @@ export function filterProducts() {
     });
 
     if (!filterCheck) {
-      apiErrorRate.add(1);
-      successRate.add(false);
+      productFilterApiErrorRate.add(1);
     } else {
-      apiErrorRate.add(0);
-      successRate.add(true);
+      productFilterApiErrorRate.add(0);
     }
 
     // Get a single product if available
@@ -369,11 +388,17 @@ export function filterProducts() {
 
       const singleBody = safeJson(singleRes);
 
-      check(singleRes, {
+      const singleCheck = check(singleRes, {
         "filter: single product status is 200": (r) => r.status === 200,
         "filter: single product has data": () =>
           Boolean(singleBody && (singleBody.product || singleBody)),
       });
+
+      if (!singleCheck) {
+        productDetailApiErrorRate.add(1);
+      } else {
+        productDetailApiErrorRate.add(0);
+      }
 
       // Cover related-products endpoint from a selected product detail.
       const singleProduct = singleBody?.product || singleBody;
@@ -388,15 +413,22 @@ export function filterProducts() {
         relatedProductResponseDuration.add(relatedRes.timings.duration);
 
         const relatedBody = safeJson(relatedRes);
-        check(relatedRes, {
+        const relatedCheck = check(relatedRes, {
           "filter: related-product status is 200": (r) => r.status === 200,
           "filter: related-product returns array": () => Array.isArray(relatedBody),
         });
+
+        if (!relatedCheck) {
+          relatedProductApiErrorRate.add(1);
+        } else {
+          relatedProductApiErrorRate.add(0);
+        }
       }
     }
   } catch {
-    apiErrorRate.add(1);
-    successRate.add(false);
+    productFilterApiErrorRate.add(1);
+    productDetailApiErrorRate.add(1);
+    relatedProductApiErrorRate.add(1);
   }
 
   sleep(THINK_TIME);
