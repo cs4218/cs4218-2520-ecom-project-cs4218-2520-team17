@@ -56,7 +56,7 @@ function maybeCategory(categories) {
   const maxSelection = Math.min(3, categories.length);
   const selectionCount = randomInt(maxSelection) + 1;
   const selectedIds = new Set();
-  
+
   // Choose 1–3 unique category IDs
   while (selectedIds.size < selectionCount) {
     const category = categories[randomInt(categories.length)];

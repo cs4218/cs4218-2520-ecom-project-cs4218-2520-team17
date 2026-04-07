@@ -35,7 +35,7 @@ function testPassword() {
 }
 
 export default function registerCapacityTest() {
-const url = `${BASE_URL}${REGISTER_PATH}`;
+  const url = `${BASE_URL}${REGISTER_PATH}`;
   const payload = {
     name: `k6-user-${__VU}-${__ITER}`,
     email: uniqueEmail(),
