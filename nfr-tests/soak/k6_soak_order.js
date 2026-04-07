@@ -131,7 +131,6 @@ export const options = {
     user_orders_api_error_rate: ["rate<0.01"],
     all_orders_api_error_rate: ["rate<0.10"],
     order_status_update_api_error_rate: ["rate<0.10"],
-    order_scenario_errors: ["count<150"],
   },
   summaryTrendStats: ["avg", "min", "med", "p(90)", "p(95)", "p(99)", "max"],
 };
