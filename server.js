@@ -56,4 +56,7 @@ const server = app.listen(PORT, () => {
     console.log(`[${process.env.NODE_ENV}] Server running on ${process.env.DEV_MODE} mode on ${PORT}`.bgCyan.white);
 });
 
-server.timeout = 3 * 60 * 1000; // 3 minutes
+const serverTimeoutMs = Number(process.env.SERVER_TIMEOUT_MS);
+if (Number.isFinite(serverTimeoutMs) && serverTimeoutMs > 0) {
+    server.timeout = serverTimeoutMs;
+}

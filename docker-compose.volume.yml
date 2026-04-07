@@ -15,14 +15,6 @@ services:
       - mongo_volume_data:/data/db
     cpus: 2.0
     mem_limit: 4g
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-          memory: 4G
-        reservations:
-          cpus: "1.0"
-          memory: 1G
     command: >
       mongod
       --wiredTigerCacheSizeGB 3
