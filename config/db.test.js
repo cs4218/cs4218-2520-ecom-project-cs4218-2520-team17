@@ -21,10 +21,17 @@ jest.mock('colors', () => {
     return {};
 });
 
+const options = {
+  maxPoolSize: 200,
+  minPoolSize: 10,
+  socketTimeoutMS: 0, // never time out sockets
+  family: 4, // Use IPv4
+};
+
 describe('Connect to mongoose db', () => {
     let consoleLogSpy;
     let consoleErrorSpy;
-    
+
     beforeEach(() => {
         consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
         consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -42,17 +49,17 @@ describe('Connect to mongoose db', () => {
                 host: 'testhost:27017'
             }
         };
-        
+
         beforeEach(() => {
             mongoose.connect.mockResolvedValue(mockConnection);
         });
 
         it('should connect to MongoDB using the MONGO_URL environment variable', async () => {
             process.env.MONGO_URL = `mongodb://${mockConnection.connection.host}/testdb`;
-            
+
             await connectDB();
 
-            expect(mongoose.connect).toHaveBeenCalledWith(`mongodb://${mockConnection.connection.host}/testdb`);
+            expect(mongoose.connect).toHaveBeenCalledWith(`mongodb://${mockConnection.connection.host}/testdb`, options);
         });
 
         it('should log success message with connection host', async () => {
@@ -99,4 +106,3 @@ describe('Connect to mongoose db', () => {
         });
     });
 });
-

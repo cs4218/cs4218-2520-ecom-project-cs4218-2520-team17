@@ -1,0 +1,30 @@
+# Li Jiakai, A0252287Y
+# Docker Compose configuration for MongoDB for volume testing.
+services:
+  mongo-volume:
+    image: mongo:8.2.6-noble
+    container_name: ecom-mongo-volume
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_DATABASE: ecom_volume
+    volumes:
+      - mongo_volume_data:/data/db
+    cpus: 2.0
+    mem_limit: 4g
+    command: >
+      mongod
+      --wiredTigerCacheSizeGB 3
+      --maxConns 1000
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "mongodb://root:rootpassword@localhost:27017/admin", "--eval", "db.adminCommand({ ping: 1 }).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  mongo_volume_data:

@@ -19,7 +19,13 @@
     "pw": "playwright test",
     "pw:ui": "playwright test --ui",
     "pw:report": "playwright show-report",
-    "pw:codegen": "playwright codegen localhost:6060"
+    "pw:codegen": "playwright codegen localhost:6060",
+
+    "volume:mongo:up": "docker compose -f docker-compose.volume.yml up -d",
+    "volume:mongo:down": "docker compose -f docker-compose.volume.yml down",
+    "volume:seed": "node ./scripts/seed-volume-data.js",
+    "volume:validate": "node ./scripts/validate-volume-data.js",
+    "volume:run": "node ./scripts/run-volume-test.js"
   },
   "keywords": [],
   "author": "RP",
