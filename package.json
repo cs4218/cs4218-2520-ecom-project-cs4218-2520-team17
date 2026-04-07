@@ -19,7 +19,12 @@
     "pw": "playwright test",
     "pw:ui": "playwright test --ui",
     "pw:report": "playwright show-report",
-    "pw:codegen": "playwright codegen localhost:6060"
+    "pw:codegen": "playwright codegen localhost:6060",
+    "k6:register:capacity": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=k6/reports/capacity-test/register-report.html k6 run k6/scenarios/register-capacity.js",
+    "k6:login:capacity": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=k6/reports/capacity-test/login-report.html k6 run k6/scenarios/login-capacity.js",
+    "k6:product:browse:capacity": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=k6/reports/capacity-test/product-browse-report.html k6 run k6/scenarios/product-browse-capacity.js",
+    "k6:product:filter:capacity": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=k6/reports/capacity-test/product-filter-report.html k6 run k6/scenarios/product-filter-capacity.js",
+    "k6:register:cleanup": "node k6/utils/cleanup-k6-users.mjs"
   },
   "keywords": [],
   "author": "RP",
