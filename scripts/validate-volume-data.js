@@ -1,3 +1,5 @@
+// Li Jiakai, A0252287Y
+
 import process from "node:process";
 import mongoose from "mongoose";
 import categoryModel from "../models/categoryModel.js";

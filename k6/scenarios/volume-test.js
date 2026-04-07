@@ -1,3 +1,5 @@
+// Li Jiakai, A0252287Y
+
 import { sleep } from "k6";
 import { Counter, Gauge, Trend } from "k6/metrics";
 import { buildSeededAdminEmail, buildSeededUserEmail, randomInt, randomPick, shuffleCopy, toBooleanEnv, uniqueName } from "../utils/common.js";
