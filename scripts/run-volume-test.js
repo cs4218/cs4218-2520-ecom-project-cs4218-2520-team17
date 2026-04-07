@@ -41,6 +41,7 @@ const config = {
   maxProductQty: process.env.VOLUME_MAX_PRODUCT_QTY || "10",
   keepMongo: (process.env.VOLUME_KEEP_MONGO || "true").toLowerCase() === "true",
   keepK6: (process.env.VOLUME_KEEP_K6 || "true").toLowerCase() === "true",
+  shouldStartBackend: (process.env.VOLUME_START_BACKEND || "false").toLowerCase() === "true",
 };
 
 function commandDisplay(command, args) {
@@ -249,17 +250,23 @@ async function main() {
     await runCommand(process.execPath, [validateScript], { env: seededEnv });
 
     console.log("[volume] waiting for backend to be ready");
-    // backendProcess = spawn(npmCommand, ["run", "start"], {
-    //   cwd: workspaceRoot,
-    //   env: {
-    //     ...process.env,
-    //     MONGO_URL: config.mongoUrl,
-    //     NODE_ENV: "production",
-    //     PORT: "6060",
-    //   },
-    //   shell: false,
-    //   stdio: "inherit",
-    // });
+    if (config.shouldStartBackend) {
+      backendProcess = spawn(npmCommand, ["run", "start"], {
+        cwd: workspaceRoot,
+        env: {
+          ...process.env,
+          MONGO_URL: config.mongoUrl,
+          NODE_ENV: "production",
+          DEV_MODE: "volume-production",
+          PORT: "6060",
+          SERVER_TIMEOUT_MS: "300000", // 5 minutes
+        },
+        shell: false,
+        stdio: "inherit",
+      });
+    } else {
+      console.log("[volume] assuming backend is managed externally; set VOLUME_START_BACKEND=true to start it from this script");
+    }
 
     await waitForApi("http://localhost:6060/api/v1/category/get-category");
 
