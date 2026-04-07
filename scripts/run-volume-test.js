@@ -19,7 +19,7 @@ const config = {
   mongoUrl:
     process.env.MONGO_URL ||
     "mongodb://root:rootpassword@localhost:27017/ecom_volume?authSource=admin",
-  baseUrl: process.env.BASE_URL || "http://host.docker.internal:6060",
+  baseUrl: process.env.BASE_URL || "http://localhost:6060", // use host.docker.internal for docker mode if connecting to host's backend
   userVus: process.env.USER_VUS || "100",
   dataGrowthVus: process.env.DATA_GROWTH_VUS || "4",
   rampUp: process.env.RAMP_UP || "5m",
@@ -36,12 +36,13 @@ const config = {
   k6DashboardHost: process.env.K6_WEB_DASHBOARD_HOST || "0.0.0.0",
   k6DashboardPort: process.env.K6_WEB_DASHBOARD_PORT || "5665",
   k6DashboardPeriod: process.env.K6_WEB_DASHBOARD_PERIOD || "2s",
-  k6DashboardExport: process.env.K6_WEB_DASHBOARD_EXPORT || "/work/k6/reports/html-report.html",
+  k6DashboardExport: process.env.K6_WEB_DASHBOARD_EXPORT || "k6/reports/html-report.html", // if docker mode need to add "/work/" prefix
   maxDistinctProducts: process.env.VOLUME_MAX_DISTINCT_PRODUCTS || "20",
   maxProductQty: process.env.VOLUME_MAX_PRODUCT_QTY || "10",
   keepMongo: (process.env.VOLUME_KEEP_MONGO || "true").toLowerCase() === "true",
   keepK6: (process.env.VOLUME_KEEP_K6 || "true").toLowerCase() === "true",
   shouldStartBackend: (process.env.VOLUME_START_BACKEND || "false").toLowerCase() === "true",
+  k6RunType: process.env.K6_RUN_TYPE || "windows", // or "docker"
 };
 
 function commandDisplay(command, args) {
@@ -274,6 +275,55 @@ async function main() {
     stopMongoMonitor = startMongoMonitor("ecom-mongo-volume", mongoStatsPath, 5000);
 
     console.log("[volume] running k6 volume test with dual scenarios");
+
+    if (config.k6RunType === "windows") {
+      console.log("[volume] running k6 directly (windows mode)");
+
+      const k6Args = ["run"];
+
+      // Set environment variables for Windows
+      const env = {
+        ...process.env,
+        BASE_URL: config.baseUrl,
+        USER_VUS: config.userVus,
+        DATA_GROWTH_VUS: config.dataGrowthVus,
+        RAMP_UP: config.rampUp,
+        STEADY_DURATION: config.steadyDuration,
+        RAMP_DOWN: config.rampDown,
+        DATA_GROWTH_DURATION: config.dataGrowthDuration,
+        VOLUME_SEED_USERS: config.seedUsers,
+        VOLUME_MAX_DISTINCT_PRODUCTS: config.maxDistinctProducts,
+        VOLUME_MAX_PRODUCT_QTY: config.maxProductQty,
+        VOLUME_TEST_PASSWORD: process.env.VOLUME_TEST_PASSWORD || "VolumeTest!123",
+        INCLUDE_PAYMENT: config.includePayment,
+        K6_WEB_DASHBOARD: String(config.enableK6Dashboard),
+        K6_WEB_DASHBOARD_HOST: config.k6DashboardHost,
+        K6_WEB_DASHBOARD_PORT: config.k6DashboardPort,
+        K6_WEB_DASHBOARD_PERIOD: config.k6DashboardPeriod,
+        K6_WEB_DASHBOARD_EXPORT: path.join(workspaceRoot, "k6/reports/html-report.html")
+      };
+
+      if (config.enableK6Dashboard) {
+        console.log(
+          `[volume] k6 dashboard expected at http://localhost:${config.k6DashboardPort}`
+        );
+        console.log(
+          `[volume] HTML report will be exported to: ${env.K6_WEB_DASHBOARD_EXPORT}`
+        );
+      }
+
+      k6Args.push(
+        path.join(workspaceRoot, "k6/scenarios/volume-test.js"),
+        `--summary-export=${path.join(workspaceRoot, "k6/reports/k6-summary.json")}`,
+        "--out",
+        `json=${path.join(workspaceRoot, "k6/reports/k6-results.json")}`
+      );
+
+      await runCommand("k6", k6Args, { env });
+
+    } else {
+      console.log("[volume] running k6 in Docker (docker mode)");
+
     const dockerArgs = ["run"];
     if (!config.keepK6) {
       dockerArgs.push("--rm");
@@ -343,6 +393,7 @@ async function main() {
     );
 
     await runCommand("docker", dockerArgs);
+  }
 
     if (stopMongoMonitor) {
       await stopMongoMonitor();

@@ -19,11 +19,12 @@ Playwright codegen (localhost:6060):
 
 ## Volume Testing
 
+0. Install k6 on windows using msi installer.
 1. Build frontend using `npm run build:client`
 2. Configure env with:
 
     ```env
-    MONGO_URL=mongodb://root:rootpassword@localhost:27017/ecom_volume?authSource=admin`
+    MONGO_URL=mongodb://root:rootpassword@localhost:27017/ecom_volume?authSource=admin
     SERVER_TIMEOUT_MS=300000
     NODE_ENV=production
     DEV_MODE=production
