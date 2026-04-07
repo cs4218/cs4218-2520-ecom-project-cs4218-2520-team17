@@ -52,6 +52,11 @@ if (process.env.NODE_ENV === 'production') {
 
 const PORT = process.env.PORT || 6060;
 
-app.listen(PORT, () => {
-    console.log(`Server running on ${process.env.DEV_MODE} mode on ${PORT}`.bgCyan.white);
+const server = app.listen(PORT, () => {
+    console.log(`[${process.env.NODE_ENV}] Server running on ${process.env.DEV_MODE} mode on ${PORT}`.bgCyan.white);
 });
+
+const serverTimeoutMs = Number(process.env.SERVER_TIMEOUT_MS);
+if (Number.isFinite(serverTimeoutMs) && serverTimeoutMs > 0) {
+    server.timeout = serverTimeoutMs;
+}
