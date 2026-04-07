@@ -20,7 +20,15 @@ Playwright codegen (localhost:6060):
 ## Volume Testing
 
 1. Build frontend using `npm run build:client`
-2. Configure env with: `MONGO_URL = mongodb://root:rootpassword@localhost:27017/ecom_volume?authSource=admin`
+2. Configure env with:
+
+    ```env
+    MONGO_URL=mongodb://root:rootpassword@localhost:27017/ecom_volume?authSource=admin`
+    SERVER_TIMEOUT_MS=300000
+    NODE_ENV=production
+    DEV_MODE=production
+    ```
+
 3. Start the application with: `npm run start`
 4. Run full automated volume test pipeline: `npm run volume:run`
 5. HTML export available in `k6/reports`
