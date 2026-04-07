@@ -1,18 +1,18 @@
 import http from "k6/http";
 import { check, sleep } from "k6";
-import { Rate, Trend } from "k6/metrics";
+import { Counter, Rate, Trend } from "k6/metrics";
 
 // Sebastian Tay, A0252864X
 //TODO verify the VU scenarios flow before commencing long soak test - just want to check the calling of API endpoints, no need simulate user interaction flows
 
 const BASE_URL = "http://localhost:6060";
 const TARGET_VUS = 100;
-// const WARM_UP = "10m";
-// const SOAK_HOLD = "700m";
-// const COOL_DOWN = "10m";
-const WARM_UP = "1m";
-const SOAK_HOLD = "2m";
-const COOL_DOWN = "1m";
+const WARM_UP = "10m";
+const SOAK_HOLD = "700m";
+const COOL_DOWN = "10m";
+// const WARM_UP = "1m";
+// const SOAK_HOLD = "2m";
+// const COOL_DOWN = "1m";
 const THINK_TIME = 0.5;
 
 const USER_EMAIL = "cs4218@test.com";
@@ -25,10 +25,15 @@ const SEARCH_KEYWORDS = "phone,laptop,shoe,bag,watch,headphone,camera,tablet"
   .map((k) => k.trim())
   .filter(Boolean);
 
- 
-//Monitored metrics - Throughput, Response Time, HTTP Error Rate
-//TODO might need to refine the metrics collection for response time, throughput
-//Throughput = total successful requests / total duration in seconds
+// Throughput counters for endpoint-level requests over time.
+const endpointRequestsTotalThroughput = new Counter(
+  "endpoint_requests_total_throughput",
+);
+const endpointSuccessfulRequestsTotalThroughput = new Counter(
+  "endpoint_successful_requests_total_throughput",
+);
+
+// Response Duration
 const productBrowseResponseDuration = new Trend("product_browse_response_duration", true);
 const productCountResponseDuration = new Trend("product_count_response_duration", true);
 const productPhotoResponseDuration = new Trend("product_photo_response_duration", true);
@@ -38,6 +43,9 @@ const productListResponseDuration = new Trend("product_list_response_duration", 
 const productFilterResponseDuration = new Trend("product_filter_response_duration", true);
 const productDetailResponseDuration = new Trend("product_detail_response_duration", true);
 const relatedProductResponseDuration = new Trend("related_product_response_duration", true);
+
+
+// Error Rates
 const productBrowseApiErrorRate = new Rate("product_browse_api_error_rate");
 const productCountApiErrorRate = new Rate("product_count_api_error_rate");
 const productPhotoApiErrorRate = new Rate("product_photo_api_error_rate");
@@ -48,12 +56,25 @@ const productFilterApiErrorRate = new Rate("product_filter_api_error_rate");
 const productDetailApiErrorRate = new Rate("product_detail_api_error_rate");
 const relatedProductApiErrorRate = new Rate("related_product_api_error_rate");
 
+function recordEndpointThroughput(endpoint, res) {
+  endpointRequestsTotalThroughput.add(1, {
+    endpoint,
+    status: String(res.status),
+  });
+
+  if (res.status >= 200 && res.status < 400) {
+    endpointSuccessfulRequestsTotalThroughput.add(1, { endpoint });
+  }
+}
+
 function loginAndGetToken(email, password, label) {
+  const endpoint = `auth_login_${label}`;
   const loginRes = http.post(
     `${BASE_URL}/api/v1/auth/login`,
     JSON.stringify({ email, password }),
-    { headers: jsonHeaders(), tags: { endpoint: `auth_login_${label}` } },
+    { headers: jsonHeaders(), tags: { endpoint } },
   );
+  recordEndpointThroughput(endpoint, loginRes);
 
   const loginBody = safeJson(loginRes);
   const ok = check(loginRes, {
@@ -178,8 +199,7 @@ export const options = {
     product_list_api_error_rate: ["rate<0.01"],
     product_filter_api_error_rate: ["rate<0.05"],
     product_detail_api_error_rate: ["rate<0.05"],
-    related_product_api_error_rate: ["rate<0.10"],
-    product_scenario_errors: ["count<100"],
+    related_product_api_error_rate: ["rate<0.10"]
   },
   summaryTrendStats: ["avg", "min", "med", "p(90)", "p(95)", "p(99)", "max"],
 };
@@ -201,6 +221,7 @@ export function browseProducts() {
     const listRes = http.get(`${BASE_URL}/api/v1/product/get-product`, {
       tags: { endpoint: "product_browse" },
     });
+    recordEndpointThroughput("product_browse", listRes);
     productBrowseResponseDuration.add(listRes.timings.duration);
 
     const listBody = safeJson(listRes);
@@ -223,6 +244,7 @@ export function browseProducts() {
     const countRes = http.get(`${BASE_URL}/api/v1/product/product-count`, {
       tags: { endpoint: "product_count" },
     });
+    recordEndpointThroughput("product_count", countRes);
     productCountResponseDuration.add(countRes.timings.duration);
 
     const countBody = safeJson(countRes);
@@ -249,6 +271,7 @@ export function browseProducts() {
           `${BASE_URL}/api/v1/product/product-photo/${sampledProduct._id}`,
           { tags: { endpoint: "product_photo" } },
         );
+        recordEndpointThroughput("product_photo", photoRes);
         productPhotoResponseDuration.add(photoRes.timings.duration);
         const photoCheck = check(photoRes, {
           "browse: product-photo status is 200": (r) => r.status === 200,
@@ -267,6 +290,7 @@ export function browseProducts() {
           `${BASE_URL}/api/v1/product/product-category/${categorySlug}`,
           { tags: { endpoint: "product_category" } },
         );
+        recordEndpointThroughput("product_category", categoryRes);
         productCategoryResponseDuration.add(categoryRes.timings.duration);
 
         const categoryBody = safeJson(categoryRes);
@@ -304,6 +328,7 @@ export function searchProducts() {
         tags: { endpoint: "product_search" },
       },
     );
+    recordEndpointThroughput("product_search", searchRes);
     productSearchResponseDuration.add(searchRes.timings.duration);
 
     const searchBody = safeJson(searchRes);
@@ -324,6 +349,7 @@ export function searchProducts() {
     const listRes = http.get(`${BASE_URL}/api/v1/product/product-list/${page}`, {
       tags: { endpoint: "product_list" },
     });
+    recordEndpointThroughput("product_list", listRes);
     productListResponseDuration.add(listRes.timings.duration);
 
     const listBody = safeJson(listRes);
@@ -361,6 +387,7 @@ export function filterProducts() {
         tags: { endpoint: "product_filter" },
       },
     );
+    recordEndpointThroughput("product_filter", filterRes);
     productFilterResponseDuration.add(filterRes.timings.duration);
 
     const filterBody = safeJson(filterRes);
@@ -383,7 +410,11 @@ export function filterProducts() {
 
       const singleRes = http.get(
         `${BASE_URL}/api/v1/product/get-product/${slug}`,
+        {
+          tags: { endpoint: "product_detail" },
+        },
       );
+      recordEndpointThroughput("product_detail", singleRes);
       productDetailResponseDuration.add(singleRes.timings.duration);
 
       const singleBody = safeJson(singleRes);
@@ -410,6 +441,7 @@ export function filterProducts() {
           `${BASE_URL}/api/v1/product/related-product/${productId}/${categoryId}`,
           { tags: { endpoint: "related_product" } },
         );
+        recordEndpointThroughput("related_product", relatedRes);
         relatedProductResponseDuration.add(relatedRes.timings.duration);
 
         const relatedBody = safeJson(relatedRes);

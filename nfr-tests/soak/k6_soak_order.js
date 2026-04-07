@@ -1,6 +1,6 @@
 import http from "k6/http";
 import { check, sleep } from "k6";
-import { Rate, Trend } from "k6/metrics";
+import { Counter, Rate, Trend } from "k6/metrics";
 
 // Sebastian Tay, A0252864X
 //TODO verify the VU scenarios flow before commencing long soak test - just want to check the calling of API endpoints, no need simulate user interaction flows
@@ -21,15 +21,34 @@ const USER_PASSWORD = "cs4218@test.com";
 const ADMIN_EMAIL = "test@admin.com";
 const ADMIN_PASSWORD = "test@admin.com";
 
-//Monitored metrics - Throughput, Response Time, HTTP Error Rate
-//TODO might need to refine the metrics collection for response time, throughput
-//Throughput = total successful requests / total duration in seconds
+//Response Duration metrics
 const userOrdersResponseDuration = new Trend("user_orders_response_duration", true);
 const allOrdersResponseDuration = new Trend("all_orders_response_duration", true);
 const orderStatusUpdateResponseDuration = new Trend("order_status_update_response_duration", true);
+
+// Throughput counters for endpoint-level requests over time.
+const endpointRequestsTotalThroughput = new Counter(
+  "endpoint_requests_total_throughput",
+);
+const endpointSuccessfulRequestsTotalThroughput = new Counter(
+  "endpoint_successful_requests_total_throughput",
+);
+
+//Error rate metrics
 const userOrdersApiErrorRate = new Rate("user_orders_api_error_rate");
 const allOrdersApiErrorRate = new Rate("all_orders_api_error_rate");
 const orderStatusUpdateApiErrorRate = new Rate("order_status_update_api_error_rate");
+
+function recordEndpointThroughput(endpoint, res) {
+  endpointRequestsTotalThroughput.add(1, {
+    endpoint,
+    status: String(res.status),
+  });
+
+  if (res.status >= 200 && res.status < 400) {
+    endpointSuccessfulRequestsTotalThroughput.add(1, { endpoint });
+  }
+}
 
 function safeJson(res) {
   try {
@@ -50,11 +69,13 @@ function jsonHeaders(token = "") {
 }
 
 function loginAndGetToken(email, password, label) {
+  const endpoint = `auth_login_${label}`;
   const loginRes = http.post(
     `${BASE_URL}/api/v1/auth/login`,
     JSON.stringify({ email, password }),
-    { headers: jsonHeaders(), tags: { endpoint: `auth_login_${label}` } },
+    { headers: jsonHeaders(), tags: { endpoint } },
   );
+  recordEndpointThroughput(endpoint, loginRes);
 
   const loginBody = safeJson(loginRes);
   const ok = check(loginRes, {
@@ -139,6 +160,7 @@ export function getUserOrders(data) {
       headers: jsonHeaders(userToken),
       tags: { endpoint: "user_orders" },
     });
+    recordEndpointThroughput("user_orders", ordersRes);
     userOrdersResponseDuration.add(ordersRes.timings.duration);
 
     const ordersBody = safeJson(ordersRes);
@@ -178,6 +200,7 @@ export function adminOrderOperations(data) {
       headers: jsonHeaders(adminToken),
       tags: { endpoint: "all_orders" },
     });
+    recordEndpointThroughput("all_orders", allOrdersRes);
     allOrdersResponseDuration.add(allOrdersRes.timings.duration);
 
     const allOrdersBody = safeJson(allOrdersRes);
@@ -214,6 +237,7 @@ export function adminOrderOperations(data) {
           tags: { endpoint: "order_status" },
         },
       );
+      recordEndpointThroughput("order_status", statusRes);
       orderStatusUpdateResponseDuration.add(statusRes.timings.duration);
 
       const statusBody = safeJson(statusRes);
