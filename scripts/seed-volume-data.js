@@ -39,7 +39,7 @@ const config = {
   users: parseIntEnv("VOLUME_SEED_USERS", 5000),
   admins: parseIntEnv("VOLUME_SEED_ADMINS", 5),
   products: parseIntEnv("VOLUME_SEED_PRODUCTS", 10000),
-  orders: parseIntEnv("VOLUME_SEED_ORDERS", 5000),
+  orders: parseIntEnv("VOLUME_SEED_ORDERS", 10000),
   maxDistinctProductsPerOrder: parseIntEnv("VOLUME_MAX_DISTINCT_PRODUCTS", 20),
   maxQuantityPerProduct: parseIntEnv("VOLUME_MAX_PRODUCT_QTY", 10),
   reset: parseBoolEnv("VOLUME_SEED_RESET", true),

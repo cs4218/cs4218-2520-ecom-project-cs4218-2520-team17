@@ -24,7 +24,7 @@ const config = {
   expectedCategories: parseIntEnv("VOLUME_SEED_CATEGORIES", 100),
   expectedUsers: parseIntEnv("VOLUME_SEED_USERS", 5000),
   expectedProducts: parseIntEnv("VOLUME_SEED_PRODUCTS", 10000),
-  expectedOrders: parseIntEnv("VOLUME_SEED_ORDERS", 5000),
+  expectedOrders: parseIntEnv("VOLUME_SEED_ORDERS", 10000),
 };
 
 async function main() {
