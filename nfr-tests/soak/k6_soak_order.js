@@ -3,7 +3,6 @@ import { check, sleep } from "k6";
 import { Counter, Rate, Trend } from "k6/metrics";
 
 // Sebastian Tay, A0252864X
-//TODO verify the VU scenarios flow before commencing long soak test - just want to check the calling of API endpoints, no need simulate user interaction flows
 
 const BASE_URL = "http://localhost:6060";
 const TARGET_VUS = 100;
