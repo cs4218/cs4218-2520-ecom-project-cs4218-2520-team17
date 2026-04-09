@@ -9,6 +9,7 @@ import productRoutes from './routes/productRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -60,3 +61,28 @@ const serverTimeoutMs = Number(process.env.SERVER_TIMEOUT_MS);
 if (Number.isFinite(serverTimeoutMs) && serverTimeoutMs > 0) {
     server.timeout = serverTimeoutMs;
 }
+
+
+// Memory usage logging for soak testing
+// const memoryLogFile = path.join(__dirname, "logs", "memory-usage.log");
+// fs.mkdirSync(path.dirname(memoryLogFile), { recursive: true });
+
+// Log memory usage every 5 seconds for soak test - To uncomment when required
+// setInterval(() => {
+//   const { heapUsed, heapTotal, rss } = process.memoryUsage();
+//   const localTimestamp = new Date().toLocaleString("sv-SE", {
+//     timeZoneName: "short",
+//   });
+
+//   const line =
+//     `[${localTimestamp}] ` +
+//     `heapUsed=${(heapUsed / 1024 / 1024).toFixed(2)}MB ` +
+//     `heapTotal=${(heapTotal / 1024 / 1024).toFixed(2)}MB ` +
+//     `rss=${(rss / 1024 / 1024).toFixed(2)}MB\n`;
+
+//   fs.appendFile(memoryLogFile, line, (error) => {
+//     if (error) {
+//       console.error("Failed to write memory usage log", error);
+//     }
+//   });
+// }, 5000);
