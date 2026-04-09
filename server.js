@@ -64,8 +64,8 @@ if (Number.isFinite(serverTimeoutMs) && serverTimeoutMs > 0) {
 
 
 // Memory usage logging for soak testing
-const memoryLogFile = path.join(__dirname, "logs", "memory-usage.log");
-fs.mkdirSync(path.dirname(memoryLogFile), { recursive: true });
+// const memoryLogFile = path.join(__dirname, "logs", "memory-usage.log");
+// fs.mkdirSync(path.dirname(memoryLogFile), { recursive: true });
 
 // Log memory usage every 5 seconds for soak test - To uncomment when required
 // setInterval(() => {
