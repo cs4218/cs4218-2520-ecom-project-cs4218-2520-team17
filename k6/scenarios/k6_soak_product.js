@@ -16,6 +16,8 @@ const USER_PASSWORD = "cs4218@test.com";
 const ADMIN_EMAIL = "test@admin.com";
 const ADMIN_PASSWORD = "test@admin.com";
 const CRUD_SOAK_MARKER = "[SOAK-CRUD]";
+const BOOK_CATEGORY_SLUG = "book";
+const DEFAULT_BOOK_CATEGORY_ID = "66db427fdb0119d9234b27ef";
 
 const SEARCH_KEYWORDS = "phone,laptop,shoe,bag,watch,headphone,camera,tablet"
   .split(",")
@@ -90,6 +92,30 @@ function loginAndGetToken(email, password, label) {
   }
 
   return loginBody.token;
+}
+
+function getBookCategoryId() {
+  const categoriesRes = http.get(`${BASE_URL}/api/v1/category/get-category`, {
+    tags: {
+      endpoint: "category_list",
+      name: "GET /api/v1/category/get-category",
+    },
+  });
+
+  const categoriesBody = safeJson(categoriesRes);
+  const categories = Array.isArray(categoriesBody?.category)
+    ? categoriesBody.category
+    : [];
+
+  const bookCategory = categories.find(
+    (c) => c?.slug === BOOK_CATEGORY_SLUG || String(c?.name || "").toLowerCase() === "book",
+  );
+
+  if (bookCategory?._id) {
+    return bookCategory._id;
+  }
+
+  return DEFAULT_BOOK_CATEGORY_ID;
 }
 
 function randomItem(arr) {
@@ -261,10 +287,12 @@ export const options = {
 export function setup() {
   const userToken = loginAndGetToken(USER_EMAIL, USER_PASSWORD, "user");
   const adminToken = loginAndGetToken(ADMIN_EMAIL, ADMIN_PASSWORD, "admin");
+  const bookCategoryId = getBookCategoryId();
 
   return {
     userToken,
     adminToken,
+    bookCategoryId,
   };
 }
 
@@ -324,7 +352,12 @@ export function browseProducts() {
       if (sampledProduct?._id) {
         const photoRes = http.get(
           `${BASE_URL}/api/v1/product/product-photo/${sampledProduct._id}`,
-          { tags: { endpoint: "product_photo" } },
+          {
+            tags: {
+              endpoint: "product_photo",
+              name: "GET /api/v1/product/product-photo/:id",
+            },
+          },
         );
         recordEndpointThroughput("product_photo", photoRes);
         productPhotoResponseDuration.add(photoRes.timings.duration);
@@ -343,7 +376,12 @@ export function browseProducts() {
       if (categorySlug) {
         const categoryRes = http.get(
           `${BASE_URL}/api/v1/product/product-category/${categorySlug}`,
-          { tags: { endpoint: "product_category" } },
+          {
+            tags: {
+              endpoint: "product_category",
+              name: "GET /api/v1/product/product-category/:slug",
+            },
+          },
         );
         recordEndpointThroughput("product_category", categoryRes);
         productCategoryResponseDuration.add(categoryRes.timings.duration);
@@ -380,7 +418,10 @@ export function searchProducts() {
     const searchRes = http.get(
       `${BASE_URL}/api/v1/product/search/${encodeURIComponent(keyword)}`,
       {
-        tags: { endpoint: "product_search" },
+        tags: {
+          endpoint: "product_search",
+          name: "GET /api/v1/product/search/:keyword",
+        },
       },
     );
     recordEndpointThroughput("product_search", searchRes);
@@ -402,7 +443,10 @@ export function searchProducts() {
     // Get paginated list
     const page = 1 + Math.floor(Math.random() * 5);
     const listRes = http.get(`${BASE_URL}/api/v1/product/product-list/${page}`, {
-      tags: { endpoint: "product_list" },
+      tags: {
+        endpoint: "product_list",
+        name: "GET /api/v1/product/product-list/:page",
+      },
     });
     recordEndpointThroughput("product_list", listRes);
     productListResponseDuration.add(listRes.timings.duration);
@@ -428,14 +472,14 @@ export function searchProducts() {
   sleep(THINK_TIME);
 }
 
-export function filterProducts() {
-  const BOOK_CATEGORY_ID = "66db427fdb0119d9234b27ef";
+export function filterProducts(data) {
+  const bookCategoryId = data?.bookCategoryId || DEFAULT_BOOK_CATEGORY_ID;
   try {
     // Filter products by price or category
     const filterRes = http.post(
       `${BASE_URL}/api/v1/product/product-filters`,
       JSON.stringify({
-        checked: [BOOK_CATEGORY_ID],
+        checked: [bookCategoryId],
         radio: [50, 60],
       }),
       {
@@ -468,7 +512,10 @@ export function filterProducts() {
       const singleRes = http.get(
         `${BASE_URL}/api/v1/product/get-product/${slug}`,
         {
-          tags: { endpoint: "product_detail" },
+          tags: {
+            endpoint: "product_detail",
+            name: "GET /api/v1/product/get-product/:slug",
+          },
         },
       );
       recordEndpointThroughput("product_detail", singleRes);
@@ -496,7 +543,12 @@ export function filterProducts() {
       if (productId && categoryId) {
         const relatedRes = http.get(
           `${BASE_URL}/api/v1/product/related-product/${productId}/${categoryId}`,
-          { tags: { endpoint: "related_product" } },
+          {
+            tags: {
+              endpoint: "related_product",
+              name: "GET /api/v1/product/related-product/:productId/:categoryId",
+            },
+          },
         );
         recordEndpointThroughput("related_product", relatedRes);
         relatedProductResponseDuration.add(relatedRes.timings.duration);
@@ -525,6 +577,7 @@ export function filterProducts() {
 
 export function adminProductCrud(data) {
   const adminToken = data?.adminToken || "";
+  const bookCategoryId = data?.bookCategoryId || DEFAULT_BOOK_CATEGORY_ID;
 
   if (!adminToken) {
     sleep(THINK_TIME);
@@ -533,7 +586,7 @@ export function adminProductCrud(data) {
 
   try {
     const suffix = `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
-    const createPayload = buildProductPayload("66db427fdb0119d9234b27ef", suffix); //Book category
+    const createPayload = buildProductPayload(bookCategoryId, suffix);
 
     const createRes = http.post(
       `${BASE_URL}/api/v1/product/create-product`,
@@ -571,7 +624,10 @@ export function adminProductCrud(data) {
       },
       {
         headers: authHeaders(adminToken),
-        tags: { endpoint: "product_update" },
+        tags: {
+          endpoint: "product_update",
+          name: "PUT /api/v1/product/update-product/:id",
+        },
       },
     );
     recordEndpointThroughput("product_update", updateRes);
@@ -595,7 +651,10 @@ export function adminProductCrud(data) {
       null,
       {
         headers: authHeaders(adminToken),
-        tags: { endpoint: "product_delete" },
+        tags: {
+          endpoint: "product_delete",
+          name: "DELETE /api/v1/product/delete-product/:id",
+        },
       },
     );
     recordEndpointThroughput("product_delete", deleteRes);
