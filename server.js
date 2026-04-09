@@ -67,21 +67,22 @@ if (Number.isFinite(serverTimeoutMs) && serverTimeoutMs > 0) {
 const memoryLogFile = path.join(__dirname, "logs", "memory-usage.log");
 fs.mkdirSync(path.dirname(memoryLogFile), { recursive: true });
 
-setInterval(() => {
-  const { heapUsed, heapTotal, rss } = process.memoryUsage();
-  const localTimestamp = new Date().toLocaleString("sv-SE", {
-    timeZoneName: "short",
-  });
+// Log memory usage every 5 seconds for soak test - To uncomment when required
+// setInterval(() => {
+//   const { heapUsed, heapTotal, rss } = process.memoryUsage();
+//   const localTimestamp = new Date().toLocaleString("sv-SE", {
+//     timeZoneName: "short",
+//   });
 
-  const line =
-    `[${localTimestamp}] ` +
-    `heapUsed=${(heapUsed / 1024 / 1024).toFixed(2)}MB ` +
-    `heapTotal=${(heapTotal / 1024 / 1024).toFixed(2)}MB ` +
-    `rss=${(rss / 1024 / 1024).toFixed(2)}MB\n`;
+//   const line =
+//     `[${localTimestamp}] ` +
+//     `heapUsed=${(heapUsed / 1024 / 1024).toFixed(2)}MB ` +
+//     `heapTotal=${(heapTotal / 1024 / 1024).toFixed(2)}MB ` +
+//     `rss=${(rss / 1024 / 1024).toFixed(2)}MB\n`;
 
-  fs.appendFile(memoryLogFile, line, (error) => {
-    if (error) {
-      console.error("Failed to write memory usage log", error);
-    }
-  });
-}, 5000);
+//   fs.appendFile(memoryLogFile, line, (error) => {
+//     if (error) {
+//       console.error("Failed to write memory usage log", error);
+//     }
+//   });
+// }, 5000);
