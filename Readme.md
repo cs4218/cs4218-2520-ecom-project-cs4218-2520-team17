@@ -225,6 +225,25 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
 **UI Tests**
 1. `ui-tests/auth.spec.ts`: UI tests for registration, login and updating user profile.
 
+
+### Milestone 3
+
+#### Li Jiakai
+
+
+
+#### Rayyan Ismail
+
+#### Sebastian Tay Yong Xun
+1. Soak Testing
+- orderController
+- productController
+
+
+#### Tan Shi Yu
+
+#### Tan Zhi Heng
+
 ---
 
 ## 1. Project Introduction
