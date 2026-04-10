@@ -1,3 +1,5 @@
+// Tan Zhi Heng, A0252037M
+
 import { MongoClient } from "mongodb";
 
 function escapeRegExp(text) {

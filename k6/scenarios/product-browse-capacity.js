@@ -1,3 +1,5 @@
+// Tan Zhi Heng, A0252037M
+
 import http from "k6/http";
 import { check } from "k6";
 

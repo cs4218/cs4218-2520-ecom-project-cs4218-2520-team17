@@ -235,14 +235,19 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
 #### Rayyan Ismail
 
 #### Sebastian Tay Yong Xun
-1. Soak Testing
-- orderController
-- productController
+**Soak Testing**
+1. orderController
+2. productController
 
 
 #### Tan Shi Yu
 
 #### Tan Zhi Heng
+**Capacity Testing**
+1. User registration
+2. User login
+3. Product browsing
+4. Product filtering
 
 ---
 
