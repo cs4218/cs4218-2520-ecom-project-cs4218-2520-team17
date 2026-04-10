@@ -27,6 +27,10 @@
     "k6:product:filter:capacity": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=k6/reports/capacity-test/product-filter-report.html k6 run k6/scenarios/product-filter-capacity.js",
     "k6:register:cleanup": "node k6/utils/cleanup-k6-users.mjs",
 
+    "k6:load:seed": "node ./scripts/seed-load-data.js",
+    "k6:load:run": "k6 run k6/scenarios/load-test.js",
+    "k6:load:test": "npm run k6:load:seed && timeout /t 5 /nobreak > nul && npm run k6:load:run",
+
     "volume:mongo:up": "docker compose -f docker-compose.volume.yml up -d",
     "volume:mongo:down": "docker compose -f docker-compose.volume.yml down",
     "volume:seed": "node ./scripts/seed-volume-data.js",
