@@ -244,6 +244,12 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
 
 
 #### Tan Shi Yu
+**Spike Testing**
+1. User login
+2. Product Browsing
+3. Product Searching
+4. Product Detail
+5. Product Filter
 
 #### Tan Zhi Heng
 **Capacity Testing**
