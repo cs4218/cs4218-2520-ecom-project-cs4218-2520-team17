@@ -233,6 +233,9 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
 
 
 #### Rayyan Ismail
+**Load Testing**
+1. Homepage browse and product detail flow
+2. Search, filter, and category browse flow
 
 #### Sebastian Tay Yong Xun
 **Soak Testing**
