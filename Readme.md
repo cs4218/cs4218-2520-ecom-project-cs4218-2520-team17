@@ -230,6 +230,22 @@ Note: getOrdersController, getAllOrdersController, orderStatusController have be
 
 #### Li Jiakai
 
+**Volume Testing**
+
+Data Volume:
+
+- 5000 users
+- 100 categories
+- 10000 products
+- 10000 orders
+
+Endpoints Tested:
+
+- User Registration, Login, Session status
+- Product Browsing and Search
+- Order Creation
+- Admin View, Create and Update Products and Categories
+- Admin View and Update Order status
 
 
 #### Rayyan Ismail
