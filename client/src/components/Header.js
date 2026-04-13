@@ -73,20 +73,7 @@ const Header = () => {
                 </ul>
               </li>
 
-              {!auth?.user ? (
-                <>
-                  <li className="nav-item">
-                    <NavLink to="/register" className="nav-link">
-                      Register
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink to="/login" className="nav-link">
-                      Login
-                    </NavLink>
-                  </li>
-                </>
-              ) : (
+              {auth?.user ? (
                 <>
                   <li className="nav-item dropdown">
                     <NavLink
@@ -119,6 +106,19 @@ const Header = () => {
                         </NavLink>
                       </li>
                     </ul>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li className="nav-item">
+                    <NavLink to="/register" className="nav-link">
+                      Register
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/login" className="nav-link">
+                      Login
+                    </NavLink>
                   </li>
                 </>
               )}
